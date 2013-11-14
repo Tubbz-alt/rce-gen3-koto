@@ -1,0 +1,134 @@
+
+NET led(0)         LOC = "AA19"  | IOSTANDARD="LVCMOS25"; 
+NET led(1)         LOC = "T15"   | IOSTANDARD="LVCMOS25";
+
+NET i2cScl         LOC = "AB13"  | IOSTANDARD="LVCMOS25"; 
+NET i2cSda         LOC = "AA10"  | IOSTANDARD="LVCMOS25";
+
+NET pciRefClkP     LOC = "U6"; 
+NET pciRefClkM     LOC = "U5";
+NET pcieRxP        LOC = "T4"; 
+NET pcieRxM        LOC = "T3"; 
+NET pcieTxP        LOC = "U2"; 
+NET pcieTxM        LOC = "U1"; 
+NET pcieResetL     LOC = "T14"   | IOSTANDARD = "LVCMOS25"; 
+
+NET ethRxP         LOC = "AA6"; 
+NET ethRxM         LOC = "AA5"; 
+NET ethTxP         LOC = "AB4"; 
+NET ethTxM         LOC = "AB3"; 
+
+#NET dtmToRtmHsP(0) LOC = "AA2";
+#NET dtmToRtmHsM(0) LOC = "AA1";
+#NET rtmToDtmHsP(0) LOC = "Y4";
+#NET rtmToDtmHsM(0) LOC = "Y3";
+#NET dtmToRtmHsP(1) LOC = "W2";
+#NET dtmToRtmHsM(1) LOC = "W1";
+#NET rtmToDtmHsP(1) LOC = "V4";
+#NET rtmToDtmHsM(1) LOC = "V3";
+#NET hsRefClkP      LOC = "W6";
+#NET hsRefClkM      LOC = "W5";
+
+NET dtmToRtmLsP(11) LOC = "AA14" | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(11) LOC = "AB14" | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(10) LOC = "AA17" | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(10) LOC = "AB17" | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(9)  LOC = "AA15" | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(9)  LOC = "AB15" | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(8)  LOC = "V15"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(8)  LOC = "W15"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(7)  LOC = "U9"   | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(7)  LOC = "U8"   | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(6)  LOC = "W9"   | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(6)  LOC = "Y8"   | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(5)  LOC = "V8"   | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(5)  LOC = "W8"   | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(4)  LOC = "U10"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(4)  LOC = "V10"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(3)  LOC = "T20"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(3)  LOC = "U20"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(2)  LOC = "R17"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(2)  LOC = "R18"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(1)  LOC = "R19"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(1)  LOC = "T19"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsP(0)  LOC = "T17"  | IOSTANDARD = "LVCMOS25";
+NET dtmToRtmLsM(0)  LOC = "U17"  | IOSTANDARD = "LVCMOS25";
+
+NET dpm3ToDtmP(3)   LOC = "U19"  | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmM(3)   LOC = "V20"  | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmP(2)   LOC = "Y17"  | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmM(2)   LOC = "Y18"  | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmP(1)   LOC = "V17"  | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmM(1)   LOC = "W18"  | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmP(0)   LOC = "AB18" | IOSTANDARD = "LVCMOS25";
+NET dpm3ToDtmM(0)   LOC = "AB19" | IOSTANDARD = "LVCMOS25";
+
+NET dpm2ToDtmP(3)   LOC = "N20"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmM(3)   LOC = "P20"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmP(2)   LOC = "N17"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmM(2)   LOC = "N18"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmP(1)   LOC = "P18"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmM(1)   LOC = "P19"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmP(0)   LOC = "U18"  | IOSTANDARD = "LVCMOS25";
+NET dpm2ToDtmM(0)   LOC = "V18"  | IOSTANDARD = "LVCMOS25";
+
+NET dpm1ToDtmP(3)   LOC = "V21"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmM(3)   LOC = "V22"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmP(2)   LOC = "W19"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmM(2)   LOC = "W20"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmP(1)   LOC = "N21"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmM(1)   LOC = "N22"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmP(0)   LOC = "R22"  | IOSTANDARD = "LVCMOS25";
+NET dpm1ToDtmM(0)   LOC = "T22"  | IOSTANDARD = "LVCMOS25";
+
+NET dpm0ToDtmP(3)   LOC = "AA22" | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmM(3)   LOC = "AB22" | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmP(2)   LOC = "Y21"  | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmM(2)   LOC = "AA21" | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmP(1)   LOC = "AA20" | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmM(1)   LOC = "AB20" | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmP(0)   LOC = "W21"  | IOSTANDARD = "LVCMOS25";
+NET dpm0ToDtmM(0)   LOC = "Y22"  | IOSTANDARD = "LVCMOS25";
+
+NET userClkP        LOC = "J5"   | IOSTANDARD = "LVCMOS18";
+NET userClkM        LOC = "J4"   | IOSTANDARD = "LVCMOS18";
+
+NET bpClkIn(5)      LOC = "AA12" | IOSTANDARD = "LVCMOS25";
+NET bpClkIn(4)      LOC = "Y16"  | IOSTANDARD = "LVCMOS25";
+NET bpClkIn(3)      LOC = "W11"  | IOSTANDARD = "LVCMOS25";
+NET bpClkIn(2)      LOC = "Y14"  | IOSTANDARD = "LVCMOS25";
+NET bpClkIn(1)      LOC = "Y12"  | IOSTANDARD = "LVCMOS25";
+NET bpClkIn(0)      LOC = "W14"  | IOSTANDARD = "LVCMOS25";
+
+#NET bpClkOut(5)     LOC = "T12" | IOSTANDARD = "LVCMOS25";
+#NET bpClkOut(4)     LOC = "V16" | IOSTANDARD = "LVCMOS25";
+#NET bpClkOut(3)     LOC = "U13" | IOSTANDARD = "LVCMOS25";
+#NET bpClkOut(2)     LOC = "U15" | IOSTANDARD = "LVCMOS25";
+#NET bpClkOut(1)     LOC = "V12" | IOSTANDARD = "LVCMOS25";
+#NET bpClkOut(0)     LOC = "T11" | IOSTANDARD = "LVCMOS25";
+
+NET dtmToIpmiP(1)   LOC = "T10"  | IOSTANDARD = "LVCMOS25";
+NET dtmToIpmiM(1)   LOC = "T9"   | IOSTANDARD = "LVCMOS25";
+NET dtmToIpmiP(0)   LOC = "Y9"   | IOSTANDARD = "LVCMOS25";
+NET dtmToIpmiM(0)   LOC = "AA9"  | IOSTANDARD = "LVCMOS25";
+
+NET U_ArmRceG3Top/fclkClk0 TNM_NET = "fclkClk0";
+TIMESPEC TS_fclkClk0 = PERIOD fclkClk0 100 Mhz HIGH 50%;
+
+NET U_ArmRceG3Top/U_ArmRceG3Clocks/ponResetL TIG;
+
+##########################################
+# PCIE Core Constraints
+##########################################
+
+NET "pciRefClk" TNM_NET = "PCICLK" ;
+NET "U_ZynqPcieMaster/U_Pcie/gt_top_i/pipe_wrapper_i/pipe_clock_int.pipe_clock_i/clk_125mhz" TNM_NET = "CLK_125";
+
+TIMESPEC "TS_PCICLK"  = PERIOD "PCICLK" 100 MHz HIGH 50 %;
+TIMESPEC "TS_CLK_125"  = PERIOD "CLK_125" TS_PCICLK*1.25;
+
+##########################################
+# End PCIe Core Constraints
+##########################################
+
+

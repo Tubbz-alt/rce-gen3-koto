@@ -1,0 +1,9 @@
+run
+-ofn $PROJECT
+-top $PROJECT
+-p $PRJ_PART
+-sd $CORE_DIRS
+-ifn $SOURCE_FILE
+-opt_mode Speed
+-opt_level 1
+-netlist_hierarchy rebuilt
