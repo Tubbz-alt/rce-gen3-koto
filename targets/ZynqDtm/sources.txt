@@ -1,2 +1,3 @@
+vhdl work ../../modules/common/hdl/DtmCore.vhd
 vhdl work Version.vhd
 vhdl work hdl/ZynqDtm.vhd
