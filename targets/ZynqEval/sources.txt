@@ -1,2 +1,3 @@
+vhdl work ../../modules/common/hdl/EvalCore.vhd
 vhdl work Version.vhd
-vhdl work hdl/ZynqTestNew.vhd
+vhdl work hdl/ZynqEval.vhd

@@ -1,5 +1,5 @@
 The files in this directory are used to build
-the DPM project in this directory. The project
+the project in this directory. The project
 name matches the name of the directory in which
 this file is found.
 
@@ -15,6 +15,8 @@ The coredirs.txt file contains a list of coregen directories,
 one per line, to be included in the build. Typically this file 
 will contain a single entry "coregen".
 
+The constraints.txt file contains a list of ucf files.
+
 The sources.txt file contains a list of source files,
 one per line, to be included in the build. This file
 should contained "Version.vhd" and the top level module.
@@ -23,8 +25,7 @@ The following sub directories exist in this project:
 
 boot:
    This directory contains boot loader files which are
-   used to program the boot loader code in the DPM. The
-   files in this directory include: 
+   used to program the boot loader code. 
 
 config:
    This directory contains Xilinx configuration files for
