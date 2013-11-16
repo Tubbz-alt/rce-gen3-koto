@@ -7,126 +7,181 @@ use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 use work.ArmRceG3Pkg.all;
+use work.StdRtlPkg.all;
 
 entity ZynqDpm is
    port (
 
       -- Debug
-      led          : out   std_logic_vector(1 downto 0);
+      led          : out   slv(1 downto 0);
 
       -- I2C
-      i2cSda       : inout std_logic;
-      i2cScl       : inout std_logic;
+      i2cSda       : inout sl;
+      i2cScl       : inout sl;
 
       -- Ethernet
-      ethRxP      : in    std_logic;
-      ethRxM      : in    std_logic;
-      ethTxP      : out   std_logic;
-      ethTxM      : out   std_logic;
+      ethRxP       : in    slv(0 downto 0);
+      ethRxM       : in    slv(0 downto 0);
+      ethTxP       : out   slv(0 downto 0);
+      ethTxM       : out   slv(0 downto 0);
 
       -- RTM High Speed
-      --dpmToRtmHsP : out   std_logic_vector(11 downto 0);
-      --dpmToRtmHsM : out   std_logic_vector(11 downto 0);
-      --rtmToDpmHsP : in    std_logic_vector(11 downto 0);
-      --rtmToDpmHsM : in    std_logic_vector(11 downto 0);
-      --hsRefClkP   : in    std_logic_vector(3  downto 0);
-      --hsRefClkM   : in    std_logic_vector(3  downto 0);
+      --dpmToRtmHsP  : out   slv(11 downto 0);
+      --dpmToRtmHsM  : out   slv(11 downto 0);
+      --rtmToDpmHsP  : in    slv(11 downto 0);
+      --rtmToDpmHsM  : in    slv(11 downto 0);
 
-      -- RTM Low Speed
-      dpmToRtmLsP  : inout std_logic_vector(3  downto 0);
-      dpmToRtmLsM  : inout std_logic_vector(3  downto 0);
+      -- Reference Clocks
+      locRefClkP   : in    slv(1  downto 0);
+      locRefClkM   : in    slv(1  downto 0);
+      dtmRefClkP   : in    sl;
+      dtmRefClkM   : in    sl;
 
-      -- DPM Signals
-      dpmToDtmP    : inout std_logic_vector(1  downto 0);
-      dpmToDtmM    : inout std_logic_vector(1  downto 0);
+      -- DTM Signals
+      dtmClkP      : in    slv(1  downto 0);
+      dtmClkM      : in    slv(1  downto 0);
+      dtmFbP       : out   sl;
+      dtmFbM       : out   sl;
 
-      -- User clock
-      userClkP     : in    std_logic;
-      userClkM     : in    std_logic
+      -- Clock Select
+      clkSelA      : out   slv(1 downto 0);
+      clkSelB      : out   slv(1 downto 0);
 
+      -- Dedicated External Inputs
+      psSrstB      : in    sl;
+      psClk        : in    sl;
+      psPorB       : in    sl
    );
 end ZynqDpm;
 
 architecture STRUCTURE of ZynqDpm is
 
    -- Local Signals
-   signal localBusSlave      : LocalBusSlaveVector(15 downto 8);
-   signal ethFromArm         : EthFromArmVector(1 downto 0);
-   signal ethToArm           : EthToArmVector(1 downto 0);
-   signal axiClk             : std_logic;
-   signal axiClkRst          : std_logic;
-   signal sysClk125          : std_logic;
-   signal sysClk200          : std_logic;
-   signal sysClk200Rst       : std_logic;
+   signal obPpiClk       : slv(3 downto 0);
+   signal obPpiToFifo    : ObPpiToFifoVector(3 downto 0);
+   signal obPpiFromFifo  : ObPpiFromFifoVector(3 downto 0);
+   signal ibPpiClk       : slv(3 downto 0);
+   signal ibPpiToFifo    : IbPpiToFifoVector(3 downto 0);
+   signal ibPpiFromFifo  : IbPpiFromFifoVector(3 downto 0);
+   signal dtmFb          : sl;
+   signal dtmClk         : slv(1 downto 0);
+   signal locRefClk      : slv(1 downto 0);
+   signal dtmRefClk      : sl;
+   signal axiClk         : sl;
+   signal axiClkRst      : sl;
+   signal sysClk125      : sl;
+   signal sysClk125Rst   : sl;
+   signal sysClk200      : sl;
+   signal sysClk200Rst   : sl;
+   signal localBusMaster : LocalBusMasterVector(15 downto 8);
+   signal localBusSlave  : LocalBusSlaveVector(15 downto 8);
 
 begin
 
    --------------------------------------------------
    -- Core
    --------------------------------------------------
-   U_ArmRceG3Top: entity work.ArmRceG3Top
-      generic map (
-         DEBUG_EN_G   => false,
-         AXI_CLKDIV_G => 4.7
-      ) port map (
-         i2cSda             => i2cSda,
-         i2cScl             => i2cScl,
-         axiClk             => axiClk,
-         axiClkRst          => axiClkRst,
-         sysClk125          => sysClk125,
-         sysClk125Rst       => open,
-         sysClk200          => sysClk200,
-         sysClk200Rst       => sysClk200Rst,
-         localBusMaster     => open,
-         localBusSlave      => localBusSlave,
-         ethFromArm         => ethFromArm,
-         ethToArm           => ethToArm
-      );
-
-   localBusSlave <= (others=>LocalBusSlaveInit);
-   led <= "00";
-
-   --------------------------------------------------
-   -- Ethernet
-   --------------------------------------------------
-   U_ZynqEthernet : entity work.ZynqEthernet 
+   U_DpmCore: entity work.DpmCore 
       port map (
-         sysClk125                => sysClk125,
-         sysClk200                => sysClk200,
-         sysClk200Rst             => sysClk200Rst,
-         ethFromArm               => ethFromArm(0),
-         ethToArm                 => ethToArm(0),
+         i2cSda                   => i2cSda,
+         i2cScl                   => i2cScl,
          ethRxP                   => ethRxP,
          ethRxM                   => ethRxM,
          ethTxP                   => ethTxP,
-         ethTxM                   => ethTxM
+         ethTxM                   => ethTxM,
+         locRefClkP               => locRefClkP,
+         locRefClkM               => locRefClkM,
+         locRefClk                => locRefClk,
+         dtmRefClkP               => dtmRefClkP,
+         dtmRefClkM               => dtmRefClkM,
+         dtmRefClk                => dtmRefClk,
+         axiClk                   => axiClk,
+         axiClkRst                => axiClkRst,
+         sysClk125                => sysClk125,
+         sysClk125Rst             => sysClk125Rst,
+         sysClk200                => sysClk200,
+         sysClk200Rst             => sysClk200Rst,
+         dtmClkP                  => dtmClkP,
+         dtmClkM                  => dtmClkM,
+         dtmClk                   => dtmClk,
+         dtmFbP                   => dtmFbP,
+         dtmFbM                   => dtmFbM,
+         dtmFb                    => dtmFb,
+         localBusMaster           => localBusMaster,
+         localBusSlave            => localBusSlave,
+         obPpiClk                 => obPpiClk,
+         obPpiToFifo              => obPpiToFifo,
+         obPpiFromFifo            => obPpiFromFifo,
+         ibPpiClk                 => ibPpiClk,
+         ibPpiToFifo              => ibPpiToFifo,
+         ibPpiFromFifo            => ibPpiFromFifo,
+         clkSelA                  => clkSelA,
+         clkSelB                  => clkSelB,
+         psSrstB                  => psSrstB,
+         psClk                    => psClk,
+         psPorB                   => psPorB
       );
 
-   ethToArm(1) <= EthToArmInit;
+   --------------------------------------------------
+   -- PPI Loopback
+   --------------------------------------------------
+   U_LoopGen : for i in 0 to 3 generate
+
+      ibPpiClk(i) <= axiClk;
+      obPpiClk(i) <= axiClk;
+
+      ibPpiToFifo(i).data    <= obPpiFromFifo(i).data;
+      ibPpiToFifo(i).size    <= obPpiFromFifo(i).size;
+      ibPpiToFifo(i).ftype   <= obPpiFromFifo(i).ftype;
+      ibPpiToFifo(i).mgmt    <= obPpiFromFifo(i).mgmt;
+      ibPpiToFifo(i).eoh     <= obPpiFromFifo(i).eoh;
+      ibPpiToFifo(i).eof     <= obPpiFromFifo(i).eof;
+      ibPpiToFifo(i).err     <= '0';
+      ibPpiToFifo(i).id      <= (others=>'0');
+      ibPpiToFifo(i).version <= (others=>'0');
+      ibPpiToFifo(i).configA <= (others=>'0');
+      ibPpiToFifo(i).configB <= (others=>'0');
+
+      ibPpiToFifo(i).valid   <= obPpiFromFifo(i).valid;
+
+      obPpiToFifo(i).read    <= obPpiFromFifo(i).valid;
+      obPpiToFifo(i).id      <= (others=>'0');
+      obPpiToFifo(i).version <= (others=>'0');
+      obPpiToFifo(i).configA <= (others=>'0');
+      obPpiToFifo(i).configB <= (others=>'0');
+
+   end generate;
 
    --------------------------------------------------
    -- Unused Signals
    --------------------------------------------------
 
+   led <= "11";
+
    -- RTM High Speed
-   --dpmToRtmHsP : out   std_logic_vector(11 downto 0);
-   --dpmToRtmHsM : out   std_logic_vector(11 downto 0);
-   --rtmToDtmHsP : in    std_logic_vector(11 downto 0);
-   --rtmToDtmHsM : in    std_logic_vector(11 downto 0);
-   --hsRefClkP   : in    std_logic_vector(3  downto 0);
-   --hsRefClkM   : in    std_logic_vector(3  downto 0);
+   --dpmToRtmHsP : out   slv(11 downto 0);
+   --dpmToRtmHsM : out   slv(11 downto 0);
+   --rtmToDpmHsP : in    slv(11 downto 0);
+   --rtmToDpmHsM : in    slv(11 downto 0);
 
-   -- RTM Low Speed
-   dpmToRtmLsP  <= (others=>'Z');
-   dpmToRtmLsM  <= (others=>'Z');
+   -- Reference Clocks
+   --locRefClk   : slv(1  downto 0);
+   --dtmRefClk   : sl;
 
-   -- DPM Signals
-   dpmToDtmP   <= (others=>'Z');
-   dpmToDtmM   <= (others=>'Z');
+   -- DTM Feedback
+   dtmFb <= dtmClk(0) or dtmClk(1);
 
-   -- User clock
-   --userClkP     : in    std_logic;
-   --userClkM     : in    std_logic;
+   -- Local bus
+   --localBusMaster : LocalBusMasterVector(15 downto 8);
+   localBusSlave  <= (others=>LocalBusSlaveInit);
+
+   -- Clocks
+   --signal axiClk         : sl;
+   --signal axiClkRst      : sl;
+   --signal sysClk125      : sl;
+   --signal sysClk125Rst   : sl;
+   --signal sysClk200      : sl;
+   --signal sysClk200Rst   : sl;
 
 end architecture STRUCTURE;
 

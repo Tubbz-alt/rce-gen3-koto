@@ -7,12 +7,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 use work.ArmRceG3Pkg.all;
+use work.StdRtlPkg.all;
 
 entity ZynqTestNew is
    port (
-      led        : out   std_logic_vector(1 downto 0);
-      i2cSda     : inout std_logic;
-      i2cScl     : inout std_logic
+      i2cSda     : inout sl;
+      i2cScl     : inout sl
    );
 end ZynqTestNew;
 
@@ -41,8 +41,6 @@ begin
          ethFromArm         => open,
          ethToArm           => (others=>EthToArmInit)
       );
-
-   led <= "00";
 
 end architecture STRUCTURE;
 

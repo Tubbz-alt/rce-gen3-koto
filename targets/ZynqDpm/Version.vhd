@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000009"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA00000A"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Tue Nov  5 22:52:30 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Fri Nov 15 15:36:56 PST 2013 by rherbst";
 
 end Version;
 
@@ -31,5 +31,6 @@ end Version;
 -- 10/23/2013 (0xDA000006): Fixes.
 -- 10/26/2013 (0xDA000007): New build structure
 -- 11/05/2013 (0xDA000009): Changed outbound free list FIFOs
+-- 11/05/2013 (0xDA00000A): Added common DPM block
 -------------------------------------------------------------------------------
 

@@ -1,15 +1,4 @@
 
-NET led(0)         LOC = "AA28"  | IOSTANDARD="LVCMOS25"; 
-NET led(1)         LOC = "AB26"  | IOSTANDARD="LVCMOS25";
-
-NET i2cScl         LOC = "AC29"  | IOSTANDARD="LVCMOS25"; 
-NET i2cSda         LOC = "AD30"  | IOSTANDARD="LVCMOS25";
-
-NET ethRxP         LOC = "AH10"; 
-NET ethRxM         LOC = "AH9"; 
-NET ethTxP         LOC = "AK10"; 
-NET ethTxM         LOC = "AK9"; 
-
 #NET dpmToRtmHsP(0)  LOC = "AH2";
 #NET dpmToRtmHsM(0)  LOC = "AH1";
 #NET rtmToDpmHsP(0)  LOC = "AH6";
@@ -58,35 +47,4 @@ NET ethTxM         LOC = "AK9";
 #NET dpmToRtmHsM(11) LOC = "N3";
 #NET rtmToDpmHsP(11) LOC = "P6";
 #NET rtmToDpmHsM(11) LOC = "P5";
-
-#NET hsRefClkP(0)   LOC = "AD10";
-#NET hsRefClkM(0)   LOC = "AD9";
-#NET hsRefClkP(1)   LOC = "AA8";
-#NET hsRefClkM(1)   LOC = "AA7";
-#NET hsRefClkP(2)   LOC = "N8";
-#NET hsRefClkM(2)   LOC = "N7";
-#NET hsRefClkP(3)   LOC = "U8";
-#NET hsRefClkM(3)   LOC = "U7";
-
-NET dpmToRtmLsP(3)  LOC = "AB27"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsM(3)  LOC = "AC27"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsP(2)  LOC = "AE27"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsM(2)  LOC = "AF27"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsP(1)  LOC = "AC28"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsM(1)  LOC = "AD28"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsP(0)  LOC = "AE28"  | IOSTANDARD = "LVCMOS25";
-NET dpmToRtmLsM(0)  LOC = "AF28"  | IOSTANDARD = "LVCMOS25";
-
-NET dpmToDtmP(1)    LOC = "AA18" | IOSTANDARD = "LVCMOS25";
-NET dpmToDtmM(1)    LOC = "AA19" | IOSTANDARD = "LVCMOS25";
-NET dpmToDtmP(0)    LOC = "AD18" | IOSTANDARD = "LVCMOS25";
-NET dpmToDtmM(0)    LOC = "AD19" | IOSTANDARD = "LVCMOS25";
-
-NET userClkP        LOC = "D9"   | IOSTANDARD = "LVCMOS18";
-NET userClkM        LOC = "D8"   | IOSTANDARD = "LVCMOS18";
-
-NET U_ArmRceG3Top/fclkClk0 TNM_NET = "fclkClk0";
-TIMESPEC TS_fclkClk0 = PERIOD fclkClk0 100 Mhz HIGH 50%;
-
-NET U_ArmRceG3Top/U_ArmRceG3Clocks/ponResetL TIG;
 
