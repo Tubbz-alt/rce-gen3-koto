@@ -18,7 +18,7 @@ package Version is
 
 constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000016"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Fri Nov 15 16:45:31 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Fri Nov 15 16:56:58 PST 2013 by rherbst";
 
 end Version;
 

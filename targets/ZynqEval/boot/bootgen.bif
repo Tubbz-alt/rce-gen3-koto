@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+   [bootloader]_PROJ_DIR_/boot/zynq_fsbl.elf
+   _PROJECT_.bit
+   _PROJ_DIR_/boot/u-boot.elf
+}

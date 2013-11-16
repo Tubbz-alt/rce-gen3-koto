@@ -70,8 +70,8 @@ entity ZynqDtm is
       dtmToRtmLsM  : inout slv(5 downto 0);
 
       -- DPM Signals
-      dpmClkP      : out   slv(3  downto 0);
-      dpmClkM      : out   slv(3  downto 0);
+      dpmClkP      : out   slv(2  downto 0);
+      dpmClkM      : out   slv(2  downto 0);
       dpmFbP       : in    slv(7  downto 0);
       dpmFbM       : in    slv(7  downto 0);
 
@@ -114,7 +114,7 @@ architecture STRUCTURE of ZynqDtm is
    signal localBusSlave  : LocalBusSlaveVector(14 downto 8);
    signal locRefClk      : sl;
    signal dpmFb          : slv(7 downto 0);
-   signal dpmClk         : slv(3 downto 0);
+   signal dpmClk         : slv(2 downto 0);
    signal plSpareDis     : slv(4 downto 0);
    signal plSpareIn      : slv(4 downto 0);
    signal plSpareOut     : slv(4 downto 0);
