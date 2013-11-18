@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100010D"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000200"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Fri Nov 15 17:25:03 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Mon Nov 18 12:52:49 PST 2013 by rherbst";
 
 end Version;
 
@@ -47,5 +47,6 @@ end Version;
 -- 10/29/2013 (0xF100010B): Quad word FIFO bug
 -- 11/03/2013 (0xF100010C): Moved free list FIFOs
 -- 11/15/2013 (0xF100010D): New Core Structure
+-- 11/18/2013 (0xF1000200): Vivado Build
 -------------------------------------------------------------------------------
 

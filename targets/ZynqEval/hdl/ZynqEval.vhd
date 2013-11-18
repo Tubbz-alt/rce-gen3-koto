@@ -12,10 +12,7 @@ use work.StdRtlPkg.all;
 entity ZynqEval is
    port (
       i2cSda     : inout sl;
-      i2cScl     : inout sl;
-      psSrstB    : in     sl;
-      psClk      : in     sl;
-      psPorB     : in     sl
+      i2cScl     : inout sl
    );
 end ZynqEval;
 
@@ -57,10 +54,7 @@ begin
          obPpiFromFifo  => obPpiFromFifo,
          ibPpiClk       => ibPpiClk,
          ibPpiToFifo    => ibPpiToFifo,
-         ibPpiFromFifo  => ibPpiFromFifo,
-         psSrstB        => psSrstB,
-         psClk          => psClk,
-         psPorB         => psPorB
+         ibPpiFromFifo  => ibPpiFromFifo
       );
 
    localBusSlave <= (others=>LocalBusSlaveInit);

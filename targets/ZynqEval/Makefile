@@ -1,6 +1,6 @@
 
 # Define target output
-target: bit bitbin trce
+target: bit bitbin 
 
 # Define target part
 export PRJ_PART = XC7Z020CLG484-1
@@ -20,4 +20,5 @@ export SMART_MAX_RUNS = 10
 #CHIPSCOPE_INSERTER_EN = 1
 
 # Use top level makefile
-include ../../system_ise.mk
+#include ../../system_ise.mk
+include ../../system_vivado.mk
