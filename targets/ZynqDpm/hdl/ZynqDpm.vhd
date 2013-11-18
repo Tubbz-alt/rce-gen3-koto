@@ -45,12 +45,7 @@ entity ZynqDpm is
 
       -- Clock Select
       clkSelA      : out   slv(1 downto 0);
-      clkSelB      : out   slv(1 downto 0);
-
-      -- Dedicated External Inputs
-      psSrstB      : in    sl;
-      psClk        : in    sl;
-      psPorB       : in    sl
+      clkSelB      : out   slv(1 downto 0)
    );
 end ZynqDpm;
 
@@ -116,10 +111,7 @@ begin
          ibPpiToFifo              => ibPpiToFifo,
          ibPpiFromFifo            => ibPpiFromFifo,
          clkSelA                  => clkSelA,
-         clkSelB                  => clkSelB,
-         psSrstB                  => psSrstB,
-         psClk                    => psClk,
-         psPorB                   => psPorB
+         clkSelB                  => clkSelB
       );
 
    --------------------------------------------------

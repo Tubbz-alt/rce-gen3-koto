@@ -1,2 +1,4 @@
 ../../modules/common/hdl/DpmCore.ucf
+../../modules/common/hdl/DpmCore.xdc
 hdl/ZynqDpm.ucf
+hdl/ZynqDpm.xdc
