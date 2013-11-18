@@ -1,6 +1,6 @@
 
 # Define target output
-target: bit bitbin trce
+target: bit bitbin
 
 # Define target part
 export PRJ_PART = XC7Z030FBG484-1
@@ -19,4 +19,5 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
 export SMART_MAX_RUNS = 10
 
 # Use top level makefile
-include ../../system_ise.mk
+#include ../../system_ise.mk
+include ../../system_vivado.mk

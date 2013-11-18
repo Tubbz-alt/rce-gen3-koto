@@ -85,12 +85,7 @@ entity ZynqDtm is
 
       -- Spare Signals
       plSpareP     : inout slv(4 downto 0);
-      plSpareM     : inout slv(4 downto 0);
-
-      -- External Inputs
-      psSrstB      : in     sl;
-      psClk        : in     sl;
-      psPorB       : in     sl
+      plSpareM     : inout slv(4 downto 0)
 
    );
 end ZynqDtm;
@@ -185,10 +180,7 @@ begin
          obPpiFromFifo   => obPpiFromFifo,
          ibPpiClk        => ibPpiClk,
          ibPpiToFifo     => ibPpiToFifo,
-         ibPpiFromFifo   => ibPpiFromFifo,
-         psSrstB         => psSrstB,
-         psClk           => psClk,
-         psPorB          => psPorB
+         ibPpiFromFifo   => ibPpiFromFifo
       );
 
    --------------------------------------------------
