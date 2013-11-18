@@ -20,4 +20,4 @@ export SMART_MAX_RUNS = 10
 #CHIPSCOPE_INSERTER_EN = 1
 
 # Use top level makefile
-include ../../system.mk
+include ../../system_ise.mk
