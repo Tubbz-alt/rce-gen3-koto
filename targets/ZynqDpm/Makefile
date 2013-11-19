@@ -1,6 +1,6 @@
 
 # Define target output
-target: bit bitbin trce
+target: bit bitbin
 
 # Define target part
 export PRJ_PART = XC7Z045FFG900-1
