@@ -1,2 +1,0 @@
-../../modules/common/hdl/EvalCore.ucf
-hdl/ZynqEval.ucf
