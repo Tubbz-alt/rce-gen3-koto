@@ -4,6 +4,7 @@ set SOURCE_FILE $::env(SOURCE_FILE)
 set XDC_FILES   $::env(XDC_FILES)
 set PRJ_PART    $::env(PRJ_PART)
 set PROJECT     $::env(PROJECT)
+set PROJ_DIR    $::env(PROJ_DIR)
 
 ## Run source file commands
 source $SOURCE_FILE
@@ -14,6 +15,9 @@ read_xdc $XDC_FILES
 ## Synthesize
 synth_design -top $PROJECT -part $PRJ_PART
 write_checkpoint -force ${PROJECT}_post_synth_.dcp
+
+## Debug
+#source ${PROJ_DIR}/vivado/debug_test.tcl
 
 ## Optimize
 opt_design
