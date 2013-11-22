@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000200"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000201"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Wed Nov 20 15:18:57 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Thu Nov 21 17:45:05 PST 2013 by rherbst";
 
 end Version;
 
@@ -48,5 +48,6 @@ end Version;
 -- 11/03/2013 (0xF100010C): Moved free list FIFOs
 -- 11/15/2013 (0xF100010D): New Core Structure
 -- 11/18/2013 (0xF1000200): Vivado Build
+-- 11/18/2013 (0xF1000201): Remove PPI Data
 -------------------------------------------------------------------------------
 

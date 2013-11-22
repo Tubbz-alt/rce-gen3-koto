@@ -137,10 +137,6 @@ begin
       ibPpiToFifo(i).valid   <= obPpiFromFifo(i).valid;
 
       obPpiToFifo(i).read    <= obPpiFromFifo(i).valid;
-      obPpiToFifo(i).id      <= (others=>'0');
-      obPpiToFifo(i).version <= (others=>'0');
-      obPpiToFifo(i).configA <= (others=>'0');
-      obPpiToFifo(i).configB <= (others=>'0');
 
    end generate;
 
