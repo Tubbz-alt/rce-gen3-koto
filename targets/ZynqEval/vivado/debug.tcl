@@ -8,15 +8,21 @@ set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 
 # Configure Clock
 set_property port_width 1 [get_debug_ports ${ilaName}/clk]
-connect_debug_port ${ilaName}/clk [get_nets U_EvalCore/axiClk]
+connect_debug_port ${ilaName}/clk \
+   [get_nets U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl/axiClk]
 
 # First probe exists by default
-#set_property port_width 1 [get_debug_ports ${ilaName}/probe0]
-#connect_debug_port ${ilaName}/probe0 [get_nets U_EvalCore/sysClk125]
+set_property port_width 1 [get_debug_ports ${ilaName}/probe0]
+connect_debug_port ${ilaName}/probe0 \
+   [get_nets U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl/axiClkRst]
 
-# Debug ACP
-set topPath U_EvalCore
-source ${TOP_DIR}/modules/ArmRceG3/debug/debug_acp.tcl
+# Debug ACP Write Controller
+set modulePath U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl
+source ${TOP_DIR}/modules/ArmRceG3/debug/debug_read_cntrl.tcl
+
+# Debug ACP Write Controller
+set modulePath U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_IbCntrl/U_WriteCntrl
+source ${TOP_DIR}/modules/ArmRceG3/debug/debug_write_cntrl.tcl
 
 # Build the core
 implement_debug_core [get_debug_cores]
