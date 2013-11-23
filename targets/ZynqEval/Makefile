@@ -20,5 +20,5 @@ export SMART_MAX_RUNS = 10
 #CHIPSCOPE_INSERTER_EN = 1
 
 # Use top level makefile
-#include ../../system_ise.mk
+#include ../../modules/StdLib/build/system_ise_v1.mk
 include ../../modules/StdLib/build/system_vivado_v1.mk

@@ -1,7 +1,14 @@
 
+# Get environment
+set TOP_DIR  $::env(TOP_DIR)
+set PROJ_DIR $::env(PROJ_DIR)
+
+# Open the run
+open_run synth_1
+
 # Create core
 set ilaName u_ila_0
-create_debug_core u_ila_0 labtools_ila_v3
+create_debug_core ${ilaName} labtools_ila_v3
 
 # Configure Core
 set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
@@ -19,13 +26,6 @@ connect_debug_port ${ilaName}/probe0 \
 # Debug ACP Write Controller
 set modulePath U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl
 source ${TOP_DIR}/modules/ArmRceG3/debug/debug_read_cntrl.tcl
-
-# Debug ACP Write Controller
-set modulePath U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_IbCntrl/U_WriteCntrl
-source ${TOP_DIR}/modules/ArmRceG3/debug/debug_write_cntrl.tcl
-
-# Build the core
-implement_debug_core [get_debug_cores]
 
 # Write the port map file
 write_debug_probes -force ${PROJ_DIR}/debug/debug_probes.ltx
