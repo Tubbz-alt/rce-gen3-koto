@@ -113,6 +113,10 @@ architecture STRUCTURE of ZynqDtm is
    signal plSpareDis     : slv(4 downto 0);
    signal plSpareIn      : slv(4 downto 0);
    signal plSpareOut     : slv(4 downto 0);
+   signal timingCode     : slv(7 downto 0);
+   signal timingCodeEn   : sl;
+   signal fbCode         : Slv8Array(7 downto 0);
+   signal fbCodeEn       : slv(7 downto 0);
 
 begin
 
@@ -183,6 +187,7 @@ begin
          ibPpiFromFifo   => ibPpiFromFifo
       );
 
+
    --------------------------------------------------
    -- PPI Loopback
    --------------------------------------------------
@@ -205,6 +210,38 @@ begin
 
    end generate;
 
+
+   --------------------------------------------------
+   -- Timing Signals
+   --------------------------------------------------
+   U_DtmTiming : entity work.DtmTimingSource 
+      generic map (
+         TPD_G => 1 ns
+      ) port map (
+         axiClk                    => axiClk,
+         axiClkRst                 => axiClkRst,
+         localBusMaster            => localBusMaster(14),
+         localBusSlave             => localBusSlave(14),
+         sysClk200                 => sysClk200,
+         sysClk200Rst              => sysClk200Rst,
+         sysClk                    => sysClk200,
+         sysClkRst                 => sysClk200Rst,
+         timingCode                => timingCode,
+         timingCodeEn              => timingCodeEn,
+         fbCode                    => fbCode,
+         fbCodeEn                  => fbCodeEn,
+         dpmClk                    => dpmClk,
+         dpmFb                     => dpmFb
+      );
+
+   timingCode   <= (others=>'0');
+   timingCodeEn <= '0';
+   --signal fbCode         : Slv8(7 downto 0);
+   --signal fbCodeEn       : slv(7 downto 0);
+
+
+
+
    --------------------------------------------------
    -- Unused Signals
    --------------------------------------------------
@@ -213,10 +250,6 @@ begin
 
    -- Reference
    --signal locRefClk      : sl;
-
-   -- DPM Signals
-   --signal dpmFb          : slv(7 downto 0);
-   dpmClk <= (others=>'0');
 
    -- RTM
    dtmToRtmLsP    <= (others=>'Z');
@@ -232,8 +265,8 @@ begin
    bpClkOut <= (others=>'0');
 
    -- Local bus
-   --localBusMaster : LocalBusMasterVector(15 downto 8);
-   localBusSlave  <= (others=>LocalBusSlaveInit);
+   --localBusMaster : LocalBusMasterVector(13 downto 8);
+   localBusSlave(13 downto 8)  <= (others=>LocalBusSlaveInit);
 
    -- Clocks
    --signal axiClk         : sl;

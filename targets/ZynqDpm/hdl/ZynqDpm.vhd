@@ -70,6 +70,10 @@ architecture STRUCTURE of ZynqDpm is
    signal sysClk200Rst   : sl;
    signal localBusMaster : LocalBusMasterVector(15 downto 8);
    signal localBusSlave  : LocalBusSlaveVector(15 downto 8);
+   signal timingCode     : slv(7 downto 0);
+   signal timingCodeEn   : sl;
+   signal fbCode         : slv(7 downto 0);
+   signal fbCodeEn       : sl;
 
 begin
 
@@ -136,6 +140,34 @@ begin
 
    end generate;
 
+
+   --------------------------------------------------
+   -- Timing Signals
+   --------------------------------------------------
+   U_DpmTiming : entity work.DpmTimingSink 
+      generic map (
+         TPD_G => 1 ns
+      ) port map (
+         axiClk                    => axiClk,
+         axiClkRst                 => axiClkRst,
+         localBusMaster            => localBusMaster(14),
+         localBusSlave             => localBusSlave(14),
+         dpmClk                    => dtmClk,
+         dpmFb                     => dtmFb,
+         sysClk200                 => sysClk200,
+         sysClk200Rst              => sysClk200Rst,
+         sysClk                    => open,
+         sysClkRst                 => open,
+         timingCode                => timingCode,
+         timingCodeEn              => timingCodeEn,
+         fbCode                    => fbCode,
+         fbCodeEn                  => fbCodeEn
+      );
+
+   fbCode   <= timingCode;
+   fbCodeEn <= timingCodeEn;
+
+
    --------------------------------------------------
    -- Unused Signals
    --------------------------------------------------
@@ -152,8 +184,6 @@ begin
    --locRefClk   : slv(1  downto 0);
    --dtmRefClk   : sl;
 
-   -- DTM Feedback
-   dtmFb <= dtmClk(0) or dtmClk(1);
 
    -- Local bus
    --localBusMaster : LocalBusMasterVector(15 downto 8);

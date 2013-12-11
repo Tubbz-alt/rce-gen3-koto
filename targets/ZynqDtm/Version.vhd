@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000200"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000201"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Fri Nov 22 23:57:10 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Wed Dec 11 15:10:02 PST 2013 by rherbst";
 
 end Version;
 
@@ -44,5 +44,6 @@ end Version;
 -- 11/05/2013 (0xDC000015): Changed outbound free list FIFOs.
 -- 11/15/2013 (0xDC000016): Added core module.
 -- 11/18/2013 (0xDC000200): Vivado build.
+-- 12/11/2013 (0xDC000201): Added COB Clocking
 -------------------------------------------------------------------------------
 
