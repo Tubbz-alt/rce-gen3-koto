@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000202"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000203"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Fri Dec 13 08:36:21 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Fri Dec 13 11:04:22 PST 2013 by rherbst";
 
 end Version;
 
@@ -35,5 +35,6 @@ end Version;
 -- 11/18/2013 (0xDA000200): Vivado Build
 -- 12/11/2013 (0xDA000201): Added timing
 -- 12/11/2013 (0xDA000202): Version Change
+-- 12/11/2013 (0xDA000203): Reset change
 -------------------------------------------------------------------------------
 
