@@ -161,7 +161,8 @@ begin
          timingCode                => timingCode,
          timingCodeEn              => timingCodeEn,
          fbCode                    => fbCode,
-         fbCodeEn                  => fbCodeEn
+         fbCodeEn                  => fbCodeEn,
+         led                       => led
       );
 
    fbCode   <= timingCode;
@@ -172,7 +173,7 @@ begin
    -- Unused Signals
    --------------------------------------------------
 
-   led <= "11";
+   --led <= "11";
 
    -- RTM High Speed
    --dpmToRtmHsP : out   slv(11 downto 0);

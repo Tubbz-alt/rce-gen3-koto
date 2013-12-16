@@ -231,7 +231,8 @@ begin
          fbCode                    => fbCode,
          fbCodeEn                  => fbCodeEn,
          dpmClk                    => dpmClk,
-         dpmFb                     => dpmFb
+         dpmFb                     => dpmFb,
+         led                       => led
       );
 
    timingCode   <= (others=>'0');
@@ -246,7 +247,7 @@ begin
    -- Unused Signals
    --------------------------------------------------
 
-   led <= "11";
+   --led <= "11";
 
    -- Reference
    --signal locRefClk      : sl;
