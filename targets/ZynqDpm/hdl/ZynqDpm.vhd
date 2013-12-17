@@ -188,7 +188,8 @@ begin
 
    -- Local bus
    --localBusMaster : LocalBusMasterVector(15 downto 8);
-   localBusSlave  <= (others=>LocalBusSlaveInit);
+   localBusSlave(15)          <= LocalBusSlaveInit;
+   localBusSlave(13 downto 8) <= (others=>LocalBusSlaveInit);
 
    -- Clocks
    --signal axiClk         : sl;
