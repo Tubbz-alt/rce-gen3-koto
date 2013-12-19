@@ -3,4 +3,4 @@ vhdl work ../../modules/common/hdl/CobOpCodeSource.vhd
 vhdl work ../../modules/common/hdl/DpmTimingSink.vhd
 vhdl work ../../modules/common/hdl/DpmCore.vhd
 vhdl work Version.vhd
-vhdl work hdl/ZynqDpm.vhd
+vhdl work hdl/ZynqDpmPgp.vhd
