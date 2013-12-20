@@ -99,6 +99,10 @@ architecture STRUCTURE of ZynqDpmPgp is
    signal linkDownCnt      : Slv32Array(11 downto 0);
    signal linkErrorCnt     : Slv32Array(11 downto 0);
    signal countReset       : sl;
+   signal countResetRegA   : sl;
+   signal countResetRegB   : sl;
+   signal clockCount       : slv(31 downto 0);
+   signal loopEnable       : slv(2 downto 0);
 
    type VcUsBuff16InQuad  is array (0 to 3) of VcUsBuff16InType;
    type VcUsBuff16OutQuad is array (0 to 3) of VcUsBuff16OutType;
@@ -323,7 +327,7 @@ begin
             pgpVcRxCommonOut  => pgpVcRxCommonOut(i),
             pgpVcRxQuadOut    => pgpVcRxQuadOut(i),
             -- GT loopback control
-            loopback         => "000"
+            loopback         => loopEnable
          );
 
 
@@ -444,23 +448,27 @@ begin
             cellErrorCnt(i) <= (others=>'0') after 1 ns;
             linkDownCnt(i)  <= (others=>'0') after 1 ns;
             linkErrorCnt(i) <= (others=>'0') after 1 ns;
+            countResetRegA  <= '0'           after 1 ns;
+            countResetRegB  <= '0'           after 1 ns;
          elsif rising_edge(pgpClk) then
+            countResetRegA  <= countReset     after 1 ns;
+            countResetRegB  <= countResetRegA after 1 ns;
 
-            if countReset = '1' then
+            if countResetRegB = '1' then
                cellErrorCnt(i) <= (others=>'0') after 1 ns;
-            elsif pgpRxOut(i).cellError = '1' then
+            elsif pgpRxOut(i).cellError = '1' and cellErrorCnt /= x"FFFFFFFF" then
                cellErrorCnt(i) <= cellErrorCnt(i) + 1 after 1 ns;
             end if;
 
-            if countReset = '1' then
+            if countResetRegB = '1' then
                linkDownCnt(i)  <= (others=>'0') after 1 ns;
-            elsif pgpRxOut(i).linkDown = '1' then
+            elsif pgpRxOut(i).linkDown = '1' and linkDownCnt /= x"FFFFFFFF" then
                linkDownCnt(i) <= linkDownCnt(i) + 1 after 1 ns;
             end if;
 
-            if countReset = '1' then
+            if countResetRegB = '1' then
                linkErrorCnt(i) <= (others=>'0') after 1 ns;
-            elsif pgpRxOut(i).linkError = '1' then
+            elsif pgpRxOut(i).linkError = '1' and linkErrorCnt /= x"FFFFFFFF" then
                linkErrorCnt(i) <= linkErrorCnt(i) + 1 after 1 ns;
             end if;
 
@@ -469,10 +477,20 @@ begin
 
    end generate;
 
+   process ( pgpClk, pgpClkRst ) begin
+      if pgpClkRst = '1' then
+         clockCount <= (others=>'0') after 1 ns;
+      elsif rising_edge(pgpClk) then
+         clockCount <= clockCount + 1 after 1 ns;
+      end if;
+   end process;
+
+
    process ( axiClk, axiClkRst ) begin
       if axiClkRst = '1' then
          localBusSlave(13) <= LocalBusSlaveInit after 1 ns;
          countReset        <= '0'               after 1 ns;
+         loopEnable        <= (others=>'0')     after 1 ns;
       elsif rising_edge(axiClk) then
          localBusSlave(13).readValid <= localBusMaster(13).readEnable after 1 ns;
          localBusSlave(13).readData  <= (others=>'0')                 after 1 ns;
@@ -484,17 +502,30 @@ begin
                countReset <= localBusMaster(13).writeData(0) after 1 ns;
             end if;
 
+         elsif localBusMaster(13).addr(11 downto 0) = x"004" then
+            localBusSlave(13).readData(2 downto 0) <= loopEnable after 1 ns;
+
+            if localBusMaster(13).writeEnable = '1' then
+               loopEnable <= localBusMaster(13).writeData(2 downto 0) after 1 ns;
+            end if;
+
+         elsif localBusMaster(13).addr(11 downto 0) = x"008" then
+            localBusSlave(13).readData <= clockCount after 1 ns;
+
+         elsif localBusMaster(13).addr(11 downto 0) = x"00C" then
+            localBusSlave(13).readData(11 downto 0) <= pgpTxMmcmReset  after 1 ns;
+            localBusSlave(13).readData(16)          <= pgpTxMmcmLocked after 1 ns;
+            localBusSlave(13).readData(17)          <= pgpClkRst       after 1 ns;
+
          elsif localBusMaster(13).addr(11 downto 8) = x"1" then
             if localBusMaster(13).addr(3 downto 2) = "00" then
-               localBusSlave(13).readData(0) <= pgpRxOut(conv_integer(localBusMaster(13).addr(7 downto 4))).linkReady after 1 ns;
-            end if;
-            if localBusMaster(13).addr(3 downto 2) = "01" then
+               localBusSlave(13).readData(0)            <= pgpRxOut(conv_integer(localBusMaster(13).addr(7 downto 4))).linkReady after 1 ns;
+               localBusSlave(13).readData(31 downto 28) <= clockCount(3 downto 0)                                                after 1 ns;
+            elsif localBusMaster(13).addr(3 downto 2) = "01" then
                localBusSlave(13).readData    <= cellErrorCnt(conv_integer(localBusMaster(13).addr(7 downto 4)))       after 1 ns;
-            end if;
-            if localBusMaster(13).addr(3 downto 2) = "10" then
+            elsif localBusMaster(13).addr(3 downto 2) = "10" then
                localBusSlave(13).readData    <= linkDownCnt(conv_integer(localBusMaster(13).addr(7 downto 4)))        after 1 ns;
-            end if;
-            if localBusMaster(13).addr(3 downto 2) = "11" then
+            elsif localBusMaster(13).addr(3 downto 2) = "11" then
                localBusSlave(13).readData    <= linkErrorCnt(conv_integer(localBusMaster(13).addr(7 downto 4)))       after 1 ns;
             end if;
          end if;
@@ -561,7 +592,7 @@ begin
          CLKINSTOPPED         => open,
          CLKFBSTOPPED         => open,
          PWRDWN               => '0',
-         RST                  => pgpTxMmcmReset(0)
+         RST                  => axiClkRst
       );
 
    -- Clock Buffer
