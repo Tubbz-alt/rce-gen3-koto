@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000205"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000207"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Thu Dec 19 21:36:40 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Fri Dec 20 12:14:12 PST 2013 by rherbst";
 
 end Version;
 
@@ -37,5 +37,8 @@ end Version;
 -- 12/11/2013 (0xDA000202): Version Change
 -- 12/11/2013 (0xDA000203): Reset change
 -- 12/16/2013 (0xDA000204): Added LEDs
+-- 12/16/2013 (0xDA000205): PGP local vc loop
+-- 12/16/2013 (0xDA000206): PGP vc grame generate
+-- 12/20/2013 (0xDA000207): 5.0G PGP
 -------------------------------------------------------------------------------
 
