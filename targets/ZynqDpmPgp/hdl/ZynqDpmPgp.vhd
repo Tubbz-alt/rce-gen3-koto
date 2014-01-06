@@ -101,7 +101,9 @@ architecture STRUCTURE of ZynqDpmPgp is
    signal countReset       : sl;
    signal countResetRegA   : sl;
    signal countResetRegB   : sl;
-   signal pgpReset         : sl;
+   signal pllReset         : sl;
+   signal pgpReset         : slv(11 downto 0);
+   signal pgpResetCore     : slv(11 downto 0);
    signal clockCount       : slv(31 downto 0);
    signal loopEnable       : slv(2 downto 0);
    signal txCount          : Slv32Array(11 downto 0);
@@ -318,12 +320,12 @@ begin
             gtRxP(0)         => rtmToDpmHsP(i),  -- GT Serial Receive Positive
             gtRxN(0)         => rtmToDpmHsM(i),  -- GT Serial Receive Negative
             -- Tx Clocking
-            pgpTxReset        => pgpClkRst,
+            pgpTxReset        => pgpResetCore(i),
             pgpTxClk          => pgpClk,
             pgpTxMmcmReset    => pgpTxMmcmReset(i),
             pgpTxMmcmLocked   => pgpTxMmcmLocked,
             -- Rx clocking
-            pgpRxReset        => pgpClkRst,
+            pgpRxReset        => pgpResetCore(i),
             pgpRxRecClk       => open,         -- recovered clock
             pgpRxClk          => pgpClk,
             pgpRxMmcmReset    => open,
@@ -343,6 +345,22 @@ begin
             -- GT loopback control
             loopback         => loopEnable
          );
+
+      -- Reset
+      U_pgpRstGen : entity work.RstSync
+         generic map (
+            TPD_G           => 1 ns,
+            IN_POLARITY_G   => '1',
+            OUT_POLARITY_G  => '1',
+            RELEASE_DELAY_G => 16
+         )
+         port map (
+           clk      => pgpClk,
+           asyncRst => pgpReset(i),
+           syncRst  => pgpResetCore(i)
+         );
+
+
 
       -- Rx Control
       pgpRxIn(i).flush    <= '0';
@@ -480,7 +498,8 @@ begin
       if axiClkRst = '1' then
          localBusSlave(13) <= LocalBusSlaveInit after 1 ns;
          countReset        <= '0'               after 1 ns;
-         pgpReset          <= '1'               after 1 ns;
+         pllReset          <= '1'               after 1 ns;
+         pgpReset          <= (others=>'1')     after 1 ns;
          loopEnable        <= (others=>'0')     after 1 ns;
       elsif rising_edge(axiClk) then
          localBusSlave(13).readValid <= localBusMaster(13).readEnable after 1 ns;
@@ -509,10 +528,17 @@ begin
             localBusSlave(13).readData(17)          <= pgpClkRst       after 1 ns;
 
          elsif localBusMaster(13).addr(11 downto 0) = x"010" then
-            localBusSlave(13).readData(0) <= pgpReset after 1 ns;
+            localBusSlave(13).readData(11 downto 0) <= pgpReset after 1 ns;
 
             if localBusMaster(13).writeEnable = '1' then
-               pgpReset <= localBusMaster(13).writeData(0) after 1 ns;
+               pgpReset <= localBusMaster(13).writeData(11 downto 0) after 1 ns;
+            end if;
+
+         elsif localBusMaster(13).addr(11 downto 0) = x"014" then
+            localBusSlave(13).readData(0) <= pllReset after 1 ns;
+
+            if localBusMaster(13).writeEnable = '1' then
+               pllReset <= localBusMaster(13).writeData(0) after 1 ns;
             end if;
 
          elsif localBusMaster(13).addr(11 downto 9) = "001" then
@@ -596,7 +622,7 @@ begin
          CLKINSTOPPED         => open,
          CLKFBSTOPPED         => open,
          PWRDWN               => '0',
-         RST                  => pgpReset
+         RST                  => pllReset
       );
 
    -- Clock Buffer
