@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000208"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00020E"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Thu Dec 26 19:35:24 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Thu Jan  9 00:14:01 PST 2014 by rherbst";
 
 end Version;
 
@@ -41,5 +41,8 @@ end Version;
 -- 12/16/2013 (0xDA000206): PGP vc grame generate
 -- 12/20/2013 (0xDA000207): 5.0G PGP
 -- 12/26/2013 (0xDA000208): Seperate resets
+-- 12/26/2013 (0xDA00020A): Low power mode, usage mode 2
+-- 12/26/2013 (0xDA00020B): usage mode 2
+-- 12/26/2013 (0xDA00020E): CDR Update
 -------------------------------------------------------------------------------
 
