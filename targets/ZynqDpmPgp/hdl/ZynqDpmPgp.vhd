@@ -99,16 +99,24 @@ architecture STRUCTURE of ZynqDpmPgp is
    signal linkDownCnt      : Slv32Array(11 downto 0);
    signal linkErrorCnt     : Slv32Array(11 downto 0);
    signal countReset       : sl;
-   signal countResetRegA   : sl;
-   signal countResetRegB   : sl;
+   signal countResetPgp    : sl;
    signal pllReset         : sl;
-   signal pgpReset         : slv(11 downto 0);
-   signal pgpResetCore     : slv(11 downto 0);
+   signal pgpRxReset       : slv(11 downto 0);
+   signal pgpTxReset       : slv(11 downto 0);
+   signal pgpRxResetCore   : slv(11 downto 0);
+   signal pgpTxResetCore   : slv(11 downto 0);
    signal clockCount       : slv(31 downto 0);
    signal loopEnable       : slv(2 downto 0);
    signal txCount          : Slv32Array(11 downto 0);
    signal rxCount          : Slv32Array(11 downto 0);
    signal eofeCount        : Slv32Array(11 downto 0);
+   signal locRdEnCnt       : slv(3 downto 0);
+   signal locRdEn          : sl;
+   signal pgpRdEn          : sl;
+   signal pgpRdEdge        : sl;
+   signal pgpRdValid       : sl;
+   signal locRdValid       : sl;
+   signal pgpRdData        : slv(31 downto 0);
 
    type VcUsBuff16InQuad  is array (0 to 3) of VcUsBuff16InType;
    type VcUsBuff16OutQuad is array (0 to 3) of VcUsBuff16OutType;
@@ -274,9 +282,10 @@ begin
             -- Sim Generics
             SIM_GTRESET_SPEEDUP_G => "FALSE",
             SIM_VERSION_G         => "4.0",
-
-            STABLE_CLOCK_PERIOD_G => 4.0E-9,  --units of seconds 5.0
             CPLL_REFCLK_SEL_G     => "001",
+
+            -- 5Gbps
+            STABLE_CLOCK_PERIOD_G => 4.0E-9,
             CPLL_FBDIV_G          => 2,
             CPLL_FBDIV_45_G       => 5,
             CPLL_REFCLK_DIV_G     => 1,
@@ -284,15 +293,38 @@ begin
             TXOUT_DIV_G           => 1,
             RX_CLK25_DIV_G        => 10,
             TX_CLK25_DIV_G        => 10,
+            RXCDR_CFG_G           => x"03000023ff20400020",    -- Set by wizard
+            RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
+            RXDFEXYDEN_G          => '0',                      -- Set by wizard
+            RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
 
-            --STABLE_CLOCK_PERIOD_G => 6.4E-9,  --units of seconds 3.125
-            --CPLL_FBDIV_G          => 4,
+            -- 3.125Gbps
+            --STABLE_CLOCK_PERIOD_G => 4.0E-9,
+            --CPLL_FBDIV_G          => 5,
             --CPLL_FBDIV_45_G       => 5,
-            --CPLL_REFCLK_DIV_G     => 1,
+            --CPLL_REFCLK_DIV_G     => 2,
             --RXOUT_DIV_G           => 2,
             --TXOUT_DIV_G           => 2,
-            --RX_CLK25_DIV_G        => 7,
-            --TX_CLK25_DIV_G        => 7,
+            --RX_CLK25_DIV_G        => 10,
+            --TX_CLK25_DIV_G        => 10,
+            --RXCDR_CFG_G           => x"03000023ff40200020",    -- Set by wizard
+            --RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
+            --RXDFEXYDEN_G          => '0',                      -- Set by wizard
+            --RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
+
+            -- 1.125Gbps
+            --STABLE_CLOCK_PERIOD_G => 4.0E-9,  --units of seconds 1.25
+            --CPLL_FBDIV_G          => 2,
+            --CPLL_FBDIV_45_G       => 5,
+            --CPLL_REFCLK_DIV_G     => 1,
+            --RXOUT_DIV_G           => 4,
+            --TXOUT_DIV_G           => 4,
+            --RX_CLK25_DIV_G        => 10,
+            --TX_CLK25_DIV_G        => 10,
+            --RXCDR_CFG_G           => x"03000023ff40080020",    -- Set by wizard
+            --RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
+            --RXDFEXYDEN_G          => '0',                      -- Set by wizard
+            --RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
 
             -- Configure PLL sourc
             TX_PLL_G              => "CPLL",
@@ -320,12 +352,12 @@ begin
             gtRxP(0)         => rtmToDpmHsP(i),  -- GT Serial Receive Positive
             gtRxN(0)         => rtmToDpmHsM(i),  -- GT Serial Receive Negative
             -- Tx Clocking
-            pgpTxReset        => pgpResetCore(i),
+            pgpTxReset        => pgpTxResetCore(i),
             pgpTxClk          => pgpClk,
             pgpTxMmcmReset    => pgpTxMmcmReset(i),
             pgpTxMmcmLocked   => pgpTxMmcmLocked,
             -- Rx clocking
-            pgpRxReset        => pgpResetCore(i),
+            pgpRxReset        => pgpRxResetCore(i),
             pgpRxRecClk       => open,         -- recovered clock
             pgpRxClk          => pgpClk,
             pgpRxMmcmReset    => open,
@@ -347,7 +379,7 @@ begin
          );
 
       -- Reset
-      U_pgpRstGen : entity work.RstSync
+      U_pgpRxRstGen : entity work.RstSync
          generic map (
             TPD_G           => 1 ns,
             IN_POLARITY_G   => '1',
@@ -356,10 +388,23 @@ begin
          )
          port map (
            clk      => pgpClk,
-           asyncRst => pgpReset(i),
-           syncRst  => pgpResetCore(i)
+           asyncRst => pgpRxReset(i),
+           syncRst  => pgpRxResetCore(i)
          );
 
+      -- Reset
+      U_pgpTxRstGen : entity work.RstSync
+         generic map (
+            TPD_G           => 1 ns,
+            IN_POLARITY_G   => '1',
+            OUT_POLARITY_G  => '1',
+            RELEASE_DELAY_G => 16
+         )
+         port map (
+           clk      => pgpClk,
+           asyncRst => pgpTxReset(i),
+           syncRst  => pgpTxResetCore(i)
+         );
 
 
       -- Rx Control
@@ -394,7 +439,7 @@ begin
             eofeCount(i) <= (others=>'0') after 1 ns;
          elsif rising_edge(pgpClk) then
 
-            if countResetRegB = '1' then
+            if countResetPgp = '1' then
                txCount(i) <= (others=>'0') after 1 ns;
             elsif (pgpVcTxQuadIn(i)(0).valid = '1' and pgpVcTxQuadIn(i)(0).eof = '1' and pgpVcTxQuadOut(i)(0).ready = '1') or
                   (pgpVcTxQuadIn(i)(1).valid = '1' and pgpVcTxQuadIn(i)(1).eof = '1' and pgpVcTxQuadOut(i)(1).ready = '1') or
@@ -403,16 +448,16 @@ begin
                txCount(i) <= txCount(i) + 1 after 1 ns;
             end if;
 
-            if countResetRegB = '1' then
+            if countResetPgp = '1' then
                rxCount(i) <= (others=>'0') after 1 ns;
-            elsif (pgpVcRxQuadOut(i)(0).valid = '1' and pgpVcTxQuadIn(i)(0).eof = '1') or
-                  (pgpVcRxQuadOut(i)(1).valid = '1' and pgpVcTxQuadIn(i)(1).eof = '1') or
-                  (pgpVcRxQuadOut(i)(2).valid = '1' and pgpVcTxQuadIn(i)(2).eof = '1') or
-                  (pgpVcRxQuadOut(i)(3).valid = '1' and pgpVcTxQuadIn(i)(3).eof = '1')  then
+            elsif (pgpVcRxQuadOut(i)(0).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0') or
+                  (pgpVcRxQuadOut(i)(1).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0') or
+                  (pgpVcRxQuadOut(i)(2).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0') or
+                  (pgpVcRxQuadOut(i)(3).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0')  then
                rxCount(i) <= rxCount(i) + 1 after 1 ns;
             end if;
 
-            if countResetRegB = '1' then
+            if countResetPgp = '1' then
                eofeCount(i) <= (others=>'0') after 1 ns;
             elsif (pgpVcRxQuadOut(i)(0).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '1') or
                   (pgpVcRxQuadOut(i)(1).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '1') or
@@ -456,25 +501,21 @@ begin
             cellErrorCnt(i) <= (others=>'0') after 1 ns;
             linkDownCnt(i)  <= (others=>'0') after 1 ns;
             linkErrorCnt(i) <= (others=>'0') after 1 ns;
-            countResetRegA  <= '0'           after 1 ns;
-            countResetRegB  <= '0'           after 1 ns;
          elsif rising_edge(pgpClk) then
-            countResetRegA  <= countReset     after 1 ns;
-            countResetRegB  <= countResetRegA after 1 ns;
 
-            if countResetRegB = '1' then
+            if countResetPgp = '1' then
                cellErrorCnt(i) <= (others=>'0') after 1 ns;
             elsif pgpRxOut(i).cellError = '1' and cellErrorCnt(i) /= x"FFFFFFFF" then
                cellErrorCnt(i) <= cellErrorCnt(i) + 1 after 1 ns;
             end if;
 
-            if countResetRegB = '1' then
+            if countResetPgp = '1' then
                linkDownCnt(i)  <= (others=>'0') after 1 ns;
             elsif pgpRxOut(i).linkDown = '1' and linkDownCnt(i) /= x"FFFFFFFF" then
                linkDownCnt(i) <= linkDownCnt(i) + 1 after 1 ns;
             end if;
 
-            if countResetRegB = '1' then
+            if countResetPgp = '1' then
                linkErrorCnt(i) <= (others=>'0') after 1 ns;
             elsif pgpRxOut(i).linkError = '1' and linkErrorCnt(i) /= x"FFFFFFFF" then
                linkErrorCnt(i) <= linkErrorCnt(i) + 1 after 1 ns;
@@ -499,11 +540,23 @@ begin
          localBusSlave(13) <= LocalBusSlaveInit after 1 ns;
          countReset        <= '0'               after 1 ns;
          pllReset          <= '1'               after 1 ns;
-         pgpReset          <= (others=>'1')     after 1 ns;
+         pgpRxReset        <= (others=>'1')     after 1 ns;
+         pgpTxReset        <= (others=>'1')     after 1 ns;
          loopEnable        <= (others=>'0')     after 1 ns;
+         locRdEnCnt        <= (others=>'0')     after 1 ns;
+         locRdEn           <= '0'               after 1 ns;
       elsif rising_edge(axiClk) then
          localBusSlave(13).readValid <= localBusMaster(13).readEnable after 1 ns;
          localBusSlave(13).readData  <= (others=>'0')                 after 1 ns;
+
+         if localBusMaster(13).readEnable = '1' then
+            locRdEnCnt <= (others=>'1') after 1 ns;
+            locRdEn    <= '1'           after 1 ns;
+         elsif locRdEnCnt = 0 then
+            locRdEn <= '0' after 1 ns;
+         else
+            locRdEnCnt <= locRdEnCnt - 1 after 1 ns;
+         end if;
 
          if localBusMaster(13).addr(11 downto 0) = x"000" then
             localBusSlave(13).readData(0) <= countReset after 1 ns;
@@ -528,10 +581,12 @@ begin
             localBusSlave(13).readData(17)          <= pgpClkRst       after 1 ns;
 
          elsif localBusMaster(13).addr(11 downto 0) = x"010" then
-            localBusSlave(13).readData(11 downto 0) <= pgpReset after 1 ns;
+            localBusSlave(13).readData(11 downto  0) <= pgpTxReset after 1 ns;
+            localBusSlave(13).readData(27 downto 16) <= pgpRxReset after 1 ns;
 
             if localBusMaster(13).writeEnable = '1' then
-               pgpReset <= localBusMaster(13).writeData(11 downto 0) after 1 ns;
+               pgpTxReset <= localBusMaster(13).writeData(11 downto  0) after 1 ns;
+               pgpRxReset <= localBusMaster(13).writeData(27 downto 16) after 1 ns;
             end if;
 
          elsif localBusMaster(13).addr(11 downto 0) = x"014" then
@@ -542,26 +597,91 @@ begin
             end if;
 
          elsif localBusMaster(13).addr(11 downto 9) = "001" then
-            if localBusMaster(13).addr(4 downto 2) = "000" then
-               localBusSlave(13).readData(0)            <= pgpRxOut(conv_integer(localBusMaster(13).addr(8 downto 5))).linkReady after 1 ns;
-               localBusSlave(13).readData(31 downto 28) <= clockCount(3 downto 0)                                                after 1 ns;
-            elsif localBusMaster(13).addr(4 downto 2) = "001" then
-               localBusSlave(13).readData    <= cellErrorCnt(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
-            elsif localBusMaster(13).addr(4 downto 2) = "010" then
-               localBusSlave(13).readData    <= linkDownCnt(conv_integer(localBusMaster(13).addr(8 downto 5)))        after 1 ns;
-            elsif localBusMaster(13).addr(4 downto 2) = "011" then
-               localBusSlave(13).readData    <= linkErrorCnt(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
-            elsif localBusMaster(13).addr(4 downto 2) = "100" then
-               localBusSlave(13).readData    <= txCount(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
-            elsif localBusMaster(13).addr(4 downto 2) = "101" then
-               localBusSlave(13).readData    <= rxCount(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
-            elsif localBusMaster(13).addr(4 downto 2) = "110" then
-               localBusSlave(13).readData    <= eofeCount(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
-            end if;
+            localBusSlave(13).readValid <= locRdValid after 1 ns;
+            localBusSlave(13).readData  <= pgpRdData  after 1 ns;
          end if;
 
       end if;
    end process;
+
+   U_CRstSyncA : entity work.SynchronizerEdge
+      generic map (
+         TPD_G          => 1 ns,
+         RST_POLARITY_G => '1',
+         RST_ASYNC_G    => false,
+         STAGES_G       => 4,
+         INIT_G         => "0"
+      ) port map (
+         clk         => pgpClk,
+         rst         => pgpClkRst,
+         dataIn      => countReset,
+         dataOut     => countResetPgp,
+         risingEdge  => open,
+         fallingEdge => open
+      );
+
+
+   U_ReadSyncA : entity work.SynchronizerEdge
+      generic map (
+         TPD_G          => 1 ns,
+         RST_POLARITY_G => '1',
+         RST_ASYNC_G    => false,
+         STAGES_G       => 8,
+         INIT_G         => "0"
+      ) port map (
+         clk         => pgpClk,
+         rst         => pgpClkRst,
+         dataIn      => locRdEn,
+         dataOut     => pgpRdEn,
+         risingEdge  => pgpRdEdge,
+         fallingEdge => open
+      );
+
+   process ( pgpClk, pgpClkRst ) begin
+      if pgpClkRst = '1' then
+         pgpRdData  <= (others=>'0') after 1 ns;
+         pgpRdValid <= '0'           after 1 ns;
+      elsif rising_edge(pgpClk) then
+         pgpRdValid <= pgpRdEn after 1 ns;
+
+         if pgpRdEdge = '1' then
+            pgpRdData  <= (others=>'0') after 1 ns;
+
+            if localBusMaster(13).addr(4 downto 2) = "000" then
+               pgpRdData(0)            <= pgpRxOut(conv_integer(localBusMaster(13).addr(8 downto 5))).linkReady after 1 ns;
+               pgpRdData(31 downto 28) <= clockCount(3 downto 0)                                                after 1 ns;
+            elsif localBusMaster(13).addr(4 downto 2) = "001" then
+               pgpRdData    <= cellErrorCnt(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
+            elsif localBusMaster(13).addr(4 downto 2) = "010" then
+               pgpRdData    <= linkDownCnt(conv_integer(localBusMaster(13).addr(8 downto 5)))        after 1 ns;
+            elsif localBusMaster(13).addr(4 downto 2) = "011" then
+               pgpRdData    <= linkErrorCnt(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
+            elsif localBusMaster(13).addr(4 downto 2) = "100" then
+               pgpRdData    <= txCount(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
+            elsif localBusMaster(13).addr(4 downto 2) = "101" then
+               pgpRdData    <= rxCount(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
+            elsif localBusMaster(13).addr(4 downto 2) = "110" then
+               pgpRdData    <= eofeCount(conv_integer(localBusMaster(13).addr(8 downto 5)))       after 1 ns;
+            end if;
+         end if;
+      end if;
+   end process;
+
+   U_ReadSyncB : entity work.SynchronizerEdge
+      generic map (
+         TPD_G          => 1 ns,
+         RST_POLARITY_G => '1',
+         RST_ASYNC_G    => false,
+         STAGES_G       => 8,
+         INIT_G         => "0"
+      ) port map (
+         clk         => axiClk,
+         rst         => axiClkRst,
+         dataIn      => pgpRdValid,
+         dataOut     => open,
+         risingEdge  => locRdValid,
+         fallingEdge =>open
+      );
 
    -- PLL
    U_PgpClkGen : MMCME2_ADV
@@ -574,7 +694,8 @@ begin
          CLKFBOUT_MULT_F      => 4.000,
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 4.0,
+         CLKOUT0_DIVIDE_F     => 4.0, -- 5.0 gbps
+         --CLKOUT0_DIVIDE_F     => 16.0, -- 1.125 gbps
          CLKOUT0_PHASE        => 0.000,
          CLKOUT0_DUTY_CYCLE   => 0.5,
          CLKOUT0_USE_FINE_PS  => FALSE,
