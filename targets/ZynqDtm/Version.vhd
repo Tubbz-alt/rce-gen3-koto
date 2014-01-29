@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000203"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000205"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Mon Jan 20 15:39:52 PST 2014 by ruckman";
+constant BUILD_STAMP_C : string := "Built Thu Jan 23 23:53:21 PST 2014 by rherbst";
 
 end Version;
 
@@ -46,5 +46,7 @@ end Version;
 -- 11/18/2013 (0xDC000200): Vivado build.
 -- 12/11/2013 (0xDC000201): Added COB Clocking
 -- 12/16/2013 (0xDC000202): LED Blinking
+-- 12/16/2013 (0xDC000204): New DTM with ethernet
+-- 12/16/2013 (0xDC000205): PHY Reset
 -------------------------------------------------------------------------------
 
