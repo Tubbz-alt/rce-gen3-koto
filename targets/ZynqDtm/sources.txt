@@ -1,7 +1,2 @@
-vhdl work ../../modules/common/hdl/CobOpCodeSink.vhd
-vhdl work ../../modules/common/hdl/CobOpCodeSource.vhd
-vhdl work ../../modules/common/hdl/DtmTimingSource.vhd
-vhdl work ../../modules/common/hdl/GmiiToRgmiiSwitch.vhd
-vhdl work ../../modules/common/hdl/DtmCore.vhd
 vhdl work Version.vhd
 vhdl work hdl/ZynqDtm.vhd

@@ -58,10 +58,6 @@ architecture STRUCTURE of ZynqDpm is
    signal ibPpiClk       : slv(3 downto 0);
    signal ibPpiToFifo    : IbPpiToFifoVector(3 downto 0);
    signal ibPpiFromFifo  : IbPpiFromFifoVector(3 downto 0);
-   signal dtmFb          : sl;
-   signal dtmClk         : slv(1 downto 0);
-   signal locRefClk      : slv(1 downto 0);
-   signal dtmRefClk      : sl;
    signal axiClk         : sl;
    signal axiClkRst      : sl;
    signal sysClk125      : sl;
@@ -88,24 +84,12 @@ begin
          ethRxM                   => ethRxM,
          ethTxP                   => ethTxP,
          ethTxM                   => ethTxM,
-         locRefClkP               => locRefClkP,
-         locRefClkM               => locRefClkM,
-         locRefClk                => locRefClk,
-         dtmRefClkP               => dtmRefClkP,
-         dtmRefClkM               => dtmRefClkM,
-         dtmRefClk                => dtmRefClk,
          axiClk                   => axiClk,
          axiClkRst                => axiClkRst,
          sysClk125                => sysClk125,
          sysClk125Rst             => sysClk125Rst,
          sysClk200                => sysClk200,
          sysClk200Rst             => sysClk200Rst,
-         dtmClkP                  => dtmClkP,
-         dtmClkM                  => dtmClkM,
-         dtmClk                   => dtmClk,
-         dtmFbP                   => dtmFbP,
-         dtmFbM                   => dtmFbM,
-         dtmFb                    => dtmFb,
          localBusMaster           => localBusMaster,
          localBusSlave            => localBusSlave,
          obPpiClk                 => obPpiClk,
@@ -144,7 +128,7 @@ begin
    --------------------------------------------------
    -- Timing Signals
    --------------------------------------------------
-   U_DpmTiming : entity work.DpmTimingSink 
+   U_DpmTimingSink : entity work.DpmTimingSink 
       generic map (
          TPD_G => 1 ns
       ) port map (
@@ -152,12 +136,14 @@ begin
          axiClkRst                 => axiClkRst,
          localBusMaster            => localBusMaster(14),
          localBusSlave             => localBusSlave(14),
-         dpmClk                    => dtmClk,
-         dpmFb                     => dtmFb,
          sysClk200                 => sysClk200,
          sysClk200Rst              => sysClk200Rst,
-         sysClk                    => open,
-         sysClkRst                 => open,
+         dtmClkP                   => dtmClkP,
+         dtmClkM                   => dtmClkM,
+         dtmFbP                    => dtmFbP,
+         dtmFbM                    => dtmFbM,
+         distClk                   => open,
+         distClkRst                => open,
          timingCode                => timingCode,
          timingCodeEn              => timingCodeEn,
          fbCode                    => fbCode,
@@ -182,9 +168,16 @@ begin
    --rtmToDpmHsM : in    slv(11 downto 0);
 
    -- Reference Clocks
-   --locRefClk   : slv(1  downto 0);
-   --dtmRefClk   : sl;
+   --locRefClkP   : in    slv(1  downto 0);
+   --locRefClkM   : in    slv(1  downto 0);
+   --dtmRefClkP   : in    sl;
+   --dtmRefClkM   : in    sl;
 
+   -- DTM Signals
+   --dtmClkP      : in    slv(1  downto 0);
+   --dtmClkM      : in    slv(1  downto 0);
+   --dtmFbP       : out   sl;
+   --dtmFbM       : out   sl;
 
    -- Local bus
    --localBusMaster : LocalBusMasterVector(15 downto 8);

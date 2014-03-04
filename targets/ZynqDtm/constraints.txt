@@ -1,4 +1,2 @@
-../../modules/common/hdl/DtmCore.ucf
-../../modules/common/hdl/DtmCore.xdc
-hdl/ZynqDtm.ucf
+../../modules/DtmCore/hdl/DtmCore.xdc
 hdl/ZynqDtm.xdc

@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000201"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000202"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Fri Nov 22 23:56:37 PST 2013 by rherbst";
+constant BUILD_STAMP_C : string := "Built Tue Mar  4 13:16:41 PST 2014 by rherbst";
 
 end Version;
 
@@ -49,5 +49,6 @@ end Version;
 -- 11/15/2013 (0xF100010D): New Core Structure
 -- 11/18/2013 (0xF1000200): Vivado Build
 -- 11/18/2013 (0xF1000201): Remove PPI Data
+-- 02/28/2014 (0xF1000202): new build
 -------------------------------------------------------------------------------
 

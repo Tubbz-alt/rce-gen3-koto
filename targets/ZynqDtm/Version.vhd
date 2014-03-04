@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000205"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000221"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Thu Jan 23 23:53:21 PST 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Tue Mar  4 10:54:26 PST 2014 by rherbst";
 
 end Version;
 
@@ -48,5 +48,10 @@ end Version;
 -- 12/16/2013 (0xDC000202): LED Blinking
 -- 12/16/2013 (0xDC000204): New DTM with ethernet
 -- 12/16/2013 (0xDC000205): PHY Reset
+-- 12/16/2013 (0xDC000210): Added PGP
+-- 12/16/2013 (0xDC000213): Added PGP, 2nd ethernet port
+-- 12/16/2013 (0xDC000215): Changed phy address in core.
+-- 12/16/2013 (0xDC000217): Ethernet Channel 0
+-- 02/25/2014 (0xDC000220): Structure Change
 -------------------------------------------------------------------------------
 

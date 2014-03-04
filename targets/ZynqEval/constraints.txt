@@ -1,4 +1,2 @@
-../../modules/common/hdl/EvalCore.ucf
-../../modules/common/hdl/EvalCore.xdc
-hdl/ZynqEval.ucf
+../../modules/EvalCore/hdl/EvalCore.xdc
 hdl/ZynqEval.xdc
