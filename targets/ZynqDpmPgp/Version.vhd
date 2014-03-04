@@ -16,7 +16,7 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000220"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00021F"; -- MAKE_VERSION
 
 constant BUILD_STAMP_C : string := "Built Tue Mar  4 10:54:46 PST 2014 by rherbst";
 
@@ -59,6 +59,5 @@ end Version;
 -- 12/26/2013 (0xDA00021D): 5.00 gbps, CDR Update, seperate resets, 1000mv, tx inhibit
 -- 12/26/2013 (0xDA00021E): 5.00 gbps, CDR Update, seperate resets, standard drive, tx inhibit, no ethernet
 -- 12/26/2013 (0xDA00021F): new build test
--- 12/26/2013 (0xDA000220): 5.00 gbps, standard drive
 -------------------------------------------------------------------------------
 

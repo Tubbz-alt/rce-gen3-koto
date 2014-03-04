@@ -52,6 +52,6 @@ end Version;
 -- 12/16/2013 (0xDC000213): Added PGP, 2nd ethernet port
 -- 12/16/2013 (0xDC000215): Changed phy address in core.
 -- 12/16/2013 (0xDC000217): Ethernet Channel 0
--- 02/25/2014 (0xDC000220): Structure Change
+-- 02/25/2014 (0xDC000221): Structure Change
 -------------------------------------------------------------------------------
 
