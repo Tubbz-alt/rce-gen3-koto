@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000202"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000203"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Tue Mar  4 13:16:41 PST 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Wed Mar 12 18:43:32 PDT 2014 by rherbst";
 
 end Version;
 
@@ -50,5 +50,6 @@ end Version;
 -- 11/18/2013 (0xF1000200): Vivado Build
 -- 11/18/2013 (0xF1000201): Remove PPI Data
 -- 02/28/2014 (0xF1000202): new build
+-- 02/28/2014 (0xF1000203): Updated register bus
 -------------------------------------------------------------------------------
 

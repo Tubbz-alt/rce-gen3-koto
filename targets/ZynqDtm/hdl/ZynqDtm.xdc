@@ -1,7 +1,7 @@
 
 # PGP Clocks
 create_clock -name locRefClk -period 4.0 [get_ports locRefClkP]
-set pgpClkGroup [get_clocks -of_objects [get_pins U_PgpClkGen/CLKOUT0]]
+set pgpClkGroup [get_clocks -of_objects [get_pins U_RtmTest/U_PgpClkGen/CLKOUT0]]
 
 # Cross Clock Domains
 set_clock_groups -asynchronous -group ${axiClkGroup}    -group ${pgpClkGroup}

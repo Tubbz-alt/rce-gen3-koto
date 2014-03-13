@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000205"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000211"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Tue Mar  4 10:54:13 PST 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Wed Mar 12 18:43:32 PDT 2014 by rherbst";
 
 end Version;
 
@@ -38,5 +38,6 @@ end Version;
 -- 12/11/2013 (0xDA000203): Reset change
 -- 12/16/2013 (0xDA000204): Added LEDs
 -- 02/28/2014 (0xDA000205): new build system
+-- 02/25/2014 (0xDC000211): Structure Change
 -------------------------------------------------------------------------------
 

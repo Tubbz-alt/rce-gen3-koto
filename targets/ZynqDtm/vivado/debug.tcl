@@ -1,32 +1,42 @@
 
-# Get environment
-set TOP_DIR  $::env(TOP_DIR)
-set PROJ_DIR $::env(PROJ_DIR)
-
-# Open the run
+## Open the run
 open_run synth_1
 
-# Create core
+## Create core
 set ilaName u_ila_0
-create_debug_core ${ilaName} labtools_ila_v3
+CreateDebugCore ${ilaName}
 
-# Configure Core
-set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
+## Configure Core
+set_property C_DATA_DEPTH 2048 [get_debug_cores ${ilaName}]
 
-# Configure Clock
-set_property port_width 1 [get_debug_ports ${ilaName}/clk]
-connect_debug_port ${ilaName}/clk \
-   [get_nets U_DtmCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl/axiClk]
+## Setup Clock, Variable set in xdc file
+SetDebugCoreClk ${ilaName} [get_nets -of_objects ${axiClkGroup}]
 
-# First probe exists by default
-set_property port_width 1 [get_debug_ports ${ilaName}/probe0]
-connect_debug_port ${ilaName}/probe0 \
-   [get_nets U_DtmCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl/axiClkRst]
+## Read Controller
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadFromArm[1][arvalid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadFromArm[1][araddr]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadFromArm[1][rready]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadFromArm[1][arid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadToArm[1][arready]}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadToArm[1][rdata]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadToArm[1][rvalid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadToArm[1][rresp]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterReadToArm[1][rid]*}
 
-# Debug ACP Write Controller
-set modulePath U_DtmCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl
-source ${TOP_DIR}/modules/ArmRceG3/debug/debug_read_cntrl.tcl
+## Write Controller
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteFromArm[1][awvalid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteFromArm[1][awaddr]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteFromArm[1][wdata]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteFromArm[1][wvalid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteFromArm[1][awid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteToArm[1][awready]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteToArm[1][wready]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteToArm[1][bvalid]*}
+ConfigProbe ${ilaName} {U_DtmCore/U_ArmRceG3Top/axiGpMasterWriteToArm[1][bid]*}
 
-# Write the port map file
+## Delete the last unused port
+delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
+
+## Write the port map file
 write_debug_probes -force ${PROJ_DIR}/debug/debug_probes.ltx
 

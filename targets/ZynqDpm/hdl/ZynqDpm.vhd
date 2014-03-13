@@ -8,6 +8,7 @@ library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 use work.ArmRceG3Pkg.all;
 use work.StdRtlPkg.all;
+use work.AxiLitePkg.all;
 
 entity ZynqDpm is
    port (
@@ -26,10 +27,10 @@ entity ZynqDpm is
       ethTxM       : out   slv(0 downto 0);
 
       -- RTM High Speed
-      --dpmToRtmHsP  : out   slv(11 downto 0);
-      --dpmToRtmHsM  : out   slv(11 downto 0);
-      --rtmToDpmHsP  : in    slv(11 downto 0);
-      --rtmToDpmHsM  : in    slv(11 downto 0);
+      dpmToRtmHsP  : out   slv(11 downto 0);
+      dpmToRtmHsM  : out   slv(11 downto 0);
+      rtmToDpmHsP  : in    slv(11 downto 0);
+      rtmToDpmHsM  : in    slv(11 downto 0);
 
       -- Reference Clocks
       locRefClkP   : in    slv(1  downto 0);
@@ -52,24 +53,30 @@ end ZynqDpm;
 architecture STRUCTURE of ZynqDpm is
 
    -- Local Signals
-   signal obPpiClk       : slv(3 downto 0);
-   signal obPpiToFifo    : ObPpiToFifoVector(3 downto 0);
-   signal obPpiFromFifo  : ObPpiFromFifoVector(3 downto 0);
-   signal ibPpiClk       : slv(3 downto 0);
-   signal ibPpiToFifo    : IbPpiToFifoVector(3 downto 0);
-   signal ibPpiFromFifo  : IbPpiFromFifoVector(3 downto 0);
-   signal axiClk         : sl;
-   signal axiClkRst      : sl;
-   signal sysClk125      : sl;
-   signal sysClk125Rst   : sl;
-   signal sysClk200      : sl;
-   signal sysClk200Rst   : sl;
-   signal localBusMaster : LocalBusMasterVector(15 downto 8);
-   signal localBusSlave  : LocalBusSlaveVector(15 downto 8);
-   signal timingCode     : slv(7 downto 0);
-   signal timingCodeEn   : sl;
-   signal fbCode         : slv(7 downto 0);
-   signal fbCodeEn       : sl;
+   signal obPpiClk           : slv(3 downto 0);
+   signal obPpiToFifo        : ObPpiToFifoVector(3 downto 0);
+   signal obPpiFromFifo      : ObPpiFromFifoVector(3 downto 0);
+   signal ibPpiClk           : slv(3 downto 0);
+   signal ibPpiToFifo        : IbPpiToFifoVector(3 downto 0);
+   signal ibPpiFromFifo      : IbPpiFromFifoVector(3 downto 0);
+   signal axiClk             : sl;
+   signal axiClkRst          : sl;
+   signal sysClk125          : sl;
+   signal sysClk125Rst       : sl;
+   signal sysClk200          : sl;
+   signal sysClk200Rst       : sl;
+   signal timingCode         : slv(7 downto 0);
+   signal timingCodeEn       : sl;
+   signal fbCode             : slv(7 downto 0);
+   signal fbCodeEn           : sl;
+   signal intAxiReadMaster   : AxiLiteReadMasterArray(1 downto 0);
+   signal intAxiReadSlave    : AxiLiteReadSlaveArray(1 downto 0);
+   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(1 downto 0);
+   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(1 downto 0);
+   signal topAxiReadMaster   : AxiLiteReadMasterType;
+   signal topAxiReadSlave    : AxiLiteReadSlaveType;
+   signal topAxiWriteMaster  : AxiLiteWriteMasterType;
+   signal topAxiWriteSlave   : AxiLiteWriteSlaveType;
 
 begin
 
@@ -90,8 +97,10 @@ begin
          sysClk125Rst             => sysClk125Rst,
          sysClk200                => sysClk200,
          sysClk200Rst             => sysClk200Rst,
-         localBusMaster           => localBusMaster,
-         localBusSlave            => localBusSlave,
+         localAxiReadMaster       => topAxiReadMaster,
+         localAxiReadSlave        => topAxiReadSlave,
+         localAxiWriteMaster      => topAxiWriteMaster,
+         localAxiWriteSlave       => topAxiWriteSlave,
          obPpiClk                 => obPpiClk,
          obPpiToFifo              => obPpiToFifo,
          obPpiFromFifo            => obPpiFromFifo,
@@ -101,6 +110,43 @@ begin
          clkSelA                  => clkSelA,
          clkSelB                  => clkSelB
       );
+
+
+   -------------------------------------
+   -- AXI Lite Crossbar
+   -- Base: 0xA0000000 - 0xAFFFFFFF
+   -------------------------------------
+   U_AxiCrossbar : entity work.AxiLiteCrossbar 
+      generic map (
+         TPD_G              => 1 ns,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 2,
+         DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
+         MASTERS_CONFIG_G   => (
+
+            -- Channel 0 = 0xA0000000 - 0xA000FFFF : DPM Timing Source
+            0 => ( baseAddr     => x"A0000000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
+            1 => ( baseAddr     => x"A0010000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF")
+         )
+      ) port map (
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         sAxiWriteMasters(0) => topAxiWriteMaster,
+         sAxiWriteSlaves(0)  => topAxiWriteSlave,
+         sAxiReadMasters(0)  => topAxiReadMaster,
+         sAxiReadSlaves(0)   => topAxiReadSlave,
+         mAxiWriteMasters    => intAxiWriteMaster,
+         mAxiWriteSlaves     => intAxiWriteSlave,
+         mAxiReadMasters     => intAxiReadMaster,
+         mAxiReadSlaves      => intAxiReadSlave
+      );
+
 
    --------------------------------------------------
    -- PPI Loopback
@@ -134,8 +180,10 @@ begin
       ) port map (
          axiClk                    => axiClk,
          axiClkRst                 => axiClkRst,
-         localBusMaster            => localBusMaster(14),
-         localBusSlave             => localBusSlave(14),
+         axiReadMaster             => intAxiReadMaster(0),
+         axiReadSlave              => intAxiReadSlave(0),
+         axiWriteMaster            => intAxiWriteMaster(0),
+         axiWriteSlave             => intAxiWriteSlave(0),
          sysClk200                 => sysClk200,
          sysClk200Rst              => sysClk200Rst,
          dtmClkP                   => dtmClkP,
@@ -153,6 +201,29 @@ begin
 
    fbCode   <= timingCode;
    fbCodeEn <= timingCodeEn;
+
+
+   --------------------------------------------------
+   -- RTM Testing
+   --------------------------------------------------
+
+   U_RtmTest : entity work.DpmRtmTest 
+      port map (
+         sysClk200           => sysClk200,
+         sysClk200Rst        => sysClk200Rst,
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         topAxiReadMaster    => intAxiReadMaster(1),
+         topAxiReadSlave     => intAxiReadSlave(1),
+         topAxiWriteMaster   => intAxiWriteMaster(1),
+         topAxiWriteSlave    => intAxiWriteSlave(1),
+         locRefClkP          => locRefClkP(1),
+         locRefClkM          => locRefClkM(1),
+         dpmToRtmHsP         => dpmToRtmHsP,
+         dpmToRtmHsM         => dpmToRtmHsM,
+         rtmToDpmHsP         => rtmToDpmHsP,
+         rtmToDpmHsM         => rtmToDpmHsM
+      );
 
 
    --------------------------------------------------
@@ -178,11 +249,6 @@ begin
    --dtmClkM      : in    slv(1  downto 0);
    --dtmFbP       : out   sl;
    --dtmFbM       : out   sl;
-
-   -- Local bus
-   --localBusMaster : LocalBusMasterVector(15 downto 8);
-   localBusSlave(15)          <= LocalBusSlaveInit;
-   localBusSlave(13 downto 8) <= (others=>LocalBusSlaveInit);
 
    -- Clocks
    --signal axiClk         : sl;
