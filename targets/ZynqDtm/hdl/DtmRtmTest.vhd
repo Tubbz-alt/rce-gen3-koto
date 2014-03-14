@@ -60,6 +60,7 @@ architecture STRUCTURE of DtmRtmTest is
    signal pgpAxiWriteMaster  : AxiLiteWriteMasterType;
    signal pgpAxiWriteSlave   : AxiLiteWriteSlaveType;
    signal pgpClkRst          : sl;
+   signal pgpClkRstSw        : sl;
    signal pgpClk             : sl;
    signal ipgpClk            : sl;
    signal pgpTxMmcmReset     : sl;
@@ -232,6 +233,10 @@ begin
                when others => null;
             end case;
          end if;
+
+         -- Send Axi response
+         axiSlaveReadResponse(pgpAxiWriteMaster, pgpAxiReadMaster, v.axiWriteSlave, v.axiReadSlave);
+
       end if;
 
       -- Reset
@@ -454,7 +459,7 @@ begin
    -- Counters
    process ( pgpClk ) begin
       if rising_edge(pgpClk) then
-         if r.countReset = '1' or pgpClkRst = '1' then
+         if r.countReset = '1' or pgpClkRstSw = '1' then
             txCount <= (others=>'0') after 1 ns;
          elsif (pgpVcTxQuadIn(0).valid = '1' and pgpVcTxQuadIn(0).eof = '1' and pgpVcTxQuadOut(0).ready = '1') or
                (pgpVcTxQuadIn(1).valid = '1' and pgpVcTxQuadIn(1).eof = '1' and pgpVcTxQuadOut(1).ready = '1') or
@@ -463,7 +468,7 @@ begin
             txCount <= txCount + 1 after 1 ns;
          end if;
 
-         if r.countReset = '1' or pgpClkRst = '1' then
+         if r.countReset = '1' or pgpClkRstSw = '1' then
             rxCount <= (others=>'0') after 1 ns;
          elsif (pgpVcRxQuadOut(0).valid = '1' and pgpVcRxCommonOut.eof = '1' and pgpVcRxCommonOut.eofe = '0') or
                (pgpVcRxQuadOut(1).valid = '1' and pgpVcRxCommonOut.eof = '1' and pgpVcRxCommonOut.eofe = '0') or
@@ -472,7 +477,7 @@ begin
             rxCount <= rxCount + 1 after 1 ns;
          end if;
 
-         if r.countReset = '1' or pgpClkRst = '1' then
+         if r.countReset = '1' or pgpClkRstSw = '1' then
             eofeCount <= (others=>'0') after 1 ns;
          elsif (pgpVcRxQuadOut(0).valid = '1' and pgpVcRxCommonOut.eof = '1' and pgpVcRxCommonOut.eofe = '1') or
                (pgpVcRxQuadOut(1).valid = '1' and pgpVcRxCommonOut.eof = '1' and pgpVcRxCommonOut.eofe = '1') or
@@ -496,7 +501,7 @@ begin
 
       process ( pgpClk ) begin
          if rising_edge(pgpClk) then
-            if pgpClkRst = '1' then
+            if pgpClkRstSw = '1' then
                pgpVcTxQuadIn(j).data(0)  <= (others=>'0') after 1 ns;
             elsif pgpVcTxQuadOut(j).ready = '1' then
                if pgpVcTxQuadIn(j).data(0)  = 1500 then
@@ -511,19 +516,19 @@ begin
 
    process ( pgpClk ) begin
       if rising_edge(pgpClk) then
-         if r.countReset = '1' or pgpClkRst = '1' then
+         if r.countReset = '1' or pgpClkRstSw = '1' then
             cellErrorCnt <= (others=>'0') after 1 ns;
          elsif pgpRxOut.cellError = '1' and cellErrorCnt /= x"FFFFFFFF" then
             cellErrorCnt <= cellErrorCnt + 1 after 1 ns;
          end if;
 
-         if r.countReset = '1' or pgpClkRst = '1' then
+         if r.countReset = '1' or pgpClkRstSw = '1' then
             linkDownCnt  <= (others=>'0') after 1 ns;
          elsif pgpRxOut.linkDown = '1' and linkDownCnt /= x"FFFFFFFF" then
             linkDownCnt <= linkDownCnt + 1 after 1 ns;
          end if;
 
-         if r.countReset = '1' or pgpClkRst = '1' then
+         if r.countReset = '1' or pgpClkRstSw = '1' then
             linkErrorCnt <= (others=>'0') after 1 ns;
          elsif pgpRxOut.linkError = '1' and linkErrorCnt /= x"FFFFFFFF" then
             linkErrorCnt <= linkErrorCnt + 1 after 1 ns;
@@ -612,6 +617,7 @@ begin
          O     => pgpClk
       );
 
+
    -- Reset Gen
    U_pgpClkRstGen : entity work.RstSync
       generic map (
@@ -622,8 +628,23 @@ begin
       )
       port map (
         clk      => pgpClk,
-        asyncRst => r.clkReset,
+        asyncRst => axiClkRst,
         syncRst  => pgpClkRst
+      );
+
+
+   -- Reset Gen
+   U_pgpClkRstSwGen : entity work.RstSync
+      generic map (
+         TPD_G           => 1 ns,
+         IN_POLARITY_G   => '1',
+         OUT_POLARITY_G  => '1',
+         RELEASE_DELAY_G => 16
+      )
+      port map (
+        clk      => pgpClk,
+        asyncRst => r.clkReset,
+        syncRst  => pgpClkRstSw
       );
 
 end architecture STRUCTURE;

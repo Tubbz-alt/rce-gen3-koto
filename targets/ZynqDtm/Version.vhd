@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000222"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000223"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Wed Mar 12 18:44:30 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Thu Mar 13 20:22:18 PDT 2014 by rherbst";
 
 end Version;
 
@@ -53,5 +53,6 @@ end Version;
 -- 12/16/2013 (0xDC000215): Changed phy address in core.
 -- 12/16/2013 (0xDC000217): Ethernet Channel 0
 -- 02/25/2014 (0xDC000222): Axi Bus changes
+-- 03/13/2014 (0xDC000223): External AXI slowdown
 -------------------------------------------------------------------------------
 
