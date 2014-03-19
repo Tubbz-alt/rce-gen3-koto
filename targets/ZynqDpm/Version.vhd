@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000212"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000213"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Thu Mar 13 22:53:42 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Tue Mar 18 15:05:20 PDT 2014 by rherbst";
 
 end Version;
 
@@ -40,5 +40,6 @@ end Version;
 -- 02/28/2014 (0xDA000205): new build system
 -- 02/25/2014 (0xDC000211): Structure Change
 -- 03/13/2014 (0xDC000212): Slow external AXI
+-- 03/13/2014 (0xDC000213): Crossbar Fix
 -------------------------------------------------------------------------------
 
