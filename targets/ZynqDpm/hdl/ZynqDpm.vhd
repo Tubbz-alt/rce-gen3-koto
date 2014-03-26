@@ -53,12 +53,12 @@ end ZynqDpm;
 architecture STRUCTURE of ZynqDpm is
 
    -- Local Signals
-   signal obPpiClk           : slv(3 downto 0);
-   signal obPpiToFifo        : ObPpiToFifoVector(3 downto 0);
-   signal obPpiFromFifo      : ObPpiFromFifoVector(3 downto 0);
-   signal ibPpiClk           : slv(3 downto 0);
-   signal ibPpiToFifo        : IbPpiToFifoVector(3 downto 0);
-   signal ibPpiFromFifo      : IbPpiFromFifoVector(3 downto 0);
+   signal ppiClk               : slv(3 downto 0);
+   signal ppiOnline            : slv(3 downto 0);
+   signal ppiReadToFifo        : PpiReadToFifoArray(3 downto 0);
+   signal ppiReadFromFifo      : PpiReadFromFifoArray(3 downto 0);
+   signal ppiWriteToFifo       : PpiWriteToFifoArray(3 downto 0);
+   signal ppiWriteFromFifo     : PpiWriteFromFifoArray(3 downto 0);
    signal axiClk             : sl;
    signal axiClkRst          : sl;
    signal sysClk125          : sl;
@@ -101,12 +101,12 @@ begin
          localAxiReadSlave        => topAxiReadSlave,
          localAxiWriteMaster      => topAxiWriteMaster,
          localAxiWriteSlave       => topAxiWriteSlave,
-         obPpiClk                 => obPpiClk,
-         obPpiToFifo              => obPpiToFifo,
-         obPpiFromFifo            => obPpiFromFifo,
-         ibPpiClk                 => ibPpiClk,
-         ibPpiToFifo              => ibPpiToFifo,
-         ibPpiFromFifo            => ibPpiFromFifo,
+         ppiClk                   => ppiClk,
+         ppiOnline                => ppiOnline,
+         ppiReadToFifo            => ppiReadToFifo,
+         ppiReadFromFifo          => ppiReadFromFifo,
+         ppiWriteToFifo           => ppiWriteToFifo,
+         ppiWriteFromFifo         => ppiWriteFromFifo,
          clkSelA                  => clkSelA,
          clkSelB                  => clkSelB
       );
@@ -153,20 +153,19 @@ begin
    --------------------------------------------------
    U_LoopGen : for i in 0 to 3 generate
 
-      ibPpiClk(i) <= axiClk;
-      obPpiClk(i) <= axiClk;
+      ppiClk(i) <= axiClk;
 
-      ibPpiToFifo(i).data    <= obPpiFromFifo(i).data;
-      ibPpiToFifo(i).size    <= obPpiFromFifo(i).size;
-      ibPpiToFifo(i).ftype   <= obPpiFromFifo(i).ftype;
-      ibPpiToFifo(i).mgmt    <= obPpiFromFifo(i).mgmt;
-      ibPpiToFifo(i).eoh     <= obPpiFromFifo(i).eoh;
-      ibPpiToFifo(i).eof     <= obPpiFromFifo(i).eof;
-      ibPpiToFifo(i).err     <= '0';
+      ppiWriteToFifo(i).data    <= ppiReadFromFifo(i).data;
+      ppiWriteToFifo(i).size    <= ppiReadFromFifo(i).size;
+      ppiWriteToFifo(i).ftype   <= ppiReadFromFifo(i).ftype;
+      ppiWriteToFifo(i).mgmt    <= ppiReadFromFifo(i).mgmt;
+      ppiWriteToFifo(i).eoh     <= ppiReadFromFifo(i).eoh;
+      ppiWriteToFifo(i).eof     <= ppiReadFromFifo(i).eof;
+      ppiWriteToFifo(i).err     <= '0';
 
-      ibPpiToFifo(i).valid   <= obPpiFromFifo(i).valid;
+      ppiWriteToFifo(i).valid   <= ppiReadFromFifo(i).valid;
 
-      obPpiToFifo(i).read    <= obPpiFromFifo(i).valid;
+      ppiReadToFifo(i).read     <= ppiReadFromFifo(i).valid;
 
    end generate;
 

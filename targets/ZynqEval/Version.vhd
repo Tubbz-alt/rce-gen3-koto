@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000206"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000207"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Mon Mar 17 17:30:11 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Tue Mar 25 13:23:57 PDT 2014 by rherbst";
 
 end Version;
 
@@ -54,5 +54,6 @@ end Version;
 -- 03/13/2014 (0xF1000204): Debug
 -- 03/13/2014 (0xF1000205): External AXI clock slow down
 -- 03/17/2014 (0xF1000206): Crossbar Fix
+-- 03/25/2014 (0xF1000207): PPI Interface
 -------------------------------------------------------------------------------
 

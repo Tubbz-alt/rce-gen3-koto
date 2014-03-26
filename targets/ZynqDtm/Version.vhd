@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000226"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000228"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Tue Mar 18 15:05:21 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Tue Mar 25 13:34:22 PDT 2014 by rherbst";
 
 end Version;
 
@@ -57,5 +57,7 @@ end Version;
 -- 03/13/2014 (0xDC000224): Crossbar Fix
 -- 03/13/2014 (0xDC000225): PPI test
 -- 03/13/2014 (0xDC000226): Removed Debug
+-- 03/13/2014 (0xDC000227): Eth to channel 1
+-- 03/25/2014 (0xDC000228): PPI Interface Change
 -------------------------------------------------------------------------------
 
