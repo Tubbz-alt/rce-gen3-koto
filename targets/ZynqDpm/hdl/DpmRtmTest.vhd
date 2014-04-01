@@ -179,7 +179,7 @@ begin
          end if;
 
          -- Send Axi response
-         axiSlaveWriteResponse(pgpAxiWriteMaster, pgpAxiReadMaster, v.axiWriteSlave, v.axiReadSlave);
+         axiSlaveWriteResponse(v.axiWriteSlave);
 
       end if;
 
@@ -237,7 +237,7 @@ begin
          end if;
 
          -- Send Axi response
-         axiSlaveReadResponse(pgpAxiWriteMaster, pgpAxiReadMaster, v.axiWriteSlave, v.axiReadSlave);
+         axiSlaveReadResponse(v.axiReadSlave);
 
       end if;
 
