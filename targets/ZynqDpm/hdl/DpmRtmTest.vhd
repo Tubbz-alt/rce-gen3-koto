@@ -97,8 +97,8 @@ architecture STRUCTURE of DpmRtmTest is
       pgpRxReset        => (others=>'1'),
       pgpTxReset        => (others=>'1'),
       loopEnable        => (others=>'0'),
-      axiReadSlave      => AXI_READ_SLAVE_INIT_C,
-      axiWriteSlave     => AXI_WRITE_SLAVE_INIT_C
+      axiReadSlave      => AXI_LITE_READ_SLAVE_INIT_C,
+      axiWriteSlave     => AXI_LITE_WRITE_SLAVE_INIT_C
    );
 
    signal r   : RegType := REG_INIT_C;
