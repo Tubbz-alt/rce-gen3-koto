@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000209"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100020A"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Wed Apr  2 18:30:45 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Thu Apr  3 10:11:34 PDT 2014 by rherbst";
 
 end Version;
 
@@ -57,5 +57,6 @@ end Version;
 -- 03/25/2014 (0xF1000207): PPI Interface
 -- 03/31/2014 (0xF1000208): Modified Completion Value
 -- 04/02/2014 (0xF1000209): Outbound DMA pending size bug
+-- 04/02/2014 (0xF100020A): Debug
 -------------------------------------------------------------------------------
 

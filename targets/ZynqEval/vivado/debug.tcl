@@ -12,10 +12,21 @@ set_property C_DATA_DEPTH 2048 [get_debug_cores ${ilaName}]
 ## Setup Clock, Variable set in xdc file
 SetDebugCoreClk ${ilaName} [get_nets -of_objects ${dmaClkGroup}]
 
-ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/n_0_r[compFifoRdEn]}
+### Comp FIFOs
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/compFifoRdEn*}
 ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/compInt*}
-ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/n_0_r[localAxiReadSlave][rvalid]*}
-ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/n_0_r[localAxiReadSlave][rdata]*}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/localAxiReadSlave[rvalid]}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/localAxiReadSlave[rdata]*}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/n_0_r_reg[freeFifoWr]*}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/n_0_r_reg[freeFifoDin]*}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_Comp/compFifoDout[15]*}
+
+### AXI Bridge
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3LocalAxi/axiGpMasterWriteFromArm[awvalid]}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3LocalAxi/axiGpMasterWriteFromArm[wvalid]}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3LocalAxi/axiGpMasterWriteFromArm[bready]}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3LocalAxi/axiGpMasterWriteToArm[bvalid]}
+ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/U_ArmRceG3LocalAxi/axiGpMasterWriteToArm[awready]}
    
 ### Read Controller
 #ConfigProbe ${ilaName} {U_EvalCore/U_ArmRceG3Top/axiAcpSlaveReadToArm[arvalid]*}
