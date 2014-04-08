@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00022B"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00022C"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Wed Apr  2 18:31:24 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Mon Apr  7 17:24:37 PDT 2014 by rherbst";
 
 end Version;
 
@@ -62,5 +62,6 @@ end Version;
 -- 03/25/2014 (0xDC000229): Eth to channel 0
 -- 04/01/2014 (0xDC00022A): PPI changes
 -- 04/02/2014 (0xDC00022B): PPI outbound error fix.
+-- 04/02/2014 (0xDC00022C): PGP2b
 -------------------------------------------------------------------------------
 

@@ -10,8 +10,8 @@ use IEEE.numeric_std.all;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 use work.StdRtlPkg.all;
-use work.VcPkg.all;
-use work.Pgp2CoreTypesPkg.all;
+use work.Vc64Pkg.all;
+use work.Pgp2bPkg.all;
 use work.AxiLitePkg.all;
 
 entity DpmRtmTest is
@@ -66,10 +66,10 @@ architecture STRUCTURE of DpmRtmTest is
    signal pgpRxOut           : PgpRxOutArray(11 downto 0);
    signal pgpTxIn            : PgpTxInArray(11 downto 0);
    signal pgpTxOut           : PgpTxOutArray(11 downto 0);
-   signal pgpVcTxQuadIn      : VcTxQuadInArray(11 downto 0);
-   signal pgpVcTxQuadOut     : VcTxQuadOutArray(11 downto 0);
-   signal pgpVcRxCommonOut   : VcRxCommonOutArray(11 downto 0);
-   signal pgpVcRxQuadOut     : VcRxQuadOutArray(11 downto 0);
+   signal pgpTxVcData        : Vc64DataArray(95 downto 0);
+   signal pgpTxVcCtrl        : Vc64CtrlArray(95 downto 0);
+   signal pgpRxVcData        : Vc64DataArray(11 downto 0);
+   signal pgpRxVcCtrl        : Vc64CtrlArray(95 downto 0);
    signal pgpFbClk           : sl;
    signal cellErrorCnt       : Slv32Array(11 downto 0);
    signal linkDownCnt        : Slv32Array(11 downto 0);
@@ -103,21 +103,6 @@ architecture STRUCTURE of DpmRtmTest is
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-
-   type VcUsBuff16InQuad  is array (0 to 3) of VcUsBuff16InType;
-   type VcUsBuff16OutQuad is array (0 to 3) of VcUsBuff16OutType;
-   type VcDsBuff16InQuad  is array (0 to 3) of VcDsBuff16InType;
-   type VcDsBuff16OutQuad is array (0 to 3) of VcDsBuff16OutType;
-
-   type VcUsBuff16InQuadVector  is array (natural range <>) of VcUsBuff16InQuad;
-   type VcUsBuff16OutQuadVector is array (natural range <>) of VcUsBuff16OutQuad;
-   type VcDsBuff16InQuadVector  is array (natural range <>) of VcDsBuff16InQuad;
-   type VcDsBuff16OutQuadVector is array (natural range <>) of VcDsBuff16OutQuad;
-
-   signal usBuff16In       : VcUsBuff16InQuadVector(11 downto 0);
-   signal usBuff16Out      : VcUsBuff16OutQuadVector(11 downto 0);
-   signal dsBuff16In       : VcDsBuff16InQuadVector(11 downto 0);
-   signal dsBuff16Out      : VcDsBuff16OutQuadVector(11 downto 0);
 
 begin
 
@@ -282,7 +267,7 @@ begin
    U_PgpGen : for i in 0 to 11 generate
 
       -- PGP Core
-      U_Pgp: entity work.Pgp2Gtx7MultiLane 
+      U_Pgp: entity work.Pgp2bGtx7MultiLane 
          generic map (
             TPD_G                 => 1 ns,
             -----------------------------------------
@@ -343,9 +328,9 @@ begin
             ----------------------------------------
             -- PGP Settings
             ----------------------------------------
-            PayloadCntTop         => 7,  -- Top bit for payload counter
-            EnShortCells          => 1,  -- Enable short non-EOF cells
-            VcInterleave          => 1
+            PAYLOAD_CNT_TOP_G     => 7,  -- Top bit for payload counter
+            EN_SHORT_CELLS_G      => 1,  -- Enable short non-EOF cells
+            VC_INTERLEAVE_G       => 1
          ) port map (
             -- GT Clocking
             stableClk        => sysClk200,    -- GT needs a stable clock to "boot up"
@@ -377,12 +362,12 @@ begin
             -- Non VC Tx Signals
             pgpTxIn           => pgpTxIn(i),
             pgpTxOut          => pgpTxOut(i),
-            -- Frame Transmit Interface - Array of 4 VCs
-            pgpVcTxQuadIn     => pgpVcTxQuadIn(i),
-            pgpVcTxQuadOut    => pgpVcTxQuadOut(i),
-            -- Frame Receive Interface - Array of 4 VCs
-            pgpVcRxCommonOut  => pgpVcRxCommonOut(i),
-            pgpVcRxQuadOut    => pgpVcRxQuadOut(i),
+            -- Frame Transmit Interface - 1 Lane, Array of 4 VCs
+            pgpTxVcData       => pgpTxVcData(i*4+3 downto i*4),
+            pgpTxVcCtrl       => pgpTxVcCtrl(i*4+3 downto i*4),
+            -- Frame Receive Interface - 1 Lane, Array of 4 VCs
+            pgpRxVcData       => pgpRxVcData(i),
+            pgpRxVcCtrl       => pgpRxVcCtrl(i*4+3 downto i*4),
             -- GT loopback control
             loopback          => r.loopEnable
          );
@@ -445,53 +430,48 @@ begin
          if rising_edge(pgpClk) then
             if r.countReset = '1' or pgpClkRstSw = '1' then
                txCount(i) <= (others=>'0') after 1 ns;
-            elsif (pgpVcTxQuadIn(i)(0).valid = '1' and pgpVcTxQuadIn(i)(0).eof = '1' and pgpVcTxQuadOut(i)(0).ready = '1') or
-                  (pgpVcTxQuadIn(i)(1).valid = '1' and pgpVcTxQuadIn(i)(1).eof = '1' and pgpVcTxQuadOut(i)(1).ready = '1') or
-                  (pgpVcTxQuadIn(i)(2).valid = '1' and pgpVcTxQuadIn(i)(2).eof = '1' and pgpVcTxQuadOut(i)(2).ready = '1') or
-                  (pgpVcTxQuadIn(i)(3).valid = '1' and pgpVcTxQuadIn(i)(3).eof = '1' and pgpVcTxQuadOut(i)(3).ready = '1')  then
+            elsif (pgpTxVcData(i*4+0).valid = '1' and pgpTxVcData(i*4+0).eof = '1' and pgpTxVcCtrl(i*4+0).ready = '1') or
+                  (pgpTxVcData(i*4+1).valid = '1' and pgpTxVcData(i*4+1).eof = '1' and pgpTxVcCtrl(i*4+1).ready = '1') or
+                  (pgpTxVcData(i*4+2).valid = '1' and pgpTxVcData(i*4+2).eof = '1' and pgpTxVcCtrl(i*4+2).ready = '1') or
+                  (pgpTxVcData(i*4+3).valid = '1' and pgpTxVcData(i*4+3).eof = '1' and pgpTxVcCtrl(i*4+3).ready = '1') then
                txCount(i) <= txCount(i) + 1 after 1 ns;
             end if;
 
             if r.countReset = '1' or pgpClkRstSw = '1' then
                rxCount(i) <= (others=>'0') after 1 ns;
-            elsif (pgpVcRxQuadOut(i)(0).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0') or
-                  (pgpVcRxQuadOut(i)(1).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0') or
-                  (pgpVcRxQuadOut(i)(2).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0') or
-                  (pgpVcRxQuadOut(i)(3).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '0')  then
+            elsif (pgpRxVcData(i).valid = '1' and pgpRxVcData(i).eof = '1' and pgpRxVcData(i).eofe = '0') then
                rxCount(i) <= rxCount(i) + 1 after 1 ns;
             end if;
 
             if r.countReset = '1' or pgpClkRstSw = '1' then
                eofeCount(i) <= (others=>'0') after 1 ns;
-            elsif (pgpVcRxQuadOut(i)(0).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '1') or
-                  (pgpVcRxQuadOut(i)(1).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '1') or
-                  (pgpVcRxQuadOut(i)(2).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '1') or
-                  (pgpVcRxQuadOut(i)(3).valid = '1' and pgpVcRxCommonOut(i).eof = '1' and pgpVcRxCommonOut(i).eofe = '1')  then
+            elsif (pgpRxVcData(i).valid = '1' and pgpRxVcData(i).eof = '1' and pgpRxVcData(i).eofe = '1') then
                eofeCount(i) <= eofeCount(i) + 1 after 1 ns;
             end if;
          end if;
       end process;
 
-
       -- Transmit data on VCs
       U_LoopGen : for j in 0 to 3 generate
-         pgpVcTxQuadIn(i)(j).locBuffAFull <= '0';
-         pgpVcTxQuadIn(i)(j).locBuffFull  <= '0';
-         pgpVcTxQuadIn(i)(j).eofe         <= '0';
-         pgpVcTxQuadIn(i)(j).valid        <= '1';
-         pgpVcTxQuadIn(i)(j).sof          <= '1' when pgpVcTxQuadIn(i)(j).data(0) = 0    else '0';
-         pgpVcTxQuadIn(i)(j).eof          <= '1' when pgpVcTxQuadIn(i)(j).data(0) = 1500 else '0';
-         pgpVcTxQuadIn(i)(j).data(1 to 3) <= (others=>(others=>'0'));
+         pgpRxVcCtrl(i*4+j).overflow   <= '0';
+         pgpRxVcCtrl(i*4+j).almostFull <= '0';
+         pgpRxVcCtrl(i*4+j).ready      <= '1';
+         pgpTxVcData(i*4+j).eofe       <= '0';
+         pgpTxVcData(i*4+j).size       <= '0';
+         pgpTxVcData(i*4+j).vc         <= "00";
+         pgpTxVcData(i*4+j).valid      <= '1';
+         pgpTxVcData(i*4+j).sof        <= '1' when pgpTxVcData(i*4+j).data = 0    else '0';
+         pgpTxVcData(i*4+j).eof        <= '1' when pgpTxVcData(i*4+j).data = 1500 else '0';
 
          process ( pgpClk ) begin
             if rising_edge(pgpClk) then
                if pgpClkRstSw = '1' then
-                  pgpVcTxQuadIn(i)(j).data(0)  <= (others=>'0') after 1 ns;
-               elsif pgpVcTxQuadOut(i)(j).ready = '1' then
-                  if pgpVcTxQuadIn(i)(j).data(0)  = 1500 then
-                     pgpVcTxQuadIn(i)(j).data(0)  <= (others=>'0') after 1 ns;
+                  pgpTxVcData(i*4+j).data <= (others=>'0') after 1 ns;
+               elsif pgpTxVcCtrl(i*4+j).ready = '1' then
+                   if pgpTxVcData(i*4+j).data = 1500 then
+                     pgpTxVcData(i*4+j).data <= (others=>'0') after 1 ns;
                   else
-                     pgpVcTxQuadIn(i)(j).data(0)  <= pgpVcTxQuadIn(i)(j).data(0)  + 1 after 1 ns;
+                     pgpTxVcData(i*4+j).data <= pgpTxVcData(i*4+j).data + 1 after 1 ns;
                   end if;
                end if;
             end if;

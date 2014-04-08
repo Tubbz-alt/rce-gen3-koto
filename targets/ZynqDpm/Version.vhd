@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000217"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000218"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Wed Apr  2 18:30:27 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Mon Apr  7 17:18:46 PDT 2014 by rherbst";
 
 end Version;
 
@@ -45,5 +45,6 @@ end Version;
 -- 03/13/2014 (0xDC000215): PPI Interface Change
 -- 04/01/2014 (0xDC000216): PPI Interface Change again
 -- 04/02/2014 (0xDC000217): OB PPI error fix.
+-- 04/02/2014 (0xDC000218): PGP2b
 -------------------------------------------------------------------------------
 
