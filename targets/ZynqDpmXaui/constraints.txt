@@ -1,0 +1,2 @@
+../../modules/DpmCore/hdl/DpmCore.xdc
+hdl/ZynqDpmXaui.xdc

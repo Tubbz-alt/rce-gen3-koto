@@ -1,9 +1,5 @@
 ##-----------------------------------------------------------------------------
-## Title         : Xilinx map options file
+## Title         : Xilinx bitgen options file
 ##-----------------------------------------------------------------------------
-
 -intstyle silent
--ol high
--xe n
--logic_opt on
--t 3
+-w

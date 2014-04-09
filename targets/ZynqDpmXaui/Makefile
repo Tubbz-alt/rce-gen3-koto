@@ -7,6 +7,7 @@ export PRJ_PART = XC7Z045FFG900-2
 
 # List of build core directories.
 export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
+                     $(PROJ_DIR)/../../modules/ZynqEthernet10G  \
                      $(PROJ_DIR)/../../modules/StdLib  \
                      $(PROJ_DIR)/../../modules/i2c_core  \
                      $(PROJ_DIR)/../../modules/Vc64Lib \

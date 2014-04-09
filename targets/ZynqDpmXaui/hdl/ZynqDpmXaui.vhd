@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- ZynqDpm.vhd
+-- ZynqDpmXaui.vhd
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -10,7 +10,7 @@ use work.ArmRceG3Pkg.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 
-entity ZynqDpm is
+entity ZynqDpmXaui is
    port (
 
       -- Debug
@@ -21,18 +21,18 @@ entity ZynqDpm is
       i2cScl       : inout sl;
 
       -- Ethernet
-      ethRxP       : in    slv(0 downto 0);
-      ethRxM       : in    slv(0 downto 0);
-      ethTxP       : out   slv(0 downto 0);
-      ethTxM       : out   slv(0 downto 0);
+      ethRxP       : in    slv(3 downto 0);
+      ethRxM       : in    slv(3 downto 0);
+      ethTxP       : out   slv(3 downto 0);
+      ethTxM       : out   slv(3 downto 0);
       ethRefClkP   : in    sl;
       ethRefClkM   : in    sl;
 
       -- RTM High Speed
-      dpmToRtmHsP  : out   slv(11 downto 0);
-      dpmToRtmHsM  : out   slv(11 downto 0);
-      rtmToDpmHsP  : in    slv(11 downto 0);
-      rtmToDpmHsM  : in    slv(11 downto 0);
+      --dpmToRtmHsP  : out   slv(11 downto 0);
+      --dpmToRtmHsM  : out   slv(11 downto 0);
+      --rtmToDpmHsP  : in    slv(11 downto 0);
+      --rtmToDpmHsM  : in    slv(11 downto 0);
 
       -- Reference Clocks
       locRefClkP   : in    sl;
@@ -50,9 +50,9 @@ entity ZynqDpm is
       clkSelA      : out   slv(1 downto 0);
       clkSelB      : out   slv(1 downto 0)
    );
-end ZynqDpm;
+end ZynqDpmXaui;
 
-architecture STRUCTURE of ZynqDpm is
+architecture STRUCTURE of ZynqDpmXaui is
 
    -- Local Signals
    signal ppiClk             : slv(2 downto 0);
@@ -71,18 +71,14 @@ architecture STRUCTURE of ZynqDpm is
    signal timingCodeEn       : sl;
    signal fbCode             : slv(7 downto 0);
    signal fbCodeEn           : sl;
-   signal intAxiReadMaster   : AxiLiteReadMasterArray(1 downto 0);
-   signal intAxiReadSlave    : AxiLiteReadSlaveArray(1 downto 0);
-   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(1 downto 0);
-   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(1 downto 0);
+   signal intAxiReadMaster   : AxiLiteReadMasterArray(0 downto 0);
+   signal intAxiReadSlave    : AxiLiteReadSlaveArray(0 downto 0);
+   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(0 downto 0);
+   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(0 downto 0);
    signal topAxiReadMaster   : AxiLiteReadMasterType;
    signal topAxiReadSlave    : AxiLiteReadSlaveType;
    signal topAxiWriteMaster  : AxiLiteWriteMasterType;
    signal topAxiWriteSlave   : AxiLiteWriteSlaveType;
-   signal iethRxP            : slv(3 downto 0);
-   signal iethRxM            : slv(3 downto 0);
-   signal iethTxP            : slv(3 downto 0);
-   signal iethTxM            : slv(3 downto 0);
 
 begin
 
@@ -90,13 +86,15 @@ begin
    -- Core
    --------------------------------------------------
    U_DpmCore: entity work.DpmCore 
-      port map (
+      generic map (
+         ETH_10G_EN_G => true
+      ) port map (
          i2cSda                   => i2cSda,
          i2cScl                   => i2cScl,
-         ethRxP                   => iethRxP,
-         ethRxM                   => iethRxM,
-         ethTxP                   => iethTxP,
-         ethTxM                   => iethTxM,
+         ethRxP                   => ethRxP,
+         ethRxM                   => ethRxM,
+         ethTxP                   => ethTxP,
+         ethTxM                   => ethTxM,
          ethRefClkP               => ethRefClkP,
          ethRefClkM               => ethRefClkM,
          axiClk                   => axiClk,
@@ -119,12 +117,6 @@ begin
          clkSelB                  => clkSelB
       );
 
-   ethTxP(0)           <= iethTxP(0);
-   ethTxM(0)           <= iethTxM(0);
-   iethRxP(0)          <= ethRxP(0);
-   iethRxM(0)          <= ethRxM(0);
-   iethRxP(3 downto 1) <= (others=>'0');
-   iethRxM(3 downto 1) <= (others=>'0');
 
    -------------------------------------
    -- AXI Lite Crossbar
@@ -134,17 +126,12 @@ begin
       generic map (
          TPD_G              => 1 ns,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 2,
+         NUM_MASTER_SLOTS_G => 1,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => (
 
             -- Channel 0 = 0xA0000000 - 0xA000FFFF : DPM Timing Source
             0 => ( baseAddr     => x"A0000000",
-                   addrBits     => 16,
-                   connectivity => x"FFFF"),
-
-            -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
-            1 => ( baseAddr     => x"A0010000",
                    addrBits     => 16,
                    connectivity => x"FFFF")
          )
@@ -213,29 +200,6 @@ begin
 
    fbCode   <= timingCode;
    fbCodeEn <= timingCodeEn;
-
-
-   --------------------------------------------------
-   -- RTM Testing
-   --------------------------------------------------
-
-   U_RtmTest : entity work.DpmRtmTest 
-      port map (
-         sysClk200           => sysClk200,
-         sysClk200Rst        => sysClk200Rst,
-         axiClk              => axiClk,
-         axiClkRst           => axiClkRst,
-         topAxiReadMaster    => intAxiReadMaster(1),
-         topAxiReadSlave     => intAxiReadSlave(1),
-         topAxiWriteMaster   => intAxiWriteMaster(1),
-         topAxiWriteSlave    => intAxiWriteSlave(1),
-         locRefClkP          => locRefClkP,
-         locRefClkM          => locRefClkM,
-         dpmToRtmHsP         => dpmToRtmHsP,
-         dpmToRtmHsM         => dpmToRtmHsM,
-         rtmToDpmHsP         => rtmToDpmHsP,
-         rtmToDpmHsM         => rtmToDpmHsM
-      );
 
 
    --------------------------------------------------
