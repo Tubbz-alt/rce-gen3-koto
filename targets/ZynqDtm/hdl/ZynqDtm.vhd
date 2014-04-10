@@ -96,13 +96,53 @@ end ZynqDtm;
 
 architecture STRUCTURE of ZynqDtm is
 
+   -- PPI Configurations
+   constant PPI0_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   constant PPI1_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   constant PPI2_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   -- PPI Configuration
+   constant PPI_CONFIG_C : PpiConfigArray(2 downto 0) := (
+      0 =>  PPI0_CONFIG_C,
+      1 =>  PPI1_CONFIG_C,
+      2 =>  PPI2_CONFIG_C
+   );
+
+   constant TPD_C : time := 1 ns;
+
    -- Local Signals
-   signal ppiClk               : slv(3 downto 0);
-   signal ppiOnline            : slv(3 downto 0);
-   signal ppiReadToFifo        : PpiReadToFifoArray(3 downto 0);
-   signal ppiReadFromFifo      : PpiReadFromFifoArray(3 downto 0);
-   signal ppiWriteToFifo       : PpiWriteToFifoArray(3 downto 0);
-   signal ppiWriteFromFifo     : PpiWriteFromFifoArray(3 downto 0);
+   signal ppiClk             : slv(2 downto 0);
+   signal ppiOnline          : slv(2 downto 0);
+   signal ppiReadToFifo      : PpiReadToFifoArray(2 downto 0);
+   signal ppiReadFromFifo    : PpiReadFromFifoArray(2 downto 0);
+   signal ppiWriteToFifo     : PpiWriteToFifoArray(2 downto 0);
+   signal ppiWriteFromFifo   : PpiWriteFromFifoArray(2 downto 0);
    signal axiClk             : sl;
    signal axiClkRst          : sl;
    signal sysClk125          : sl;
@@ -128,7 +168,10 @@ begin
    -- Core
    --------------------------------------------------
    U_DtmCore: entity work.DtmCore 
-      port map (
+      generic map (
+         TPD_G        => TPD_C,
+         PPI_CONFIG_G => PPI_CONFIG_C
+      ) port map (
          i2cSda              => i2cSda,
          i2cScl              => i2cScl,
          pciRefClkP          => pciRefClkP,
@@ -186,7 +229,7 @@ begin
    -------------------------------------
    U_AxiCrossbar : entity work.AxiLiteCrossbar 
       generic map (
-         TPD_G              => 1 ns,
+         TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 2,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
@@ -219,7 +262,7 @@ begin
    --------------------------------------------------
    -- PPI Loopback
    --------------------------------------------------
-   U_LoopGen : for i in 0 to 3 generate
+   U_LoopGen : for i in 0 to 2 generate
 
       ppiClk(i) <= axiClk;
 
@@ -242,7 +285,7 @@ begin
    --------------------------------------------------
    U_DtmTimingSource : entity work.DtmTimingSource 
       generic map (
-         TPD_G => 1 ns
+         TPD_G => TPD_C
       ) port map (
          axiClk              => axiClk,
          axiClkRst           => axiClkRst,
@@ -276,7 +319,9 @@ begin
    --------------------------------------------------
 
    U_RtmTest : entity work.DtmRtmTest 
-      port map (
+      generic map (
+         TPD_G => TPD_C
+      ) port map (
          sysClk200           => sysClk200,
          sysClk200Rst        => sysClk200Rst,
          axiClk              => axiClk,

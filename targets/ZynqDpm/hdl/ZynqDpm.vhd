@@ -54,6 +54,46 @@ end ZynqDpm;
 
 architecture STRUCTURE of ZynqDpm is
 
+   -- PPI Configurations
+   constant PPI0_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   constant PPI1_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   constant PPI2_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   -- PPI Configuration
+   constant PPI_CONFIG_C : PpiConfigArray(2 downto 0) := (
+      0 =>  PPI0_CONFIG_C,
+      1 =>  PPI1_CONFIG_C,
+      2 =>  PPI2_CONFIG_C
+   );
+
+   constant TPD_C : time := 1 ns;
+
    -- Local Signals
    signal ppiClk             : slv(2 downto 0);
    signal ppiOnline          : slv(2 downto 0);
@@ -90,7 +130,11 @@ begin
    -- Core
    --------------------------------------------------
    U_DpmCore: entity work.DpmCore 
-      port map (
+      generic map (
+         TPD_G        => TPD_C,
+         PPI_CONFIG_G => PPI_CONFIG_C,
+         ETH_10G_EN_G => false
+      ) port map (
          i2cSda                   => i2cSda,
          i2cScl                   => i2cScl,
          ethRxP                   => iethRxP,
@@ -109,6 +153,7 @@ begin
          localAxiReadSlave        => topAxiReadSlave,
          localAxiWriteMaster      => topAxiWriteMaster,
          localAxiWriteSlave       => topAxiWriteSlave,
+         dbgStatus                => open,
          ppiClk                   => ppiClk,
          ppiOnline                => ppiOnline,
          ppiReadToFifo            => ppiReadToFifo,
@@ -132,7 +177,7 @@ begin
    -------------------------------------
    U_AxiCrossbar : entity work.AxiLiteCrossbar 
       generic map (
-         TPD_G              => 1 ns,
+         TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 2,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
@@ -188,27 +233,27 @@ begin
    --------------------------------------------------
    U_DpmTimingSink : entity work.DpmTimingSink 
       generic map (
-         TPD_G => 1 ns
+         TPD_G => TPD_C
       ) port map (
-         axiClk                    => axiClk,
-         axiClkRst                 => axiClkRst,
-         axiReadMaster             => intAxiReadMaster(0),
-         axiReadSlave              => intAxiReadSlave(0),
-         axiWriteMaster            => intAxiWriteMaster(0),
-         axiWriteSlave             => intAxiWriteSlave(0),
-         sysClk200                 => sysClk200,
-         sysClk200Rst              => sysClk200Rst,
-         dtmClkP                   => dtmClkP,
-         dtmClkM                   => dtmClkM,
-         dtmFbP                    => dtmFbP,
-         dtmFbM                    => dtmFbM,
-         distClk                   => open,
-         distClkRst                => open,
-         timingCode                => timingCode,
-         timingCodeEn              => timingCodeEn,
-         fbCode                    => fbCode,
-         fbCodeEn                  => fbCodeEn,
-         led                       => led
+         axiClk         => axiClk,
+         axiClkRst      => axiClkRst,
+         axiReadMaster  => intAxiReadMaster(0),
+         axiReadSlave   => intAxiReadSlave(0),
+         axiWriteMaster => intAxiWriteMaster(0),
+         axiWriteSlave  => intAxiWriteSlave(0),
+         sysClk200      => sysClk200,
+         sysClk200Rst   => sysClk200Rst,
+         dtmClkP        => dtmClkP,
+         dtmClkM        => dtmClkM,
+         dtmFbP         => dtmFbP,
+         dtmFbM         => dtmFbM,
+         distClk        => open,
+         distClkRst     => open,
+         timingCode     => timingCode,
+         timingCodeEn   => timingCodeEn,
+         fbCode         => fbCode,
+         fbCodeEn       => fbCodeEn,
+         led            => led
       );
 
    fbCode   <= timingCode;
@@ -220,7 +265,9 @@ begin
    --------------------------------------------------
 
    U_RtmTest : entity work.DpmRtmTest 
-      port map (
+      generic map (
+         TPD_G => TPD_C
+      ) port map (
          sysClk200           => sysClk200,
          sysClk200Rst        => sysClk200Rst,
          axiClk              => axiClk,

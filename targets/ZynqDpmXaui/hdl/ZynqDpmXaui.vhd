@@ -3,6 +3,8 @@
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
 
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
@@ -54,6 +56,46 @@ end ZynqDpmXaui;
 
 architecture STRUCTURE of ZynqDpmXaui is
 
+   -- PPI Configurations
+   constant PPI0_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   constant PPI1_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   constant PPI2_CONFIG_C : PpiConfigType := ( 
+      obHeaderAddrWidth  => 9,
+      obDataAddrWidth    => 9,
+      obReadyThold       => 1,
+      ibHeaderAddrWidth  => 9,
+      ibHeaderPauseThold => 255,
+      ibDataAddrWidth    => 9,
+      ibDataPauseThold   => 255
+   );
+
+   -- PPI Configuration
+   constant PPI_CONFIG_C : PpiConfigArray(2 downto 0) := (
+      0 =>  PPI0_CONFIG_C,
+      1 =>  PPI1_CONFIG_C,
+      2 =>  PPI2_CONFIG_C
+   );
+
+   constant TPD_C : time := 1 ns;
+
    -- Local Signals
    signal ppiClk             : slv(2 downto 0);
    signal ppiOnline          : slv(2 downto 0);
@@ -79,6 +121,8 @@ architecture STRUCTURE of ZynqDpmXaui is
    signal topAxiReadSlave    : AxiLiteReadSlaveType;
    signal topAxiWriteMaster  : AxiLiteWriteMasterType;
    signal topAxiWriteSlave   : AxiLiteWriteSlaveType;
+   signal dbgStatus          : slv(7 downto 0);
+   signal dbgCount           : slv(27 downto 0);
 
 begin
 
@@ -87,6 +131,8 @@ begin
    --------------------------------------------------
    U_DpmCore: entity work.DpmCore 
       generic map (
+         TPD_G        => TPD_C,
+         PPI_CONFIG_G => PPI_CONFIG_C,
          ETH_10G_EN_G => true
       ) port map (
          i2cSda                   => i2cSda,
@@ -107,6 +153,7 @@ begin
          localAxiReadSlave        => topAxiReadSlave,
          localAxiWriteMaster      => topAxiWriteMaster,
          localAxiWriteSlave       => topAxiWriteSlave,
+         dbgStatus                => dbgStatus,
          ppiClk                   => ppiClk,
          ppiOnline                => ppiOnline,
          ppiReadToFifo            => ppiReadToFifo,
@@ -124,7 +171,7 @@ begin
    -------------------------------------
    U_AxiCrossbar : entity work.AxiLiteCrossbar 
       generic map (
-         TPD_G              => 1 ns,
+         TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 1,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
@@ -175,7 +222,7 @@ begin
    --------------------------------------------------
    U_DpmTimingSink : entity work.DpmTimingSink 
       generic map (
-         TPD_G => 1 ns
+         TPD_G => TPD_C
       ) port map (
          axiClk                    => axiClk,
          axiClkRst                 => axiClkRst,
@@ -198,8 +245,22 @@ begin
          led                       => led
       );
 
-   fbCode   <= timingCode;
-   fbCodeEn <= timingCodeEn;
+   --fbCode   <= timingCode;
+   --fbCodeEn <= timingCodeEn;
+
+   process ( sysClk125 ) begin
+      if rising_edge(sysClk125) then
+         if sysClk125Rst = '1' then
+            dbgCount <= (others=>'0') after TPD_C;
+            fbCodeEn <= '0'           after TPD_C;
+            fbCode   <= (others=>'0') after TPD_C;
+         else
+            fbCodeEn <= dbgCount(27) after TPD_C;
+            fbCode   <= dbgStatus    after TPD_C;
+            dbgCount <= dbgCount + 1 after TPD_C;
+         end if;
+      end if;
+   end process;
 
 
    --------------------------------------------------
@@ -221,6 +282,7 @@ begin
    --dtmRefClkM   : in    sl;
 
    -- DTM Signals
+
    --dtmClkP      : in    slv(1  downto 0);
    --dtmClkM      : in    slv(1  downto 0);
    --dtmFbP       : out   sl;
