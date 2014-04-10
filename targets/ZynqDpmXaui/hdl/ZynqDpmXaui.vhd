@@ -122,7 +122,10 @@ architecture STRUCTURE of ZynqDpmXaui is
    signal topAxiWriteMaster  : AxiLiteWriteMasterType;
    signal topAxiWriteSlave   : AxiLiteWriteSlaveType;
    signal dbgStatus          : slv(7 downto 0);
+   signal dbgStatusSync      : slv(7 downto 0);
    signal dbgCount           : slv(27 downto 0);
+   signal distClk            : sl;
+   signal distClkRst         : sl;
 
 begin
 
@@ -236,8 +239,8 @@ begin
          dtmClkM                   => dtmClkM,
          dtmFbP                    => dtmFbP,
          dtmFbM                    => dtmFbM,
-         distClk                   => open,
-         distClkRst                => open,
+         distClk                   => distClk,
+         distClkRst                => distClkRst,
          timingCode                => timingCode,
          timingCodeEn              => timingCodeEn,
          fbCode                    => fbCode,
@@ -248,16 +251,43 @@ begin
    --fbCode   <= timingCode;
    --fbCodeEn <= timingCodeEn;
 
-   process ( sysClk125 ) begin
-      if rising_edge(sysClk125) then
-         if sysClk125Rst = '1' then
+
+
+   U_StatSync: entity work.SynchronizerFifo 
+      generic map (
+         TPD_G         => TPD_C,
+         BRAM_EN_G     => false,
+         ALTERA_SYN_G  => false,
+         ALTERA_RAM_G  => "M9K",
+         SYNC_STAGES_G => 3,
+         DATA_WIDTH_G  => 8,
+         ADDR_WIDTH_G  => 4,
+         INIT_G        => "0"
+      ) port map (
+         rst    => distClkRst,
+         wr_clk => sysClk125,
+         wr_en  => '1',
+         din    => dbgStatus,
+         rd_clk => distClk,
+         rd_en  => '1',
+         valid  => open,
+         dout   => dbgStatusSync
+      );
+
+   process ( distClk ) begin
+      if rising_edge(distClk) then
+         if distClkRst = '1' then
             dbgCount <= (others=>'0') after TPD_C;
             fbCodeEn <= '0'           after TPD_C;
             fbCode   <= (others=>'0') after TPD_C;
          else
-            fbCodeEn <= dbgCount(27) after TPD_C;
-            fbCode   <= dbgStatus    after TPD_C;
-            dbgCount <= dbgCount + 1 after TPD_C;
+            if dbgCount = 0 then
+               fbCodeEn <= '1' after TPD_C;
+            else
+               fbCodeEn <= '0' after TPD_C;
+            end if;
+            fbCode   <= dbgStatusSync after TPD_C;
+            dbgCount <= dbgCount + 1  after TPD_C;
          end if;
       end if;
    end process;
