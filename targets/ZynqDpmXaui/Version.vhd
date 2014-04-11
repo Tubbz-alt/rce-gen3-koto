@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100002"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100003"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Thu Apr 10 12:18:34 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Fri Apr 11 13:13:15 PDT 2014 by rherbst";
 
 end Version;
 
@@ -26,5 +26,6 @@ end Version;
 -- Revision History:
 -- 04/09/2014 (0xDA100001): Initial Version
 -- 04/09/2014 (0xDA100002): XAUI status over feedback bus.
+-- 04/09/2014 (0xDA100003): Reg Debug
 -------------------------------------------------------------------------------
 

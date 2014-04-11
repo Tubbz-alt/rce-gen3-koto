@@ -113,19 +113,26 @@ architecture STRUCTURE of ZynqDpmXaui is
    signal timingCodeEn       : sl;
    signal fbCode             : slv(7 downto 0);
    signal fbCodeEn           : sl;
-   signal intAxiReadMaster   : AxiLiteReadMasterArray(0 downto 0);
-   signal intAxiReadSlave    : AxiLiteReadSlaveArray(0 downto 0);
-   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(0 downto 0);
-   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(0 downto 0);
+   signal intAxiReadMaster   : AxiLiteReadMasterArray(1 downto 0);
+   signal intAxiReadSlave    : AxiLiteReadSlaveArray(1 downto 0);
+   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(1 downto 0);
+   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(1 downto 0);
    signal topAxiReadMaster   : AxiLiteReadMasterType;
    signal topAxiReadSlave    : AxiLiteReadSlaveType;
    signal topAxiWriteMaster  : AxiLiteWriteMasterType;
    signal topAxiWriteSlave   : AxiLiteWriteSlaveType;
-   signal dbgStatus          : slv(7 downto 0);
-   signal dbgStatusSync      : slv(7 downto 0);
-   signal dbgCount           : slv(27 downto 0);
+   signal ethStatus          : slv(7 downto 0);
+   signal ethStatusSync      : slv(7 downto 0);
+   signal ethDebug           : slv(5 downto 0);
+   signal ethConfig          : slv(6 downto 0);
+   signal ethCount           : slv(27 downto 0);
+   signal ethWriteReg        : Slv32Array(0 downto 0);
+   signal ethReadReg         : Slv32Array(2 downto 0);
    signal distClk            : sl;
    signal distClkRst         : sl;
+   signal ethClkCnt          : slv(31 downto 0);
+   signal ethClkCntSync      : slv(31 downto 0);
+   signal ethClkOut          : sl;
 
 begin
 
@@ -156,7 +163,10 @@ begin
          localAxiReadSlave        => topAxiReadSlave,
          localAxiWriteMaster      => topAxiWriteMaster,
          localAxiWriteSlave       => topAxiWriteSlave,
-         dbgStatus                => dbgStatus,
+         ethStatus                => ethStatus,
+         ethConfig                => ethConfig,
+         ethDebug                 => ethDebug,
+         ethClkOut                => ethClkOut,
          ppiClk                   => ppiClk,
          ppiOnline                => ppiOnline,
          ppiReadToFifo            => ppiReadToFifo,
@@ -176,12 +186,17 @@ begin
       generic map (
          TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 1,
+         NUM_MASTER_SLOTS_G => 2,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => (
 
             -- Channel 0 = 0xA0000000 - 0xA000FFFF : DPM Timing Source
             0 => ( baseAddr     => x"A0000000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
+            1 => ( baseAddr     => x"A0010000",
                    addrBits     => 16,
                    connectivity => x"FFFF")
          )
@@ -251,8 +266,6 @@ begin
    --fbCode   <= timingCode;
    --fbCodeEn <= timingCodeEn;
 
-
-
    U_StatSync: entity work.SynchronizerFifo 
       generic map (
          TPD_G         => TPD_C,
@@ -267,30 +280,81 @@ begin
          rst    => distClkRst,
          wr_clk => sysClk125,
          wr_en  => '1',
-         din    => dbgStatus,
+         din    => ethStatus,
          rd_clk => distClk,
          rd_en  => '1',
          valid  => open,
-         dout   => dbgStatusSync
+         dout   => ethStatusSync
       );
 
    process ( distClk ) begin
       if rising_edge(distClk) then
          if distClkRst = '1' then
-            dbgCount <= (others=>'0') after TPD_C;
+            ethCount <= (others=>'0') after TPD_C;
             fbCodeEn <= '0'           after TPD_C;
             fbCode   <= (others=>'0') after TPD_C;
          else
-            if dbgCount = 0 then
+            if ethCount = 0 then
                fbCodeEn <= '1' after TPD_C;
             else
                fbCodeEn <= '0' after TPD_C;
             end if;
-            fbCode   <= dbgStatusSync after TPD_C;
-            dbgCount <= dbgCount + 1  after TPD_C;
+            fbCode   <= ethStatusSync after TPD_C;
+            ethCount <= ethCount + 1  after TPD_C;
          end if;
       end if;
    end process;
+
+   process ( ethClkOut ) begin
+      if rising_edge(ethClkOut) then
+         ethClkCnt <= ethClkCnt + 1 after TPD_C;
+      end if;
+   end process;
+
+   U_CountSync: entity work.SynchronizerFifo 
+      generic map (
+         TPD_G         => TPD_C,
+         BRAM_EN_G     => false,
+         ALTERA_SYN_G  => false,
+         ALTERA_RAM_G  => "M9K",
+         SYNC_STAGES_G => 3,
+         DATA_WIDTH_G  => 32,
+         ADDR_WIDTH_G  => 4,
+         INIT_G        => "0"
+      ) port map (
+         rst    => axiClkRst,
+         wr_clk => ethClkOut,
+         wr_en  => '1',
+         din    => ethClkCnt,
+         rd_clk => axiClk,
+         rd_en  => '1',
+         valid  => open,
+         dout   => ethClkCntSync
+      );
+
+   U_Empty : entity work.AxiLiteEmpty
+      generic map (
+         TPD_G           => TPD_C,
+         NUM_WRITE_REG_G => 1,
+         NUM_READ_REG_G  => 3
+      ) port map (
+         axiClk                    => axiClk,
+         axiClkRst                 => axiClkRst,
+         axiReadMaster             => intAxiReadMaster(1),
+         axiReadSlave              => intAxiReadSlave(1),
+         axiWriteMaster            => intAxiWriteMaster(1),
+         axiWriteSlave             => intAxiWriteSlave(1),
+         writeRegister             => ethWriteReg,
+         readRegister              => ethReadReg
+      );
+
+   ethReadReg(0)               <= ethClkCntSync;
+   ethReadReg(1)(31 downto 16) <= (others=>'0');
+   ethReadReg(1)(13 downto  8) <= ethDebug;
+   ethReadReg(1)(7  downto  0) <= ethStatus;
+   ethReadReg(2)               <= x"deadbeef";
+
+   ethConfig <= ethWriteReg(0)(6 downto 0);
 
 
    --------------------------------------------------
