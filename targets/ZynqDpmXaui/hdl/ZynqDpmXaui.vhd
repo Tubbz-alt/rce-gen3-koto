@@ -31,10 +31,10 @@ entity ZynqDpmXaui is
       ethRefClkM   : in    sl;
 
       -- RTM High Speed
-      --dpmToRtmHsP  : out   slv(11 downto 0);
-      --dpmToRtmHsM  : out   slv(11 downto 0);
-      --rtmToDpmHsP  : in    slv(11 downto 0);
-      --rtmToDpmHsM  : in    slv(11 downto 0);
+      dpmToRtmHsP  : out   slv(11 downto 0);
+      dpmToRtmHsM  : out   slv(11 downto 0);
+      rtmToDpmHsP  : in    slv(11 downto 0);
+      rtmToDpmHsM  : in    slv(11 downto 0);
 
       -- Reference Clocks
       locRefClkP   : in    sl;
@@ -113,10 +113,10 @@ architecture STRUCTURE of ZynqDpmXaui is
    signal timingCodeEn       : sl;
    signal fbCode             : slv(7 downto 0);
    signal fbCodeEn           : sl;
-   signal intAxiReadMaster   : AxiLiteReadMasterArray(1 downto 0);
-   signal intAxiReadSlave    : AxiLiteReadSlaveArray(1 downto 0);
-   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(1 downto 0);
-   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(1 downto 0);
+   signal intAxiReadMaster   : AxiLiteReadMasterArray(2 downto 0);
+   signal intAxiReadSlave    : AxiLiteReadSlaveArray(2 downto 0);
+   signal intAxiWriteMaster  : AxiLiteWriteMasterArray(2 downto 0);
+   signal intAxiWriteSlave   : AxiLiteWriteSlaveArray(2 downto 0);
    signal topAxiReadMaster   : AxiLiteReadMasterType;
    signal topAxiReadSlave    : AxiLiteReadSlaveType;
    signal topAxiWriteMaster  : AxiLiteWriteMasterType;
@@ -186,7 +186,7 @@ begin
       generic map (
          TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 2,
+         NUM_MASTER_SLOTS_G => 3,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => (
 
@@ -195,11 +195,17 @@ begin
                    addrBits     => 16,
                    connectivity => x"FFFF"),
 
-            -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
+            -- Channel 1 = 0xA0010000 - 0xA001FFFF : PGP Test
             1 => ( baseAddr     => x"A0010000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            -- Channel 2 = 0xA0020000 - 0xA002FFFF : PGP Test
+            2 => ( baseAddr     => x"A0020000",
                    addrBits     => 16,
                    connectivity => x"FFFF")
          )
+
       ) port map (
          axiClk              => axiClk,
          axiClkRst           => axiClkRst,
@@ -332,6 +338,7 @@ begin
          dout   => ethClkCntSync
       );
 
+
    U_Empty : entity work.AxiLiteEmpty
       generic map (
          TPD_G           => TPD_C,
@@ -340,10 +347,10 @@ begin
       ) port map (
          axiClk                    => axiClk,
          axiClkRst                 => axiClkRst,
-         axiReadMaster             => intAxiReadMaster(1),
-         axiReadSlave              => intAxiReadSlave(1),
-         axiWriteMaster            => intAxiWriteMaster(1),
-         axiWriteSlave             => intAxiWriteSlave(1),
+         axiReadMaster             => intAxiReadMaster(2),
+         axiReadSlave              => intAxiReadSlave(2),
+         axiWriteMaster            => intAxiWriteMaster(2),
+         axiWriteSlave             => intAxiWriteSlave(2),
          writeRegister             => ethWriteReg,
          readRegister              => ethReadReg
       );
@@ -356,6 +363,25 @@ begin
 
    ethConfig <= ethWriteReg(0)(6 downto 0);
 
+   U_RtmTest : entity work.DpmRtmTest 
+      generic map (
+         TPD_G => TPD_C
+      ) port map (
+         sysClk200           => sysClk200,
+         sysClk200Rst        => sysClk200Rst,
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         topAxiReadMaster    => intAxiReadMaster(1),
+         topAxiReadSlave     => intAxiReadSlave(1),
+         topAxiWriteMaster   => intAxiWriteMaster(1),
+         topAxiWriteSlave    => intAxiWriteSlave(1),
+         locRefClkP          => locRefClkP,
+         locRefClkM          => locRefClkM,
+         dpmToRtmHsP         => dpmToRtmHsP,
+         dpmToRtmHsM         => dpmToRtmHsM,
+         rtmToDpmHsP         => rtmToDpmHsP,
+         rtmToDpmHsM         => rtmToDpmHsM
+      );
 
    --------------------------------------------------
    -- Unused Signals

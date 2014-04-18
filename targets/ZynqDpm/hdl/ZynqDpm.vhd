@@ -153,7 +153,6 @@ begin
          localAxiReadSlave        => topAxiReadSlave,
          localAxiWriteMaster      => topAxiWriteMaster,
          localAxiWriteSlave       => topAxiWriteSlave,
-         dbgStatus                => open,
          ppiClk                   => ppiClk,
          ppiOnline                => ppiOnline,
          ppiReadToFifo            => ppiReadToFifo,
