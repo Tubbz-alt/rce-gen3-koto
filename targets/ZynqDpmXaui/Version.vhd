@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100006"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100010"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Built Thu Apr 17 14:41:50 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Built Fri Apr 25 10:34:23 PDT 2014 by rherbst";
 
 end Version;
 
@@ -30,5 +30,6 @@ end Version;
 -- 04/09/2014 (0xDA100004): Self reset
 -- 04/09/2014 (0xDA100005): Removed self reset, added PGP
 -- 04/09/2014 (0xDA100006): PGP Fix
+-- 04/23/2014 (0xDA100010): Added MAC
 -------------------------------------------------------------------------------
 
