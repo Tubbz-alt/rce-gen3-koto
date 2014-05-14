@@ -1,2 +1,2 @@
 ../../modules/DtmCore/hdl/DtmCore.xdc
-hdl/ZynqDtm.xdc
+hdl/DtmEmpty.xdc

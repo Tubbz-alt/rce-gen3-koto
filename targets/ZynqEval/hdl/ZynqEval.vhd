@@ -38,12 +38,14 @@ architecture STRUCTURE of ZynqEval is
    signal dmaIbMaster             : AxiStreamMasterArray(2 downto 0);
    signal dmaIbSlave              : AxiStreamSlaveArray(2 downto 0);
 
+   constant TPD_C : time := 1 ns;
+
 begin
 
    -- Core
    U_EvalCore: entity work.EvalCore
       generic map (
-         TPD_G          => 1 ns,
+         TPD_G          => TPD_C,
          RCE_DMA_MODE_G => RCE_DMA_PPI_C
       )
       port map (

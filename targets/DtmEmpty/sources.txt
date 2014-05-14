@@ -1,3 +1,2 @@
-vhdl work hdl/DtmRtmTest.vhd
 vhdl work Version.vhd
-vhdl work hdl/ZynqDtm.vhd
+vhdl work hdl/DtmEmpty.vhd
