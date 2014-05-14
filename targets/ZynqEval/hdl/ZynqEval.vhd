@@ -6,9 +6,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-use work.ArmRceG3Pkg.all;
+use work.RceG3Pkg.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 
 entity ZynqEval is
    port (
@@ -18,48 +19,54 @@ entity ZynqEval is
 end ZynqEval;
 
 architecture STRUCTURE of ZynqEval is
-
-   -- Local Signals
-   signal ppiClk               : slv(3 downto 0);
-   signal ppiOnline            : slv(3 downto 0);
-   signal ppiReadToFifo        : PpiReadToFifoArray(3 downto 0);
-   signal ppiReadFromFifo      : PpiReadFromFifoArray(3 downto 0);
-   signal ppiWriteToFifo       : PpiWriteToFifoArray(3 downto 0);
-   signal ppiWriteFromFifo     : PpiWriteFromFifoArray(3 downto 0);
-   signal axiClk               : sl;
-   signal axiClkRst            : sl;
-   signal sysClk125            : sl;
-   signal sysClk125Rst         : sl;
-   signal sysClk200            : sl;
-   signal sysClk200Rst         : sl;
-   signal localAxiReadMaster   : AxiLiteReadMasterType;
-   signal localAxiReadSlave    : AxiLiteReadSlaveType;
-   signal localAxiWriteMaster  : AxiLiteWriteMasterType;
-   signal localAxiWriteSlave   : AxiLiteWriteSlaveType;
+   signal sysClk125               : sl;
+   signal sysClk125Rst            : sl;
+   signal sysClk200               : sl;
+   signal sysClk200Rst            : sl;
+   signal axiClk                  : sl;
+   signal axiClkRst               : sl;
+   signal extAxilReadMaster       : AxiLiteReadMasterType;
+   signal extAxilReadSlave        : AxiLiteReadSlaveType;
+   signal extAxilWriteMaster      : AxiLiteWriteMasterType;
+   signal extAxilWriteSlave       : AxiLiteWriteSlaveType;
+   signal dmaClk                  : slv(2 downto 0);
+   signal dmaClkRst               : slv(2 downto 0);
+   signal dmaOnline               : slv(2 downto 0);
+   signal dmaEnable               : slv(2 downto 0);
+   signal dmaObMaster             : AxiStreamMasterArray(2 downto 0);
+   signal dmaObSlave              : AxiStreamSlaveArray(2 downto 0);
+   signal dmaIbMaster             : AxiStreamMasterArray(2 downto 0);
+   signal dmaIbSlave              : AxiStreamSlaveArray(2 downto 0);
 
 begin
 
    -- Core
    U_EvalCore: entity work.EvalCore
+      generic map (
+         TPD_G          => 1 ns,
+         RCE_DMA_MODE_G => RCE_DMA_PPI_C
+      )
       port map (
-         i2cSda              => i2cSda,
-         i2cScl              => i2cScl,
-         sysClk125           => sysClk125,
-         sysClk125Rst        => sysClk125Rst,
-         sysClk200           => sysClk200,
-         sysClk200Rst        => sysClk200Rst,
-         axiClk              => axiClk,
-         axiClkRst           => axiClkRst,
-         localAxiReadMaster  => localAxiReadMaster,
-         localAxiReadSlave   => localAxiReadSlave,
-         localAxiWriteMaster => localAxiWriteMaster,
-         localAxiWriteSlave  => localAxiWriteSlave,
-         ppiClk              => ppiClk,
-         ppiOnline           => ppiOnline,
-         ppiReadToFifo       => ppiReadToFifo,
-         ppiReadFromFifo     => ppiReadFromFifo,
-         ppiWriteToFifo      => ppiWriteToFifo,
-         ppiWriteFromFifo    => ppiWriteFromFifo
+         i2cSda                   => i2cSda,
+         i2cScl                   => i2cScl,
+         sysClk125                => sysClk125,
+         sysClk125Rst             => sysClk125Rst,
+         sysClk200                => sysClk200,
+         sysClk200Rst             => sysClk200Rst,
+         axiClk                   => axiClk,
+         axiClkRst                => axiClkRst,
+         extAxilReadMaster        => extAxilReadMaster,
+         extAxilReadSlave         => extAxilReadSlave,
+         extAxilWriteMaster       => extAxilWriteMaster,
+         extAxilWriteSlave        => extAxilWriteSlave,
+         dmaClk                   => dmaClk,
+         dmaClkRst                => dmaClkRst,
+         dmaOnline                => dmaOnline,
+         dmaEnable                => dmaEnable,
+         dmaObMaster              => dmaObMaster,
+         dmaObSlave               => dmaObSlave,
+         dmaIbMaster              => dmaIbMaster,
+         dmaIbSlave               => dmaIbSlave
       );
 
    -- Empty AXI Slave
@@ -67,32 +74,20 @@ begin
       port map (
          axiClk          => axiClk,
          axiClkRst       => axiClkRst,
-         axiReadMaster   => localAxiReadMaster,
-         axiReadSlave    => localAxiReadSlave,
-         axiWriteMaster  => localAxiWriteMaster,
-         axiWriteSlave   => localAxiWriteSlave
+         axiReadMaster   => extAxilReadMaster,
+         axiReadSlave    => extAxilReadSlave,
+         axiWriteMaster  => extAxilWriteMaster,
+         axiWriteSlave   => extAxilWriteSlave
       );
 
 
    --------------------------------------------------
    -- PPI Loopback
    --------------------------------------------------
-   U_LoopGen : for i in 0 to 3 generate
-
-      ppiClk(i) <= axiClk;
-
-      ppiWriteToFifo(i).data    <= ppiReadFromFifo(i).data;
-      ppiWriteToFifo(i).size    <= ppiReadFromFifo(i).size;
-      ppiWriteToFifo(i).ftype   <= ppiReadFromFifo(i).ftype;
-      ppiWriteToFifo(i).eoh     <= ppiReadFromFifo(i).eoh;
-      ppiWriteToFifo(i).eof     <= ppiReadFromFifo(i).eof;
-      ppiWriteToFifo(i).err     <= '0';
-
-      ppiWriteToFifo(i).valid   <= ppiReadFromFifo(i).valid;
-
-      ppiReadToFifo(i).read     <= ppiReadFromFifo(i).valid;
-
-   end generate;
+   dmaClk      <= (others=>sysClk125);
+   dmaClkRst   <= (others=>sysClk125Rst);
+   dmaIbMaster <= dmaObMaster;
+   dmaObSlave  <= dmaIbSlave;
 
 end architecture STRUCTURE;
 
