@@ -9,9 +9,11 @@ use IEEE.numeric_std.all;
 
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-use work.ArmRceG3Pkg.all;
+
+use work.RceG3Pkg.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 
 entity DtmEmpty is
    port (
@@ -70,8 +72,8 @@ entity DtmEmpty is
       --rtmToDtmHsM : in    sl;
 
       -- RTM Low Speed
-      dtmToRtmLsP  : inout slv(5 downto 0);
-      dtmToRtmLsM  : inout slv(5 downto 0);
+      --dtmToRtmLsP  : inout slv(5 downto 0);
+      --dtmToRtmLsM  : inout slv(5 downto 0);
 
       -- DPM Signals
       dpmClkP      : out   slv(2  downto 0);
@@ -83,13 +85,13 @@ entity DtmEmpty is
       bpClkIn      : in    slv(5 downto 0);
       bpClkOut     : out   slv(5 downto 0);
 
+      -- Spare Signals
+      --plSpareP     : inout slv(4 downto 0);
+      --plSpareM     : inout slv(4 downto 0);
+
       -- IPMI
       dtmToIpmiP   : out   slv(1 downto 0);
-      dtmToIpmiM   : out   slv(1 downto 0);
-
-      -- Spare Signals
-      plSpareP     : inout slv(4 downto 0);
-      plSpareM     : inout slv(4 downto 0)
+      dtmToIpmiM   : out   slv(1 downto 0)
 
    );
 end DtmEmpty;
@@ -182,6 +184,7 @@ begin
 
 
    -- Empty AXI Slave
+   -- 0xA0000000 - 0xAFFFFFFF
    U_AxiLiteEmpty: entity work.AxiLiteEmpty 
       port map (
          axiClk          => axiClk,
@@ -207,7 +210,7 @@ begin
    -- Debug
    led <= (others=>'0');
 
-   -- Reference Clock
+   -- Reference Cloc/afs/slac.stanford.edu/g/reseng/vol15/Xilinx/vivado_2014.1/SDK/2014.1/gnu/arm/lin/k
    --locRefClkP  : in    sl;
    --locRefClkM  : in    sl;
 
@@ -221,11 +224,26 @@ begin
    --dtmToRtmLsP  : inout slv(5 downto 0);
    --dtmToRtmLsM  : inout slv(5 downto 0);
 
-   -- DPM Signals
-   --dpmClkP      : out   slv(2  downto 0);
-   --dpmClkM      : out   slv(2  downto 0);
-   --dpmFbP       : in    slv(7  downto 0);
-   --dpmFbM       : in    slv(7  downto 0);
+   -- DPM Clock Signals
+   U_DpmClkGen : for i in 0 to 2 generate
+      U_DpmClkOut : OBUFDS
+         port map(
+            O      => dpmClkP(i),
+            OB     => dpmClkM(i),
+            I      => '0'
+         );
+   end generate;
+
+   -- DPM Feedback Signals
+   U_DpmFbGen : for i in 0 to 7 generate
+      U_DpmFbIn : IBUFDS
+         generic map ( DIFF_TERM => true ) 
+         port map(
+            I      => dpmFbP(i),
+            IB     => dpmFbM(i),
+            O      => open
+         );
+   end generate;
 
    -- Backplane Clocks
    --bpClkIn      : in    slv(5 downto 0);
@@ -235,8 +253,6 @@ begin
    -- Spare Signals
    --plSpareP     : inout slv(4 downto 0);
    --plSpareM     : inout slv(4 downto 0)
-   plSpareP <= (others=>'Z');
-   plSpareM <= (others=>'Z');
 
 end architecture STRUCTURE;
 
