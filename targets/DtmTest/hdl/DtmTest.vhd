@@ -111,14 +111,10 @@ architecture STRUCTURE of DtmTest is
    signal extAxilReadSlave   : AxiLiteReadSlaveType;
    signal extAxilWriteMaster : AxiLiteWriteMasterType;
    signal extAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal clkAxilReadMaster  : AxiLiteReadMasterType;
-   signal clkAxilReadSlave   : AxiLiteReadSlaveType;
-   signal clkAxilWriteMaster : AxiLiteWriteMasterType;
-   signal clkAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal pgpAxilReadMaster  : AxiLiteReadMasterType;
-   signal pgpAxilReadSlave   : AxiLiteReadSlaveType;
-   signal pgpAxilWriteMaster : AxiLiteWriteMasterType;
-   signal pgpAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal locAxilReadMaster  : AxiLiteReadMasterArray(1 downto 0);
+   signal locAxilReadSlave   : AxiLiteReadSlaveArray(1 downto 0);
+   signal locAxilWriteMaster : AxiLiteWriteMasterArray(1 downto 0);
+   signal locAxilWriteSlave  : AxiLiteWriteSlaveArray(1 downto 0);
    signal dmaClk             : slv(2 downto 0);
    signal dmaClkRst          : slv(2 downto 0);
    signal dmaOnline          : slv(2 downto 0);
@@ -216,18 +212,14 @@ begin
       ) port map (
          axiClk              => axiClk,
          axiClkRst           => axiClkRst,
-         sAxiWriteMasters(0) => topAxiWriteMaster,
-         sAxiWriteSlaves(0)  => topAxiWriteSlave,
-         sAxiReadMasters(0)  => topAxiReadMaster,
-         sAxiReadSlaves(0)   => topAxiReadSlave,
-         mAxiWriteMasters(0) => clkAxiWriteMaster,
-         mAxiWriteSlaves(0)  => clkAxiWriteSlave,
-         mAxiReadMasters(0)  => clkAxiReadMaster,
-         mAxiReadSlaves(0)   => clkAxiReadSlave,
-         mAxiWriteMasters(1) => pgpAxiWriteMaster,
-         mAxiWriteSlaves(1)  => pgpAxiWriteSlave,
-         mAxiReadMasters(1)  => pgpAxiReadMaster,
-         mAxiReadSlaves(1)   => pgpAxiReadSlave
+         sAxiWriteMasters(0) => extAxilWriteMaster,
+         sAxiWriteSlaves(0)  => extAxilWriteSlave,
+         sAxiReadMasters(0)  => extAxilReadMaster,
+         sAxiReadSlaves(0)   => extAxilReadSlave,
+         mAxiWriteMasters    => locAxilWriteMaster,
+         mAxiWriteSlaves     => locAxilWriteSlave,
+         mAxiReadMasters     => locAxilReadMaster,
+         mAxiReadSlaves      => locAxilReadSlave
       );
 
 
@@ -249,10 +241,10 @@ begin
       ) port map (
          axiClk              => axiClk,
          axiClkRst           => axiClkRst,
-         axiReadMaster       => clkAxiReadMaster,
-         axiReadSlave        => clkAxiReadSlave,
-         axiWriteMaster      => clkAxiWriteMaster,
-         axiWriteSlave       => clkAxiWriteSlave,
+         axiReadMaster       => locAxilReadMaster(0),
+         axiReadSlave        => locAxilReadSlave(0),
+         axiWriteMaster      => locAxilWriteMaster(0),
+         axiWriteSlave       => locAxilWriteSlave(0),
          sysClk200           => sysClk200,
          sysClk200Rst        => sysClk200Rst,
          distClk             => sysClk200,
@@ -280,10 +272,10 @@ begin
          sysClk200Rst        => sysClk200Rst,
          axiClk              => axiClk,
          axiClkRst           => axiClkRst,
-         topAxiReadMaster    => pgpAxiReadMaster,
-         topAxiReadSlave     => pgpAxiReadSlave,
-         topAxiWriteMaster   => pgpAxiWriteMaster,
-         topAxiWriteSlave    => pgpAxiWriteSlave,
+         topAxiReadMaster    => locAxilReadMaster(1),
+         topAxiReadSlave     => locAxilReadSlave(1),
+         topAxiWriteMaster   => locAxilWriteMaster(1),
+         topAxiWriteSlave    => locAxilWriteSlave(1),
          locRefClkP          => locRefClkP,
          locRefClkM          => locRefClkM,
          dtmToRtmHsP         => dtmToRtmHsP,

@@ -10,9 +10,9 @@ use IEEE.numeric_std.all;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 use work.StdRtlPkg.all;
-use work.Vc64Pkg.all;
 use work.Pgp2bPkg.all;
 use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 
 entity DtmRtmTest is
    generic (
@@ -50,29 +50,35 @@ end DtmRtmTest;
 
 architecture STRUCTURE of DtmRtmTest is
 
+   constant MASTERS_COUNT_C : integer := 2;
+
    -- Local Signals
    signal locRefClk          : sl;
    signal locRefClkG         : sl;
    signal rtmClkCount        : slv(5 downto 0);
    signal rtmClkOut          : slv(5 downto 0);
-   signal pgpAxiReadMaster   : AxiLiteReadMasterType;
-   signal pgpAxiReadSlave    : AxiLiteReadSlaveType;
-   signal pgpAxiWriteMaster  : AxiLiteWriteMasterType;
-   signal pgpAxiWriteSlave   : AxiLiteWriteSlaveType;
+   signal tmpAxiReadMaster   : AxiLiteReadMasterType;
+   signal tmpAxiReadSlave    : AxiLiteReadSlaveType;
+   signal tmpAxiWriteMaster  : AxiLiteWriteMasterType;
+   signal tmpAxiWriteSlave   : AxiLiteWriteSlaveType;
+   signal pgpAxiReadMaster   : AxiLiteReadMasterArray(MASTERS_COUNT_C-1 downto 0);
+   signal pgpAxiReadSlave    : AxiLiteReadSlaveArray(MASTERS_COUNT_C-1 downto 0);
+   signal pgpAxiWriteMaster  : AxiLiteWriteMasterArray(MASTERS_COUNT_C-1 downto 0);
+   signal pgpAxiWriteSlave   : AxiLiteWriteSlaveArray(MASTERS_COUNT_C-1 downto 0);
    signal pgpClkRst          : sl;
    signal pgpClkRstSw        : sl;
    signal pgpClk             : sl;
    signal ipgpClk            : sl;
    signal pgpTxMmcmReset     : sl;
    signal pgpTxMmcmLocked    : sl;
-   signal pgpRxIn            : PgpRxInType;
-   signal pgpRxOut           : PgpRxOutType;
-   signal pgpTxIn            : PgpTxInType;
-   signal pgpTxOut           : PgpTxOutType;
-   signal pgpTxVcData        : Vc64DataArray(3 downto 0);
-   signal pgpTxVcCtrl        : Vc64CtrlArray(3 downto 0);
-   signal pgpRxVcData        : Vc64DataType;
-   signal pgpRxVcCtrl        : Vc64CtrlArray(3 downto 0);
+   signal pgpRxIn            : Pgp2bRxInType;
+   signal pgpRxOut           : Pgp2bRxOutType;
+   signal pgpTxIn            : Pgp2bTxInType;
+   signal pgpTxOut           : Pgp2bTxOutType;
+   signal pgpTxMasters       : AxiStreamMasterArray(3 downto 0);
+   signal pgpTxSlaves        : AxiStreamSlaveArray(3 downto 0);
+   signal pgpRxMasters       : AxiStreamMasterArray(3 downto 0);
+   signal pgpRxCtrl          : AxiStreamCtrlArray(3 downto 0);
    signal pgpFbClk           : sl;
    signal cellErrorCnt       : slv(31 downto 0);
    signal linkDownCnt        : slv(31 downto 0);
@@ -107,6 +113,10 @@ architecture STRUCTURE of DtmRtmTest is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   constant MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray := 
+      genAxiLiteConfig ( MASTERS_COUNT_C, x"00000000" , 16, 12 );
+      --genAxiLiteConfig ( MASTERS_COUNT_C, AXIL_BASE_ADDRESS_G , 16, 12 );
+
 begin
 
    --------------------------------------------------
@@ -115,6 +125,7 @@ begin
 
    U_AxiLiteAsync : entity work.AxiLiteAsync 
       generic map (
+         TPD_G            => TPD_G,
          NUM_ADDR_BITS_G  => 16
       ) port map (
          sAxiClk           => axiClk,
@@ -125,10 +136,30 @@ begin
          sAxiWriteSlave    => topAxiWriteSlave,
          mAxiClk           => pgpClk,
          mAxiClkRst        => pgpClkRst,
-         mAxiReadMaster    => pgpAxiReadMaster,
-         mAxiReadSlave     => pgpAxiReadSlave,
-         mAxiWriteMaster   => pgpAxiWriteMaster,
-         mAxiWriteSlave    => pgpAxiWriteSlave
+         mAxiReadMaster    => tmpAxiReadMaster,
+         mAxiReadSlave     => tmpAxiReadSlave,
+         mAxiWriteMaster   => tmpAxiWriteMaster,
+         mAxiWriteSlave    => tmpAxiWriteSlave
+      );
+
+   U_AxiCrossbar : entity work.AxiLiteCrossbar 
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => MASTERS_COUNT_C,
+         DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
+         MASTERS_CONFIG_G   => MASTERS_CONFIG_C
+      ) port map (
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         sAxiWriteMasters(0) => tmpAxiWriteMaster,
+         sAxiWriteSlaves(0)  => tmpAxiWriteSlave,
+         sAxiReadMasters(0)  => tmpAxiReadMaster,
+         sAxiReadSlaves(0)   => tmpAxiReadSlave,
+         mAxiWriteMasters    => pgpAxiWriteMaster,
+         mAxiWriteSlaves     => pgpAxiWriteSlave,
+         mAxiReadMasters     => pgpAxiReadMaster,
+         mAxiReadSlaves      => pgpAxiReadSlave
       );
 
    -- Sync
@@ -140,30 +171,30 @@ begin
    end process;
 
    -- Async
-   process (pgpClkRst, pgpAxiReadMaster, pgpAxiWriteMaster, r, pgpTxMmcmLocked, pgpTxMmcmReset, 
+   process (pgpClkRst, pgpAxiReadMaster(0), pgpAxiWriteMaster(0), r, pgpTxMmcmLocked, pgpTxMmcmReset, 
             pgpRxOut, cellErrorCnt, linkDownCnt, linkErrorCnt, txCount, rxCount, eofeCount, clockCount )
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
    begin
       v := r;
 
-      axiSlaveWaitTxn(pgpAxiWriteMaster, pgpAxiReadMaster, v.axiWriteSlave, v.axiReadSlave, axiStatus);
+      axiSlaveWaitTxn(pgpAxiWriteMaster(0), pgpAxiReadMaster(0), v.axiWriteSlave, v.axiReadSlave, axiStatus);
 
       -- Write
       if (axiStatus.writeEnable = '1') then
 
-         if pgpAxiWriteMaster.awaddr(11 downto 0) = x"000" then
-            v.countReset := pgpAxiWriteMaster.wdata(0);
+         if pgpAxiWriteMaster(0).awaddr(11 downto 0) = x"000" then
+            v.countReset := pgpAxiWriteMaster(0).wdata(0);
 
-         elsif pgpAxiWriteMaster.awaddr(11 downto 0) = x"004" then
-            v.loopEnable := pgpAxiWriteMaster.wdata(2 downto 0);
+         elsif pgpAxiWriteMaster(0).awaddr(11 downto 0) = x"004" then
+            v.loopEnable := pgpAxiWriteMaster(0).wdata(2 downto 0);
 
-         elsif pgpAxiWriteMaster.awaddr(11 downto 0) = x"010" then
-            v.pgpTxReset := pgpAxiWriteMaster.wdata(0);
-            v.pgpRxReset := pgpAxiWriteMaster.wdata(16);
+         elsif pgpAxiWriteMaster(0).awaddr(11 downto 0) = x"010" then
+            v.pgpTxReset := pgpAxiWriteMaster(0).wdata(0);
+            v.pgpRxReset := pgpAxiWriteMaster(0).wdata(16);
 
-         elsif pgpAxiWriteMaster.awaddr(11 downto 0) = x"014" then
-            v.clkReset := pgpAxiWriteMaster.wdata(0);
+         elsif pgpAxiWriteMaster(0).awaddr(11 downto 0) = x"014" then
+            v.clkReset := pgpAxiWriteMaster(0).wdata(0);
          end if;
 
          -- Send Axi response
@@ -175,28 +206,28 @@ begin
       if (axiStatus.readEnable = '1') then
          v.axiReadSlave.rdata := (others => '0');
 
-         if pgpAxiReadMaster.araddr(11 downto 0)  = x"000" then
+         if pgpAxiReadMaster(0).araddr(11 downto 0)  = x"000" then
             v.axiReadSlave.rdata(0) := r.countReset;
 
-         elsif pgpAxiReadMaster.araddr(11 downto 0)  = x"004" then
+         elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"004" then
             v.axiReadSlave.rdata(2 downto 0) := r.loopEnable;
 
-         elsif pgpAxiReadMaster.araddr(11 downto 0)  = x"008" then
+         elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"008" then
             v.axiReadSlave.rdata := clockCount;
 
-         elsif pgpAxiReadMaster.araddr(11 downto 0)  = x"00C" then
+         elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"00C" then
             v.axiReadSlave.rdata(16) := pgpTxMmcmLocked;
             v.axiReadSlave.rdata(0)  := pgpTxMmcmReset;
 
-         elsif pgpAxiReadMaster.araddr(11 downto 0)  = x"010" then
+         elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"010" then
             v.axiReadSlave.rdata(16) := r.pgpRxReset;
             v.axiReadSlave.rdata(0)  := r.pgpTxReset;
 
-         elsif pgpAxiReadMaster.araddr(11 downto 0)  = x"014" then
+         elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"014" then
             v.axiReadSlave.rdata(0) := r.clkReset;
 
-         elsif pgpAxiReadMaster.araddr(11 downto 9)  = "001" then
-            case pgpAxiReadMaster.araddr(4 downto 2) is
+         elsif pgpAxiReadMaster(0).araddr(11 downto 9)  = "001" then
+            case pgpAxiReadMaster(0).araddr(4 downto 2) is
 
                when "000" =>
                   v.axiReadSlave.rdata(31 downto 28) := clockCount(3 downto 0);
@@ -238,8 +269,8 @@ begin
       rin <= v;
 
       -- Outputs
-      pgpAxiReadSlave  <= r.axiReadSlave;
-      pgpAxiWriteSlave <= r.axiWriteSlave;
+      pgpAxiReadSlave(0)  <= r.axiReadSlave;
+      pgpAxiWriteSlave(0) <= r.axiWriteSlave;
       
    end process;
 
@@ -354,7 +385,6 @@ begin
          -- PGP Settings
          ----------------------------------------
             PAYLOAD_CNT_TOP_G     => 7,  -- Top bit for payload counter
-            EN_SHORT_CELLS_G      => 1,  -- Enable short non-EOF cells
             VC_INTERLEAVE_G       => 1
       ) port map (
          -- GT Clocking
@@ -388,11 +418,12 @@ begin
          pgpTxIn           => pgpTxIn,
          pgpTxOut          => pgpTxOut,
          -- Frame Transmit Interface - 1 Lane, Array of 4 VCs
-         pgpTxVcData       => pgpTxVcData,
-         pgpTxVcCtrl       => pgpTxVcCtrl,
+         pgpTxMasters      => pgpTxMasters,
+         pgpTxSlaves       => pgpTxSlaves,
          -- Frame Receive Interface - 1 Lane, Array of 4 VCs
-         pgpRxVcData       => pgpRxVcData,
-         pgpRxVcCtrl       => pgpRxVcCtrl,
+         pgpRxMasters      => pgpRxMasters,
+         pgpRxMasterMuxed  => open,
+         pgpRxCtrl         => pgpRxCtrl,
          -- GT loopback control
          loopback          => r.loopEnable
       );
@@ -430,12 +461,6 @@ begin
    pgpRxIn.flush    <= '0';
    pgpRxIn.resetRx  <= '0';
 
-   -- Rx Status
-   --pgpRxOut.opCodeEn   
-   --pgpRxOut.opCode     
-   --pgpRxOut.remLinkReady
-   --pgpRxOut.remLinkData 
-
    -- Tx Control
    pgpTxIn.flush        <= '0';
    pgpTxIn.opCodeEn     <= '0';
@@ -443,84 +468,131 @@ begin
    pgpTxIn.locLinkReady <= pgpRxOut.linkReady;
    pgpTxIn.locData      <= (others=>'0');
 
-   -- Tx Status
-   --pgpTxOut.linkReady
-
    -- Counters
    process ( pgpClk ) begin
       if rising_edge(pgpClk) then
+
          if r.countReset = '1' or pgpClkRstSw = '1' then
-               txCount <= (others=>'0') after 1 ns;
-            elsif (pgpTxVcData(0).valid = '1' and pgpTxVcData(0).eof = '1' and pgpTxVcCtrl(0).ready = '1') or
-                  (pgpTxVcData(1).valid = '1' and pgpTxVcData(1).eof = '1' and pgpTxVcCtrl(1).ready = '1') or
-                  (pgpTxVcData(2).valid = '1' and pgpTxVcData(2).eof = '1' and pgpTxVcCtrl(2).ready = '1') or
-                  (pgpTxVcData(3).valid = '1' and pgpTxVcData(3).eof = '1' and pgpTxVcCtrl(3).ready = '1') then
-               txCount <= txCount + 1 after 1 ns;
+            txCount <= (others=>'0') after 1 ns;
+         elsif pgpTxOut.frameTx = '1' then
+            txCount <= txCount + 1 after 1 ns;
          end if;
 
          if r.countReset = '1' or pgpClkRstSw = '1' then
-               rxCount <= (others=>'0') after 1 ns;
-            elsif (pgpRxVcData.valid = '1' and pgpRxVcData.eof = '1' and pgpRxVcData.eofe = '0') then
-               rxCount <= rxCount + 1 after 1 ns;
+            rxCount <= (others=>'0') after 1 ns;
+         elsif pgpRxOut.frameRx = '1' then
+            rxCount <= rxCount + 1 after 1 ns;
          end if;
 
          if r.countReset = '1' or pgpClkRstSw = '1' then
-               eofeCount <= (others=>'0') after 1 ns;
-            elsif (pgpRxVcData.valid = '1' and pgpRxVcData.eof = '1' and pgpRxVcData.eofe = '1') then
-               eofeCount <= eofeCount + 1 after 1 ns;
+            eofeCount <= (others=>'0') after 1 ns;
+         elsif pgpRxOut.frameRxErr = '1' then
+            eofeCount <= eofeCount + 1 after 1 ns;
+         end if;
+
+         if r.countReset = '1' or pgpClkRstSw = '1' then
+            cellErrorCnt <= (others=>'0') after 1 ns;
+         elsif pgpRxOut.cellError = '1' and cellErrorCnt /= x"FFFFFFFF" then
+            cellErrorCnt <= cellErrorCnt + 1 after 1 ns;
+         end if;
+
+         if r.countReset = '1' or pgpClkRstSw = '1' then
+            linkDownCnt  <= (others=>'0') after 1 ns;
+         elsif pgpRxOut.linkDown = '1' and linkDownCnt /= x"FFFFFFFF" then
+            linkDownCnt <= linkDownCnt + 1 after 1 ns;
+         end if;
+
+         if r.countReset = '1' or pgpClkRstSw = '1' then
+            linkErrorCnt <= (others=>'0') after 1 ns;
+         elsif pgpRxOut.linkError = '1' and linkErrorCnt /= x"FFFFFFFF" then
+            linkErrorCnt <= linkErrorCnt + 1 after 1 ns;
          end if;
       end if;
    end process;
 
+   U_SsiPrbsTx : entity work.SsiPrbsTx
+      generic map (
+         TPD_G                      => TPD_G,
+         ALTERA_SYN_G               => false,
+         ALTERA_RAM_G               => "M9K",
+         XIL_DEVICE_G               => "7SERIES",
+         BRAM_EN_G                  => true,
+         USE_BUILT_IN_G             => false,
+         GEN_SYNC_FIFO_G            => false,
+         CASCADE_SIZE_G             => 1,
+         PRBS_SEED_SIZE_G           => 32,
+         PRBS_TAPS_G                => (0 => 16),
+         FIFO_ADDR_WIDTH_G          => 9,
+         FIFO_PAUSE_THRESH_G        => 256,
+         MASTER_AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C,
+         MASTER_AXI_PIPE_STAGES_G   => 0
+      ) port map (
 
-   -- Transmit data on VCs
-   U_LoopGen : for j in 0 to 3 generate
-      pgpRxVcCtrl(j).overflow   <= '0';
-      pgpRxVcCtrl(j).almostFull <= '0';
-      pgpRxVcCtrl(j).ready      <= '1';
-      pgpTxVcData(j).eofe       <= '0';
-      pgpTxVcData(j).size       <= '0';
-      pgpTxVcData(j).vc         <= "00";
-      pgpTxVcData(j).valid      <= '1';
-      pgpTxVcData(j).sof        <= '1' when pgpTxVcData(j).data = 0    else '0';
-      pgpTxVcData(j).eof        <= '1' when pgpTxVcData(j).data = 1500 else '0';
+         mAxisClk     => pgpClk,
+         mAxisRst     => pgpClkRst,
+         mAxisSlave   => pgpTxSlaves(0),
+         mAxisMaster  => pgpTxMasters(0),
+         locClk       => pgpClk,
+         locRst       => pgpClkRst,
+         trig         => '1',
+         packetLength => x"00000800",
+         busy         => open,
+         tDest        => (others=>'0'),
+         tId          => (others=>'0')
+      );
 
-      process ( pgpClk ) begin
-         if rising_edge(pgpClk) then
-            if pgpClkRstSw = '1' then
-                  pgpTxVcData(j).data <= (others=>'0') after 1 ns;
-               elsif pgpTxVcCtrl(j).ready = '1' then
-                   if pgpTxVcData(j).data = 1500 then
-                     pgpTxVcData(j).data <= (others=>'0') after 1 ns;
-               else
-                     pgpTxVcData(j).data <= pgpTxVcData(j).data + 1 after 1 ns;
-               end if;
-            end if;
-         end if;
-      end process;
-   end generate;
+   pgpTxMasters(3 downto 1) <= (others=>AXI_STREAM_MASTER_INIT_C);
 
-   process ( pgpClk ) begin
-      if rising_edge(pgpClk) then
-         if r.countReset = '1' or pgpClkRstSw = '1' then
-               cellErrorCnt <= (others=>'0') after 1 ns;
-            elsif pgpRxOut.cellError = '1' and cellErrorCnt /= x"FFFFFFFF" then
-               cellErrorCnt <= cellErrorCnt + 1 after 1 ns;
-         end if;
 
-         if r.countReset = '1' or pgpClkRstSw = '1' then
-               linkDownCnt  <= (others=>'0') after 1 ns;
-            elsif pgpRxOut.linkDown = '1' and linkDownCnt /= x"FFFFFFFF" then
-               linkDownCnt <= linkDownCnt + 1 after 1 ns;
-         end if;
+   U_SsiPrbsRx: entity work.SsiPrbsRx 
+      generic map (
+         TPD_G                      => 1 ns,
+         STATUS_CNT_WIDTH_G         => 32,
+         AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
+         ALTERA_SYN_G               => false,
+         ALTERA_RAM_G               => "M9K",
+         CASCADE_SIZE_G             => 1,
+         XIL_DEVICE_G               => "7SERIES",
+         BRAM_EN_G                  => true,
+         USE_BUILT_IN_G             => false,
+         GEN_SYNC_FIFO_G            => false,
+         PRBS_SEED_SIZE_G           => 32,
+         PRBS_TAPS_G                => (0 => 16),
+         FIFO_ADDR_WIDTH_G          => 9,
+         FIFO_PAUSE_THRESH_G        => 256,
+         SLAVE_AXI_STREAM_CONFIG_G  => SSI_PGP2B_CONFIG_C,
+         SLAVE_AXI_PIPE_STAGES_G    => 0,
+         MASTER_AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C,
+         MASTER_AXI_PIPE_STAGES_G   => 0
+      ) port map (
+         sAxisClk        => pgpClk,
+         sAxisRst        => pgpClkRst,
+         sAxisMaster     => pgpRxMasters(0),
+         sAxisSlave      => open,
+         sAxisCtrl       => pgpRxCtrl(0),
+         mAxisClk        => pgpClk,
+         mAxisRst        => pgpClkRst,
+         mAxisMaster     => open,
+         mAxisSlave      => AXI_STREAM_SLAVE_FORCE_C,
+         axiClk          => pgpCLk,
+         axiRst          => pgpClkRst,
+         axiReadMaster   => pgpAxiReadMaster(1),
+         axiReadSlave    => pgpAxiReadSlave(1),
+         axiWriteMaster  => pgpAxiWriteMaster(1),
+         axiWriteSlave   => pgpAxiWriteSlave(1),
+         updatedResults  => open,
+         busy            => open,
+         errMissedPacket => open,
+         errLength       => open,
+         errDataBus      => open,
+         errEofe         => open,
+         errWordCnt      => open,
+         errbitCnt       => open,
+         packetRate      => open,
+         packetLength    => open
+      ); 
 
-         if r.countReset = '1' or pgpClkRstSw = '1' then
-               linkErrorCnt <= (others=>'0') after 1 ns;
-            elsif pgpRxOut.linkError = '1' and linkErrorCnt /= x"FFFFFFFF" then
-               linkErrorCnt <= linkErrorCnt + 1 after 1 ns;
-         end if;
-      end if;
-   end process;
+   pgpRxCtrl(3 downto 1) <= (others=>AXI_STREAM_CTRL_UNUSED_C);
 
    process ( pgpClk ) begin
       if rising_edge(pgpClk) then

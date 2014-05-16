@@ -1,2 +1,2 @@
 ../../modules/DpmCore/hdl/DpmCore.xdc
-hdl/ZynqDpm.xdc
+hdl/DpmTest.xdc
