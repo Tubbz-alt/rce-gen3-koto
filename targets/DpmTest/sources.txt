@@ -1,2 +1,2 @@
 vhdl work Version.vhd
-vhdl work hdl/DpmEmpty.vhd
+vhdl work hdl/DpmTest.vhd
