@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- DpmEmpty.vhd
+-- DpmTest.vhd
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -11,7 +11,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
-entity DpmEmpty is
+entity DpmTest is
    port (
 
       -- Debug
@@ -51,9 +51,9 @@ entity DpmEmpty is
       clkSelA      : out   slv(1 downto 0);
       clkSelB      : out   slv(1 downto 0)
    );
-end DpmEmpty;
+end DpmTest;
 
-architecture STRUCTURE of DpmEmpty is
+architecture STRUCTURE of DpmTest is
 
    constant TPD_C : time := 1 ns;
 
