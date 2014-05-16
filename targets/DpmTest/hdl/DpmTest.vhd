@@ -30,10 +30,10 @@ entity DpmEmpty is
       ethRefClkM   : in    sl;
 
       -- RTM High Speed
-      --dpmToRtmHsP  : out   slv(11 downto 0);
-      --dpmToRtmHsM  : out   slv(11 downto 0);
-      --rtmToDpmHsP  : in    slv(11 downto 0);
-      --rtmToDpmHsM  : in    slv(11 downto 0);
+      dpmToRtmHsP  : out   slv(11 downto 0);
+      dpmToRtmHsM  : out   slv(11 downto 0);
+      rtmToDpmHsP  : in    slv(11 downto 0);
+      rtmToDpmHsM  : in    slv(11 downto 0);
 
       -- Reference Clocks
       locRefClkP   : in    sl;
@@ -68,6 +68,14 @@ architecture STRUCTURE of DpmEmpty is
    signal extAxilReadSlave   : AxiLiteReadSlaveType;
    signal extAxilWriteMaster : AxiLiteWriteMasterType;
    signal extAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal pgpAxilReadMaster  : AxiLiteReadMasterType;
+   signal pgpAxilReadSlave   : AxiLiteReadSlaveType;
+   signal pgpAxilWriteMaster : AxiLiteWriteMasterType;
+   signal pgpAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal clkAxilReadMaster  : AxiLiteReadMasterType;
+   signal clkAxilReadSlave   : AxiLiteReadSlaveType;
+   signal clkAxilWriteMaster : AxiLiteWriteMasterType;
+   signal clkAxilWriteSlave  : AxiLiteWriteSlaveType;
    signal dmaClk             : slv(2 downto 0);
    signal dmaClkRst          : slv(2 downto 0);
    signal dmaOnline          : slv(2 downto 0);
@@ -80,6 +88,10 @@ architecture STRUCTURE of DpmEmpty is
    signal iethRxM            : slv(3 downto 0);
    signal iethTxP            : slv(3 downto 0);
    signal iethTxM            : slv(3 downto 0);
+   signal timingCode         : slv(7 downto 0);
+   signal timingCodeEn       : sl;
+   signal fbCode             : slv(7 downto 0);
+   signal fbCodeEn           : sl;
 
 begin
 
@@ -129,16 +141,44 @@ begin
    iethRxP(3 downto 1) <= (others=>'0');
    iethRxM(3 downto 1) <= (others=>'0');
 
-   -- Empty AXI Slave
-   -- 0xA0000000 - 0xAFFFFFFF
-   U_AxiLiteEmpty: entity work.AxiLiteEmpty 
-      port map (
-         axiClk          => axiClk,
-         axiClkRst       => axiClkRst,
-         axiReadMaster   => extAxilReadMaster,
-         axiReadSlave    => extAxilReadSlave,
-         axiWriteMaster  => extAxilWriteMaster,
-         axiWriteSlave   => extAxilWriteSlave
+
+   -------------------------------------
+   -- AXI Lite Crossbar
+   -- Base: 0xA0000000 - 0xAFFFFFFF
+   -------------------------------------
+   U_AxiCrossbar : entity work.AxiLiteCrossbar 
+      generic map (
+         TPD_G              => TPD_C,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 2,
+         DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
+         MASTERS_CONFIG_G   => (
+
+            -- Channel 0 = 0xA0000000 - 0xA000FFFF : DPM Timing Source
+            0 => ( baseAddr     => x"A0000000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
+            1 => ( baseAddr     => x"A0010000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF")
+         )
+      ) port map (
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         sAxiWriteMasters(0) => extAxiWriteMaster,
+         sAxiWriteSlaves(0)  => extAxiWriteSlave,
+         sAxiReadMasters(0)  => extAxiReadMaster,
+         sAxiReadSlaves(0)   => extAxiReadSlave,
+         mAxiWriteMasters(0) => clkAxiWriteMaster,
+         mAxiWriteSlaves(0)  => clkAxiWriteSlave,
+         mAxiReadMasters(0)  => clkAxiReadMaster,
+         mAxiReadSlaves(0)   => clkAxiReadSlave
+         mAxiWriteMasters(1) => pgpAxiWriteMaster,
+         mAxiWriteSlaves(1)  => pgpAxiWriteSlave,
+         mAxiReadMasters(1)  => pgpAxiReadMaster,
+         mAxiReadSlaves(1)   => pgpAxiReadSlave
       );
 
 
@@ -150,41 +190,70 @@ begin
    dmaIbMaster <= dmaObMaster;
    dmaObSlave  <= dmaIbSlave;
 
+
+   --------------------------------------------------
+   -- Timing Signals
+   --------------------------------------------------
+   U_DpmTimingSink : entity work.DpmTimingSink 
+      generic map (
+         TPD_G => TPD_C
+      ) port map (
+         axiClk         => axiClk,
+         axiClkRst      => axiClkRst,
+         axiReadMaster  => clkAxiReadMaster,
+         axiReadSlave   => clkAxiReadSlave,
+         axiWriteMaster => clkAxiWriteMaster,
+         axiWriteSlave  => clkAxiWriteSlave,
+         sysClk200      => sysClk200,
+         sysClk200Rst   => sysClk200Rst,
+         dtmClkP        => dtmClkP,
+         dtmClkM        => dtmClkM,
+         dtmFbP         => dtmFbP,
+         dtmFbM         => dtmFbM,
+         distClk        => open,
+         distClkRst     => open,
+         timingCode     => timingCode,
+         timingCodeEn   => timingCodeEn,
+         fbCode         => fbCode,
+         fbCodeEn       => fbCodeEn,
+         led            => led
+      );
+
+   fbCode   <= timingCode;
+   fbCodeEn <= timingCodeEn;
+
+
+   --------------------------------------------------
+   -- RTM Testing
+   --------------------------------------------------
+   U_RtmTest : entity work.DpmRtmTest 
+      generic map (
+         TPD_G => TPD_C
+      ) port map (
+         sysClk200           => sysClk200,
+         sysClk200Rst        => sysClk200Rst,
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         topAxiReadMaster    => pgpAxiReadMaster,
+         topAxiReadSlave     => pgpAxiReadSlave,
+         topAxiWriteMaster   => pgpAxiWriteMaster,
+         topAxiWriteSlave    => pgpAxiWriteSlave,
+         locRefClkP          => locRefClkP,
+         locRefClkM          => locRefClkM,
+         dpmToRtmHsP         => dpmToRtmHsP,
+         dpmToRtmHsM         => dpmToRtmHsM,
+         rtmToDpmHsP         => rtmToDpmHsP,
+         rtmToDpmHsM         => rtmToDpmHsM
+      );
+
+
    --------------------------------------------------
    -- Top Level Signals
    --------------------------------------------------
-   led <= (others=>'0');
-
-   -- RTM High Speed
-   --dpmToRtmHsP : out   slv(11 downto 0);
-   --dpmToRtmHsM : out   slv(11 downto 0);
-   --rtmToDpmHsP : in    slv(11 downto 0);
-   --rtmToDpmHsM : in    slv(11 downto 0);
 
    -- Reference Clocks
-   --locRefClkP   : in    sl;
-   --locRefClkM   : in    sl;
    --dtmRefClkP   : in    sl;
    --dtmRefClkM   : in    sl;
-
-   -- DTM Clock Signals
-   U_DtmClkgen : for i in 0 to 1 generate
-      U_DtmClkIn : IBUFDS
-         generic map ( DIFF_TERM => true ) 
-         port map(
-            I      => dtmClkP(i),
-            IB     => dtmClkM(i),
-            O      => open
-         );
-   end generate;
-
-   -- DTM Feedback
-   U_DtmFbOut : OBUFDS
-      port map(
-         O      => dtmFbP,
-         OB     => dtmFbM,
-         I      => '0'
-      );
 
 end architecture STRUCTURE;
 
