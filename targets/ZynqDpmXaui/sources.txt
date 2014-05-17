@@ -1,3 +1,0 @@
-vhdl work Version.vhd
-vhdl work ../ZynqDpm/hdl/DpmRtmTest.vhd
-vhdl work hdl/ZynqDpmXaui.vhd

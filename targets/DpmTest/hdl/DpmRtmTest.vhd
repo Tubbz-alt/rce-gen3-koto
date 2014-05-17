@@ -147,8 +147,8 @@ begin
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => MASTERS_CONFIG_C
       ) port map (
-         axiClk              => axiClk,
-         axiClkRst           => axiClkRst,
+         axiClk              => pgpClk,
+         axiClkRst           => pgpClkRst,
          sAxiWriteMasters(0) => tmpAxiWriteMaster,
          sAxiWriteSlaves(0)  => tmpAxiWriteSlave,
          sAxiReadMasters(0)  => tmpAxiReadMaster,

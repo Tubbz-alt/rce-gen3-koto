@@ -16,7 +16,8 @@ use work.AxiStreamPkg.all;
 
 entity DtmRtmTest is
    generic (
-      TPD_G : time := 1 ns
+      TPD_G               : time             := 1 ns;
+      AXIL_BASE_ADDRESS_G : slv(31 downto 0) := x"00000000"
    );
    port (
 
@@ -150,8 +151,8 @@ begin
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => MASTERS_CONFIG_C
       ) port map (
-         axiClk              => axiClk,
-         axiClkRst           => axiClkRst,
+         axiClk              => pgpClk,
+         axiClkRst           => pgpClkRst,
          sAxiWriteMasters(0) => tmpAxiWriteMaster,
          sAxiWriteSlaves(0)  => tmpAxiWriteSlave,
          sAxiReadMasters(0)  => tmpAxiReadMaster,
