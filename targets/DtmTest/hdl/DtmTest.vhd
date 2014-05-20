@@ -132,7 +132,7 @@ begin
    U_DtmCore: entity work.DtmCore 
       generic map (
          TPD_G          => TPD_C,
-         RCE_DMA_MODE_G => RCE_DMA_PPI_C
+         RCE_DMA_MODE_G => RCE_DMA_AXIS_C
       ) port map (
          i2cSda              => i2cSda,
          i2cScl              => i2cScl,
@@ -226,8 +226,13 @@ begin
    --------------------------------------------------
    -- PPI Loopback
    --------------------------------------------------
-   dmaClk      <= (others=>sysClk125);
-   dmaClkRst   <= (others=>sysClk125Rst);
+   dmaClk(0)    <= sysClk200;
+   dmaClkRst(0) <= sysClk200Rst;
+   dmaClk(1)    <= sysClk125;
+   dmaClkRst(1) <= sysClk125Rst;
+   dmaClk(2)    <= sysClk125;
+   dmaClkRst(2) <= sysClk125Rst;
+
    dmaIbMaster <= dmaObMaster;
    dmaObSlave  <= dmaIbSlave;
 
