@@ -117,8 +117,7 @@ architecture STRUCTURE of DtmTest is
    signal locAxilWriteSlave  : AxiLiteWriteSlaveArray(1 downto 0);
    signal dmaClk             : slv(2 downto 0);
    signal dmaClkRst          : slv(2 downto 0);
-   signal dmaOnline          : slv(2 downto 0);
-   signal dmaEnable          : slv(2 downto 0);
+   signal dmaState           : RceDmaStateArray(2 downto 0);
    signal dmaObMaster        : AxiStreamMasterArray(2 downto 0);
    signal dmaObSlave         : AxiStreamSlaveArray(2 downto 0);
    signal dmaIbMaster        : AxiStreamMasterArray(2 downto 0);
@@ -178,8 +177,7 @@ begin
          extAxilWriteSlave   => extAxilWriteSlave,
          dmaClk              => dmaClk,
          dmaClkRst           => dmaClkRst,
-         dmaOnline           => dmaOnline,
-         dmaEnable           => dmaEnable,
+         dmaState            => dmaState,
          dmaObMaster         => dmaObMaster,
          dmaObSlave          => dmaObSlave,
          dmaIbMaster         => dmaIbMaster,
