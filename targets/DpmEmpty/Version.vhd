@@ -16,14 +16,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000300"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000301"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmEmpty: Built Mon Jun  2 17:49:07 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DpmEmpty: Built Tue Jun  3 17:13:46 PDT 2014 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
 -- 06/26/2013 (0xDA000300): Initial Version
+-- 06/26/2013 (0xDA000301): PPI
 -------------------------------------------------------------------------------
 

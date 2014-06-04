@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC200303"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC200304"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DtmTest: Built Tue May 20 10:29:59 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DtmTest: Built Tue Jun  3 17:14:17 PDT 2014 by rherbst";
 
 end Version;
 
@@ -28,5 +28,6 @@ end Version;
 -- 05/14/2014 (0xDC200301): Added ID register.
 -- 05/14/2014 (0xDC200302): Increase Speed
 -- 05/14/2014 (0xDC200303): Shift testing
+-- 05/14/2014 (0xDC200304): PPI Test.
 -------------------------------------------------------------------------------
 

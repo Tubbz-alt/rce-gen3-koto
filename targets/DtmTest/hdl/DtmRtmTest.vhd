@@ -424,9 +424,7 @@ begin
          -- Frame Receive Interface - 1 Lane, Array of 4 VCs
          pgpRxMasters      => pgpRxMasters,
          pgpRxMasterMuxed  => open,
-         pgpRxCtrl         => pgpRxCtrl,
-         -- GT loopback control
-         loopback          => r.loopEnable
+         pgpRxCtrl         => pgpRxCtrl
       );
 
    -- Reset
