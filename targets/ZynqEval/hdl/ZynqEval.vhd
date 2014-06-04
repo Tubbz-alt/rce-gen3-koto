@@ -45,7 +45,8 @@ begin
    U_EvalCore: entity work.EvalCore
       generic map (
          TPD_G          => TPD_C,
-         RCE_DMA_MODE_G => RCE_DMA_PPI_C
+         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
+         OLD_BSI_MODE_G => false
       )
       port map (
          i2cSda                   => i2cSda,
@@ -66,7 +67,8 @@ begin
          dmaObMaster              => dmaObMaster,
          dmaObSlave               => dmaObSlave,
          dmaIbMaster              => dmaIbMaster,
-         dmaIbSlave               => dmaIbSlave
+         dmaIbSlave               => dmaIbSlave,
+         userInterrupt            => (others=>'0')
       );
 
    -- Empty AXI Slave
