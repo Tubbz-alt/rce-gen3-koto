@@ -461,12 +461,12 @@ begin
    -- Rx Control
    pgpRxIn.flush    <= '0';
    pgpRxIn.resetRx  <= '0';
+   pgpRxIn.loopback <= (others=>'0');
 
    -- Tx Control
    pgpTxIn.flush        <= '0';
    pgpTxIn.opCodeEn     <= '0';
    pgpTxIn.opCode       <= (others=>'0');
-   pgpTxIn.locLinkReady <= pgpRxOut.linkReady;
    pgpTxIn.locData      <= (others=>'0');
 
    -- Counters

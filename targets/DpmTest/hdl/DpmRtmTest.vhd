@@ -398,9 +398,7 @@ begin
             -- Frame Receive Interface - 1 Lane, Array of 4 VCs
             pgpRxMasters      => pgpRxMasters((i*4)+3 downto i*4),
             pgpRxMasterMuxed  => open,
-            pgpRxCtrl         => pgpRxCtrl((i*4)+3 downto i*4),
-            -- GT loopback control
-            loopback          => r.loopEnable
+            pgpRxCtrl         => pgpRxCtrl((i*4)+3 downto i*4)
          );
 
       -- Reset
@@ -435,12 +433,12 @@ begin
       -- Rx Control
       pgpRxIn(i).flush    <= '0';
       pgpRxIn(i).resetRx  <= '0';
+      pgpRxIn(i).loopback <= (others=>'0');
 
       -- Tx Control
       pgpTxIn(i).flush        <= '0';
       pgpTxIn(i).opCodeEn     <= '0';
       pgpTxIn(i).opCode       <= (others=>'0');
-      pgpTxIn(i).locLinkReady <= pgpRxOut(i).linkReady;
       pgpTxIn(i).locData      <= (others=>'0');
 
       -- Counters
