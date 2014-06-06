@@ -18,7 +18,7 @@ package Version is
 
 constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000301"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Wed Jun  4 16:32:23 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Fri Jun  6 13:48:40 PDT 2014 by rherbst";
 
 end Version;
 
