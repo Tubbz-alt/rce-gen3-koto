@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100301"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100302"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmTest: Built Fri Jun  6 13:48:58 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DpmTest: Built Sun Jun 22 13:19:56 PDT 2014 by rherbst";
 
 end Version;
 
@@ -26,5 +26,6 @@ end Version;
 -- Revision History:
 -- 06/26/2013 (0xDA100300): Initial Version
 -- 06/26/2013 (0xDA100301): PPI
+-- 06/26/2013 (0xDA100302): PPi Fix, added piplines.
 -------------------------------------------------------------------------------
 
