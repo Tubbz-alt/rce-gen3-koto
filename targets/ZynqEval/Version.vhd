@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000302"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000303"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Sun Jun 22 13:20:01 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Wed Jun 25 16:43:29 PDT 2014 by rherbst";
 
 end Version;
 
@@ -62,5 +62,6 @@ end Version;
 -- 05/14/2014 (0xF1000300): New RCE structure
 -- 05/14/2014 (0xF1000301): Added PPI
 -- 05/14/2014 (0xF1000302): Inbound length fix.
+-- 05/14/2014 (0xF1000303): Compile test.
 -------------------------------------------------------------------------------
 

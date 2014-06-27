@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Title         : Version Constant File
--- Project       : COB Zynq DTM
+-- Project       : COB Zynq DTM 10G Test
 -------------------------------------------------------------------------------
 -- File          : Version.vhd
 -- Author        : Ryan Herbst, rherbst@slac.stanford.edu
--- Created       : 05/07/2013
+-- Created       : 06/26/2014
 -------------------------------------------------------------------------------
 -- Description:
 -- Version Constant Module
@@ -16,15 +16,14 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000301"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000001"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmEmpty: Built Thu Jun 26 00:12:03 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Thu Jun 26 00:43:10 PDT 2014 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
--- 06/26/2013 (0xDA000300): Initial Version
--- 06/26/2013 (0xDA000301): PPI
+-- 06/26/2014 (0xDB000001): First Version
 -------------------------------------------------------------------------------
 
