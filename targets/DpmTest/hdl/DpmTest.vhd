@@ -87,6 +87,7 @@ architecture STRUCTURE of DpmTest is
    signal timingCodeEn       : sl;
    signal fbCode             : slv(7 downto 0);
    signal fbCodeEn           : sl;
+   signal userInterrupt      : slv(USER_INT_COUNT_C-1 downto 0);
 
 begin
 
@@ -127,7 +128,7 @@ begin
          dmaObSlave               => dmaObSlave,
          dmaIbMaster              => dmaIbMaster,
          dmaIbSlave               => dmaIbSlave,
-         userInterrupt            => (others=>'0')
+         userInterrupt            => userInterrupt
       );
 
    ethTxP(0)           <= iethTxP(0);
@@ -136,6 +137,7 @@ begin
    iethRxM(0)          <= ethRxM(0);
    iethRxP(3 downto 1) <= (others=>'0');
    iethRxM(3 downto 1) <= (others=>'0');
+   userInterrupt       <= (others=>'0');
 
 
    -------------------------------------

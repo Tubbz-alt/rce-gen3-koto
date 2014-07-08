@@ -16,15 +16,16 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000301"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000302"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmEmpty: Built Thu Jun 26 00:12:03 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DpmEmpty: Built Wed Jul  2 01:35:11 PDT 2014 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
--- 06/26/2013 (0xDA000300): Initial Version
--- 06/26/2013 (0xDA000301): PPI
+-- 06/26/2014 (0xDA000300): Initial Version
+-- 06/26/2014 (0xDA000301): PPI
+-- 07/01/2014 (0xDA000302): Interrupt controller fix
 -------------------------------------------------------------------------------
 

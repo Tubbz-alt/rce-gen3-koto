@@ -131,8 +131,8 @@ begin
    U_DtmCore: entity work.DtmCore 
       generic map (
          TPD_G          => TPD_C,
-         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
-         OLD_BSI_MODE_G => false
+         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
+         OLD_BSI_MODE_G => true
       ) port map (
          i2cSda              => i2cSda,
          i2cScl              => i2cScl,

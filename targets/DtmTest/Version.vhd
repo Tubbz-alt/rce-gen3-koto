@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC200305"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC200306"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DtmTest: Built Sun Jun 22 13:20:00 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DtmTest: Built Mon Jul  7 16:48:19 PDT 2014 by rherbst";
 
 end Version;
 
@@ -30,5 +30,6 @@ end Version;
 -- 05/14/2014 (0xDC200303): Shift testing
 -- 05/14/2014 (0xDC200304): PPI Test.
 -- 05/14/2014 (0xDC200305): PPI Fix, pineline addition.
+-- 07/07/2014 (0xDC200306): 1Gbps PGP Test
 -------------------------------------------------------------------------------
 
