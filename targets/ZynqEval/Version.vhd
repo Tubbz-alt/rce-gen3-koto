@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000304"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000305"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Wed Jul  2 01:34:49 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Tue Jul  8 10:59:00 PDT 2014 by rherbst";
 
 end Version;
 
@@ -64,5 +64,6 @@ end Version;
 -- 05/14/2014 (0xF1000302): Inbound length fix.
 -- 05/14/2014 (0xF1000303): Compile test.
 -- 07/01/2014 (0xF1000304): Interrupt controller fix.
+-- 07/08/2014 (0xF1000305): Zero length header support
 -------------------------------------------------------------------------------
 
