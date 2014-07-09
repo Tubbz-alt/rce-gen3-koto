@@ -93,6 +93,7 @@ architecture STRUCTURE of DpmRtmTest is
       pgpRxReset        : slv(11 downto 0);
       pgpTxReset        : slv(11 downto 0);
       loopEnable        : slv(2 downto 0);
+      flowCntlDis       : sl;
       axiReadSlave      : AxiLiteReadSlaveType;
       axiWriteSlave     : AxiLiteWriteSlaveType;
    end record RegType;
@@ -103,6 +104,7 @@ architecture STRUCTURE of DpmRtmTest is
       pgpRxReset        => (others=>'1'),
       pgpTxReset        => (others=>'1'),
       loopEnable        => (others=>'0'),
+      flowCntlDis       => '0',
       axiReadSlave      => AXI_LITE_READ_SLAVE_INIT_C,
       axiWriteSlave     => AXI_LITE_WRITE_SLAVE_INIT_C
    );
@@ -192,6 +194,9 @@ begin
 
          elsif pgpAxiWriteMaster(0).awaddr(11 downto 0) = x"014" then
             v.clkReset := pgpAxiWriteMaster(0).wdata(0);
+
+         elsif pgpAxiWriteMaster(0).awaddr(11 downto 0) = x"018" then
+            v.flowCntlDis := pgpAxiWriteMaster(0).wdata(0);
          end if;
 
          -- Send Axi response
@@ -222,6 +227,9 @@ begin
 
          elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"014" then
             v.axiReadSlave.rdata(0) := r.clkReset;
+
+         elsif pgpAxiReadMaster(0).araddr(11 downto 0)  = x"018" then
+            v.axiReadSlave.rdata(0) := r.flowCntlDis;
 
          elsif pgpAxiReadMaster(0).araddr(11 downto 9)  = "001" then
             case pgpAxiReadMaster(0).araddr(4 downto 2) is
@@ -440,6 +448,7 @@ begin
       pgpTxIn(i).opCodeEn     <= '0';
       pgpTxIn(i).opCode       <= (others=>'0');
       pgpTxIn(i).locData      <= (others=>'0');
+      pgpTxIn(i).flowCntlDis  <= r.flowCntlDis;
 
       -- Counters
       process ( pgpClk ) begin
