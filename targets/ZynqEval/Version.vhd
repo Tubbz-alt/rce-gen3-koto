@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000308"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000309"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Fri Jul 18 12:38:04 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Fri Jul 18 14:07:06 PDT 2014 by rherbst";
 
 end Version;
 
