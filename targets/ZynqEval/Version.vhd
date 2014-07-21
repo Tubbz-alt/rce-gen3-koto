@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F1000309"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100030A"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Fri Jul 18 14:07:06 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Mon Jul 21 10:57:58 PDT 2014 by rherbst";
 
 end Version;
 
@@ -68,5 +68,6 @@ end Version;
 -- 07/14/2014 (0xF1000306): Added e-fuse readback, PPI Fix
 -- 07/15/2014 (0xF1000307): Test
 -- 07/15/2014 (0xF1000308): PPI Debug
+-- 07/15/2014 (0xF100030A): Debug
 -------------------------------------------------------------------------------
 
