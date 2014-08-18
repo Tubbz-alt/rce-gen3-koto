@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000002"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000003"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Tue Aug  5 17:52:05 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Sun Aug 17 19:31:20 PDT 2014 by rherbst";
 
 end Version;
 
@@ -26,5 +26,6 @@ end Version;
 -- Revision History:
 -- 06/26/2014 (0xDB000001): First Version
 -- 08/05/2014 (0xDB000002): Second Version
+-- 08/17/2014 (0xDB000003): FIXED PPI
 -------------------------------------------------------------------------------
 
