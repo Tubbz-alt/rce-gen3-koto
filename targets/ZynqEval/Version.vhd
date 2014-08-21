@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100030B"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100030C"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Sat Jul 26 16:20:00 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Thu Aug 21 08:32:49 PDT 2014 by rherbst";
 
 end Version;
 
@@ -70,5 +70,6 @@ end Version;
 -- 07/15/2014 (0xF1000308): PPI Debug
 -- 07/15/2014 (0xF100030A): Debug
 -- 07/15/2014 (0xF100030B): Added disable register write
+-- 08/21/2014 (0xF100030C): new BSI registers.
 -------------------------------------------------------------------------------
 
