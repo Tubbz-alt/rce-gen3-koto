@@ -78,13 +78,12 @@ ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExp
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/pauseData*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcFifoIn*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcFifoOut*}
-ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcInv*}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcTx*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcIn*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcInit}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcDataWidth*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcDataValid}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcReset}
-ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/crcOut*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/intError}
 
 ## Delete the last unused port
