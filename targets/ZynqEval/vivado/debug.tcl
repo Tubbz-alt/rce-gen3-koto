@@ -10,15 +10,15 @@ CreateDebugCore ${ilaName}
 set_property C_DATA_DEPTH 2048 [get_debug_cores ${ilaName}]
 
 ## Setup Clock, Variable set in xdc file
-SetDebugCoreClk ${ilaName} {axiClk}
+SetDebugCoreClk ${ilaName} {sysClk125}
 
-ConfigProbe ${ilaName} {crcOut*}       : signal is "true";
-ConfigProbe ${ilaName} {crcDataValid}  : signal is "true";
-ConfigProbe ${ilaName} {crcDataWidth*} : signal is "true";
-ConfigProbe ${ilaName} {crcIn*}        : signal is "true";
-ConfigProbe ${ilaName} {crcInAdj*}     : signal is "true";
-ConfigProbe ${ilaName} {crcReset}      : signal is "true";
-ConfigProbe ${ilaName} {crcCount*}     : signal is "true";
+ConfigProbe ${ilaName} {crcOut*}
+ConfigProbe ${ilaName} {crcDataValid}
+ConfigProbe ${ilaName} {crcDataWidth*}
+ConfigProbe ${ilaName} {crcIn*} 
+ConfigProbe ${ilaName} {crcInAdj*}
+ConfigProbe ${ilaName} {crcReset}
+ConfigProbe ${ilaName} {crcCount*}
 
 ## Delete the last unused port
 delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]

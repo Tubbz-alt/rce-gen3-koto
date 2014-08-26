@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000008"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00000b"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Fri Aug 22 21:26:05 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Tue Aug 26 12:55:49 PDT 2014 by rherbst";
 
 end Version;
 
@@ -32,5 +32,8 @@ end Version;
 -- 08/19/2014 (0xDB000006): CRC Fix.
 -- 08/19/2014 (0xDB000007): CRC Fix. #2
 -- 08/19/2014 (0xDB000008): CRC Fix. #3
+-- 08/19/2014 (0xDB000009): Added clock constraints
+-- 08/19/2014 (0xDB00000A): Added clock constraints
+-- 08/19/2014 (0xDB00000B): Valid threshold change.
 -------------------------------------------------------------------------------
 

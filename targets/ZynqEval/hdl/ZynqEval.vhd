@@ -130,14 +130,15 @@ begin
       ); 
 
    process ( axiClk ) begin
-
       if rising_edge(axiClk) then
          if axiClkRst = '1' or writeRegister(0)(0) = '1' then
-            crcDataValid <= '0';
-            crcDataWidth <= (others=>'0');
-            crcIn        <= (others=>'0');
-            crcReset     <= '0';
+            crcDataValid    <= '0';
+            crcDataWidth    <= (others=>'0');
+            crcIn           <= (others=>'0');
+            crcReset        <= '0';
+            readRegister(0) <= (others=>'0');
          else
+            readRegister(0) <= crcOutAdj;
 
             case crcCount is 
 
