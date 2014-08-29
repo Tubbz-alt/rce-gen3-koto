@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00000e"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00000f"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Thu Aug 28 16:19:25 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Fri Aug 29 10:40:19 PDT 2014 by rherbst";
 
 end Version;
 
@@ -38,5 +38,6 @@ end Version;
 -- 08/19/2014 (0xDB00000C): Valid threshold change.
 -- 08/19/2014 (0xDB00000d): Fifo and threshold fix.
 -- 08/19/2014 (0xDB00000e): Export fixes. Proper simulation.
+-- 08/19/2014 (0xDB00000f): state count fix.
 -------------------------------------------------------------------------------
 
