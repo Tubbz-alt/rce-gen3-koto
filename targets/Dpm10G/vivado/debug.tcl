@@ -64,7 +64,6 @@ ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExp
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/txEnable1}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/txEnable2}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/txEnable3}
-ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/txEnable4}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/intData*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/stateCount*}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExport/stateCountRst}
@@ -90,5 +89,5 @@ ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_XMac/U_XMacExp
 delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
 
 ## Write the port map file
-write_debug_probes -force ${PROJ_DIR}/debug/debug_probes.ltx
+write_debug_probes -force $::env(PROJ_DIR)/debug/debug_probes.ltx
 
