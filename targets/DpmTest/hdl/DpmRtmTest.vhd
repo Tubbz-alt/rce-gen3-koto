@@ -318,18 +318,18 @@ begin
             CPLL_REFCLK_SEL_G     => "001",
 
             -- 5Gbps
-            STABLE_CLOCK_PERIOD_G => 4.0E-9,
-            CPLL_FBDIV_G          => 2,
-            CPLL_FBDIV_45_G       => 5,
-            CPLL_REFCLK_DIV_G     => 1,
-            RXOUT_DIV_G           => 1,
-            TXOUT_DIV_G           => 1,
-            RX_CLK25_DIV_G        => 10,
-            TX_CLK25_DIV_G        => 10,
-            RXCDR_CFG_G           => x"03000023ff20400020",    -- Set by wizard
-            RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
-            RXDFEXYDEN_G          => '0',                      -- Set by wizard
-            RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
+            --STABLE_CLOCK_PERIOD_G => 4.0E-9,
+            --CPLL_FBDIV_G          => 2,
+            --CPLL_FBDIV_45_G       => 5,
+            --CPLL_REFCLK_DIV_G     => 1,
+            --RXOUT_DIV_G           => 1,
+            --TXOUT_DIV_G           => 1,
+            --RX_CLK25_DIV_G        => 10,
+            --TX_CLK25_DIV_G        => 10,
+            --RXCDR_CFG_G           => x"03000023ff20400020",    -- Set by wizard
+            --RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
+            --RXDFEXYDEN_G          => '0',                      -- Set by wizard
+            --RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
 
             -- 3.125Gbps
             --STABLE_CLOCK_PERIOD_G => 4.0E-9,
@@ -346,18 +346,18 @@ begin
             --RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
 
             -- 1.125Gbps
-            --STABLE_CLOCK_PERIOD_G => 4.0E-9,  --units of seconds 1.25
-            --CPLL_FBDIV_G          => 2,
-            --CPLL_FBDIV_45_G       => 5,
-            --CPLL_REFCLK_DIV_G     => 1,
-            --RXOUT_DIV_G           => 4,
-            --TXOUT_DIV_G           => 4,
-            --RX_CLK25_DIV_G        => 10,
-            --TX_CLK25_DIV_G        => 10,
-            --RXCDR_CFG_G           => x"03000023ff40080020",    -- Set by wizard
-            --RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
-            --RXDFEXYDEN_G          => '0',                      -- Set by wizard
-            --RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
+            STABLE_CLOCK_PERIOD_G => 4.0E-9,  --units of seconds 1.25
+            CPLL_FBDIV_G          => 2,
+            CPLL_FBDIV_45_G       => 5,
+            CPLL_REFCLK_DIV_G     => 1,
+            RXOUT_DIV_G           => 4,
+            TXOUT_DIV_G           => 4,
+            RX_CLK25_DIV_G        => 10,
+            TX_CLK25_DIV_G        => 10,
+            RXCDR_CFG_G           => x"03000023ff40080020",    -- Set by wizard
+            RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
+            RXDFEXYDEN_G          => '0',                      -- Set by wizard
+            RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
 
             -- Configure PLL sourc
             TX_PLL_G              => "CPLL",
@@ -600,8 +600,8 @@ begin
          CLKFBOUT_MULT_F      => 4.000,
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 4.0, -- 5.0 gbps
-         --CLKOUT0_DIVIDE_F     => 16.0, -- 1.125 gbps
+         --CLKOUT0_DIVIDE_F     => 4.0, -- 5.0 gbps
+         CLKOUT0_DIVIDE_F     => 16.0, -- 1.125 gbps
          CLKOUT0_PHASE        => 0.000,
          CLKOUT0_DUTY_CYCLE   => 0.5,
          CLKOUT0_USE_FINE_PS  => FALSE,
