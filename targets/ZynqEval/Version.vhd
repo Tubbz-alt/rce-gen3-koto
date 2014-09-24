@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100030E"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F100030F"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "ZynqEval: Built Wed Sep 10 12:54:35 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "ZynqEval: Built Tue Sep 23 21:59:52 PDT 2014 by rherbst";
 
 end Version;
 
@@ -72,5 +72,6 @@ end Version;
 -- 07/15/2014 (0xF100030B): Added disable register write
 -- 08/21/2014 (0xF100030C): new BSI registers.
 -- 08/21/2014 (0xF100030E): Axis Version
+-- 09/23/2014 (0xF100030F): Core Updates and clock test.
 -------------------------------------------------------------------------------
 

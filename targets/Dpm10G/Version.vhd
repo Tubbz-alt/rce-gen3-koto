@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000010"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000011"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Sun Aug 31 09:45:03 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Wed Sep 24 00:27:05 PDT 2014 by rherbst";
 
 end Version;
 
@@ -40,5 +40,6 @@ end Version;
 -- 08/19/2014 (0xDB00000e): Export fixes. Proper simulation.
 -- 08/19/2014 (0xDB00000f): state count fix.
 -- 08/31/2014 (0xDB000010): PPI Bug Fix.
+-- 09/24/2014 (0xDB000011): New RCE, new clocking.
 -------------------------------------------------------------------------------
 

@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100306"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100307"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmTest: Built Fri Sep  5 09:48:27 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DpmTest: Built Tue Sep 23 23:12:54 PDT 2014 by rherbst";
 
 end Version;
 
@@ -31,5 +31,6 @@ end Version;
 -- 07/09/2013 (0xDA100304): Flow control fix, 1Gbps
 -- 08/19/2014 (0xDA100305): 5Gbps PGP test
 -- 08/19/2014 (0xDA100306): 1Gbps, PPI and new BSI
+-- 09/23/2014 (0xDA100307): Updates, 5Gbps
 -------------------------------------------------------------------------------
 
