@@ -326,10 +326,10 @@ begin
             TXOUT_DIV_G           => 1,
             RX_CLK25_DIV_G        => 10,
             TX_CLK25_DIV_G        => 10,
-            RXCDR_CFG_G           => x"03000023ff20400020",    -- Set by wizard
-            RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
+            --RXCDR_CFG_G           => x"03000023ff20400020",    -- Set by wizard
+            --RX_OS_CFG_G           => "0000010000000",          -- Set by wizard
             RXDFEXYDEN_G          => '0',                      -- Set by wizard
-            RX_DFE_KL_CFG2_G      => x"3010D90C",              -- Set by wizard
+            RX_DFE_KL_CFG2_G      => x"301148ac",              -- Set by wizard
 
             -- 3.125Gbps
             --STABLE_CLOCK_PERIOD_G => 4.0E-9,
@@ -367,7 +367,7 @@ begin
             ----------------------------------------
             -- PGP Settings
             ----------------------------------------
-            PAYLOAD_CNT_TOP_G     => 7,  -- Top bit for payload counter
+            PAYLOAD_CNT_TOP_G     => 8,  -- Top bit for payload counter
             VC_INTERLEAVE_G       => 1
          ) port map (
             -- GT Clocking
@@ -664,13 +664,13 @@ begin
    U_pgpClkRstGen : entity work.RstSync
       generic map (
          TPD_G           => 1 ns,
-         IN_POLARITY_G   => '1',
+         IN_POLARITY_G   => '0',
          OUT_POLARITY_G  => '1',
          RELEASE_DELAY_G => 16
       )
       port map (
         clk      => pgpClk,
-        asyncRst => axiClkRst,
+        asyncRst => pgpTxMmcmLocked,
         syncRst  => pgpClkRst
       );
 
