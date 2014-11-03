@@ -592,7 +592,7 @@ begin
    -- PLL
    U_PgpClkGen : MMCME2_ADV
       generic map (
-         BANDWIDTH            => "OPTIMIZED",
+         BANDWIDTH            => "HIGH",
          CLKOUT4_CASCADE      => FALSE,
          COMPENSATION         => "ZHOLD",
          STARTUP_WAIT         => FALSE,
