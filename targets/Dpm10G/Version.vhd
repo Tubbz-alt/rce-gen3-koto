@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000013"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000014"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Tue Jan  6 22:24:36 PST 2015 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Wed Jan  7 11:38:56 PST 2015 by rherbst";
 
 end Version;
 
@@ -43,5 +43,6 @@ end Version;
 -- 09/24/2014 (0xDB000011): New RCE, new clocking.
 -- 11/03/2014 (0xDB000012): RCE Updates, removed PPI crossbar, added debug.
 -- 01/06/2015 (0xDB000013): AXI Stream FIFO fix.
+-- 01/06/2015 (0xDB000014): Full library update.
 -------------------------------------------------------------------------------
 
