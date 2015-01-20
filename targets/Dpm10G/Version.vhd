@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000015"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00001E"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Fri Jan  9 14:34:13 PST 2015 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Tue Jan 20 11:36:10 PST 2015 by rherbst";
 
 end Version;
 
@@ -45,5 +45,13 @@ end Version;
 -- 01/06/2015 (0xDB000013): AXI Stream FIFO fix.
 -- 01/06/2015 (0xDB000014): Full library update.
 -- 01/09/2015 (0xDB000015): Buffer size increase
+-- 01/09/2015 (0xDB000016): Enabled inter-frame gap after pause frames
+-- 01/09/2015 (0xDB000017): Added pause counters
+-- 01/09/2015 (0xDB000018): Fix.
+-- 01/13/2015 (0xDB000019): Pause RX FIX.
+-- 01/13/2015 (0xDB00001A): Removed shifters.
+-- 01/13/2015 (0xDB00001B): Import shift added.
+-- 01/13/2015 (0xDB00001C): Export shift added.
+-- 01/13/2015 (0xDB00001D): Register Fix.
+-- 01/20/2015 (0xDB00001E): Added shift enables to fix first frame bug.
 -------------------------------------------------------------------------------
-
