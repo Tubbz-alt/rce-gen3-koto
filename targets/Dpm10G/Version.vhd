@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00001E"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000024"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Tue Jan 20 14:36:51 PST 2015 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Built Sat Mar  7 09:16:39 PST 2015 by rherbst";
 
 end Version;
 
@@ -54,4 +54,10 @@ end Version;
 -- 01/13/2015 (0xDB00001C): Export shift added.
 -- 01/13/2015 (0xDB00001D): Register Fix.
 -- 01/20/2015 (0xDB00001E): Added shift enables to fix first frame bug.
+-- 01/20/2015 (0xDB00001F): Fixed pause frame generation.
+-- 01/20/2015 (0xDB000020): Removed shifters.
+-- 02/08/2015 (0xDB000021): Added counters.
+-- 02/08/2015 (0xDB000022): Added counters.
+-- 02/17/2015 (0xDB000023): PPI Core fix
+-- 03/07/2015 (0xDB000024): PPI Flow Control Bug
 -------------------------------------------------------------------------------
