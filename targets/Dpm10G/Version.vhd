@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000024"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000025"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Built Sat Mar  7 09:16:39 PST 2015 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2014.3 (x86_64) Built Wed Mar 11 16:39:56 PDT 2015 by rherbst";
 
 end Version;
 
@@ -60,4 +60,5 @@ end Version;
 -- 02/08/2015 (0xDB000022): Added counters.
 -- 02/17/2015 (0xDB000023): PPI Core fix
 -- 03/07/2015 (0xDB000024): PPI Flow Control Bug
+-- 03/07/2015 (0xDB000025): Size check
 -------------------------------------------------------------------------------
