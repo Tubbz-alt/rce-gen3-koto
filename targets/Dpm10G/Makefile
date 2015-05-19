@@ -11,6 +11,10 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
                      $(PROJ_DIR)/../../modules/StdLib  \
                      $(PROJ_DIR)/../../modules/i2c_core  \
                      $(PROJ_DIR)/../../modules/PpiCommon \
+                     $(PROJ_DIR)/../../modules/MgtLib/gtx7 \
+                     $(PROJ_DIR)/../../modules/pgp2b/core \
+                     $(PROJ_DIR)/../../modules/pgp2b/gtx7 \
+                     $(PROJ_DIR)/../../modules/PpiPgp \
                      $(PROJ_DIR)/../../modules/RceG3 \
                      $(PROJ_DIR)/../../modules/DpmCore \
                      $(PROJ_DIR)
