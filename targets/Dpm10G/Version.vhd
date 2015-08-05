@@ -16,14 +16,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000026"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000027"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2014.4 (x86_64) Built Mon May 18 14:20:19 PDT 2015 by bareese";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.2 (x86_64) Built Wed Aug  5 12:37:26 PDT 2015 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 08/05/2015 (0xDB000027): Adjusted inbound thresholds
 -- 05/15/2015 (0xDB000026): Added PPI PGP Array
 -- 03/07/2015 (0xDB000025): Size check
 -- 03/07/2015 (0xDB000024): PPI Flow Control Bug
