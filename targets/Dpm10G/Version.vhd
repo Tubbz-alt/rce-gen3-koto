@@ -16,14 +16,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000027"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000028"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.2 (x86_64) Built Wed Aug  5 12:37:26 PDT 2015 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.1 (x86_64) Built Wed Aug 26 15:20:46 PDT 2015 by bareese";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 08/25/2015 (0xDB000028): Rebuilt with updated AxiStreamMux
 -- 08/05/2015 (0xDB000027): Adjusted inbound thresholds
 -- 05/15/2015 (0xDB000026): Added PPI PGP Array
 -- 03/07/2015 (0xDB000025): Size check
