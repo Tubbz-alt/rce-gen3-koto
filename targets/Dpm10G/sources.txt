@@ -1,2 +1,2 @@
 vhdl work Version.vhd
-vhdl work hdl/Dpm10G.vhd
+vhdl work hdl/Dpm10GAxi.vhd
