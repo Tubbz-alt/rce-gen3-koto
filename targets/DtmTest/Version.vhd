@@ -16,9 +16,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC200310"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC200320"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DtmTest: Built Fri Sep 26 13:18:08 PDT 2014 by rherbst";
+constant BUILD_STAMP_C : string := "DtmTest: Vivado v2014.4 (x86_64) Built Fri Oct 23 16:30:23 PDT 2015 by rherbst";
 
 end Version;
 
@@ -34,5 +34,6 @@ end Version;
 -- 07/08/2014 (0xDC200307): 1Gbps PGP Test
 -- 07/08/2014 (0xDC200308): Updated BSI. Back to 5G test.
 -- 09/26/2014 (0xDC200310): New Timing. 5Gig
+-- 10/23/2015 (0xDC200320): User memory interface added.
 -------------------------------------------------------------------------------
 
