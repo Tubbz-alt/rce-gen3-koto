@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Dpm10GAxi.vhd
+-- Dpm10G.vhd
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
@@ -14,7 +14,7 @@ use work.AxiStreamPkg.all;
 use work.Gtx7CfgPkg.all;
 use work.Pgp2bPkg.all;
 
-entity Dpm10GAxi is
+entity Dpm10G is
    generic (
       TPD_G           : time                  := 1 ns;
       PGP_LANES_G     : integer range 1 to 12 := 12;
@@ -58,9 +58,9 @@ entity Dpm10GAxi is
       clkSelA : out slv(1 downto 0);
       clkSelB : out slv(1 downto 0)
       );
-end Dpm10GAxi;
+end Dpm10G;
 
-architecture STRUCTURE of Dpm10GAxi is
+architecture STRUCTURE of Dpm10G is
 
    -- Constants
    constant AXIL_CLK_FREQ_C    : real            := 125.0E6;
@@ -113,7 +113,7 @@ begin
    U_DpmCore : entity work.DpmCore
       generic map (
          TPD_G          => TPD_G,
-         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
+         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
          OLD_BSI_MODE_G => false,
          ETH_10G_EN_G   => true
          ) port map (
