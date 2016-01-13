@@ -1,0 +1,2 @@
+../../modules/DtmCore/hdl/DtmCore.xdc
+hdl/DtmDebug.xdc
