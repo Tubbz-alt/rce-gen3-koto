@@ -9,21 +9,33 @@
 -- Description:
 -- Version Constant Module
 -------------------------------------------------------------------------------
--- Copyright (c) 2012 by SLAC. All rights reserved.
+-- This file is part of 'RCE Development Firmware'.
+-- It is subject to the license terms in the LICENSE.txt file found in the 
+-- top-level directory of this distribution and at: 
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+-- No part of 'RCE Development Firmware', including this file, 
+-- may be copied, modified, propagated, or distributed except according to 
+-- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00004C"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000054"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.3 (x86_64) Built Mon Dec  7 09:58:44 PST 2015 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.3 (x86_64) Built Mon Jan  4 17:03:27 PST 2016 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 01/04/2016 (0xDB000054): User ethernet
+-- 12/08/2015 (0xDB000053): Inbound header engine.
+-- 12/08/2015 (0xDB000052): Debug on mux/dma header in 3
+-- 12/08/2015 (0xDB000051): New arb, debug on pause tx
+-- 12/08/2015 (0xDB000050): ar/aw size fix
+-- 12/08/2015 (0xDB00004D): Test drop fix.
 -- 12/07/2015 (0xDB00004C): Vivado 2015.3
 -- 11/30/2015 (0xDB00004B): restored cache settings.
 -- 11/30/2015 (0xDB00004A): CRC Fix

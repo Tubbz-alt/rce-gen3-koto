@@ -1,3 +1,12 @@
+------------------------------------------------------------------------------
+-- This file is part of 'RCE Development Firmware'.
+-- It is subject to the license terms in the LICENSE.txt file found in the 
+-- top-level directory of this distribution and at: 
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+-- No part of 'RCE Development Firmware', including this file, 
+-- may be copied, modified, propagated, or distributed except according to 
+-- the terms contained in the LICENSE.txt file.
+------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- Dpm10G.vhd
 -------------------------------------------------------------------------------
@@ -13,6 +22,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.Gtx7CfgPkg.all;
 use work.Pgp2bPkg.all;
+use work.EthMacPkg.all;
 
 entity Dpm10G is
    generic (
@@ -105,6 +115,14 @@ architecture STRUCTURE of Dpm10G is
    signal pgpRxMasterMuxed : AxiStreamMasterArray(PGP_LANES_G-1 downto 0);
    signal pgpRxCtrl        : AxiStreamQuadCtrlArray(PGP_LANES_G-1 downto 0);
 
+   -- User loopback
+   signal userEthClk       : sl;
+   signal userEthClkRst    : sl;
+   signal userEthObMaster  : AxiStreamMasterType;
+   signal userEthObSlave   : AxiStreamSlaveType;
+   signal userEthIbMaster  : AxiStreamMasterType;
+   signal userEthIbCtrl    : AxiStreamCtrlType;
+
 begin
 
    --------------------------------------------------
@@ -112,40 +130,48 @@ begin
    --------------------------------------------------
    U_DpmCore : entity work.DpmCore
       generic map (
-         TPD_G          => TPD_G,
-         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
-         OLD_BSI_MODE_G => false,
-         ETH_10G_EN_G   => true
-         ) port map (
-            i2cSda             => i2cSda,
-            i2cScl             => i2cScl,
-            ethRxP             => ethRxP,
-            ethRxM             => ethRxM,
-            ethTxP             => ethTxP,
-            ethTxM             => ethTxM,
-            ethRefClkP         => ethRefClkP,
-            ethRefClkM         => ethRefClkM,
-            clkSelA            => clkSelA,
-            clkSelB            => clkSelB,
-            sysClk125          => sysClk125,
-            sysClk125Rst       => sysClk125Rst,
-            sysClk200          => sysClk200,
-            sysClk200Rst       => sysClk200Rst,
-            axiClk             => axilClk,
-            axiClkRst          => axilClkRst,
-            extAxilReadMaster  => extAxilReadMaster,
-            extAxilReadSlave   => extAxilReadSlave,
-            extAxilWriteMaster => extAxilWriteMaster,
-            extAxilWriteSlave  => extAxilWriteSlave,
-            dmaClk             => dmaClk,
-            dmaClkRst          => dmaClkRst,
-            dmaState           => dmaState,
-            dmaObMaster        => dmaObMaster,
-            dmaObSlave         => dmaObSlave,
-            dmaIbMaster        => dmaIbMaster,
-            dmaIbSlave         => dmaIbSlave,
-            userInterrupt      => (others => '0')
-            );
+         TPD_G           => TPD_G,
+         RCE_DMA_MODE_G  => RCE_DMA_PPI_C,
+         OLD_BSI_MODE_G  => false,
+         ETH_10G_EN_G    => true,
+         USER_ETH_EN_G   => true,
+         USER_ETH_TYPE_G => x"AAAA"
+      ) port map (
+         i2cSda             => i2cSda,
+         i2cScl             => i2cScl,
+         ethRxP             => ethRxP,
+         ethRxM             => ethRxM,
+         ethTxP             => ethTxP,
+         ethTxM             => ethTxM,
+         ethRefClkP         => ethRefClkP,
+         ethRefClkM         => ethRefClkM,
+         clkSelA            => clkSelA,
+         clkSelB            => clkSelB,
+         sysClk125          => sysClk125,
+         sysClk125Rst       => sysClk125Rst,
+         sysClk200          => sysClk200,
+         sysClk200Rst       => sysClk200Rst,
+         axiClk             => axilClk,
+         axiClkRst          => axilClkRst,
+         extAxilReadMaster  => extAxilReadMaster,
+         extAxilReadSlave   => extAxilReadSlave,
+         extAxilWriteMaster => extAxilWriteMaster,
+         extAxilWriteSlave  => extAxilWriteSlave,
+         userEthClk         => userEthClk,
+         userEthClkRst      => userEthClkRst,
+         userEthObMaster    => userEthObMaster,
+         userEthObSlave     => userEthObSlave,
+         userEthIbMaster    => userEthIbMaster,
+         userEthIbCtrl      => userEthIbCtrl,
+         dmaClk             => dmaClk,
+         dmaClkRst          => dmaClkRst,
+         dmaState           => dmaState,
+         dmaObMaster        => dmaObMaster,
+         dmaObSlave         => dmaObSlave,
+         dmaIbMaster        => dmaIbMaster,
+         dmaIbSlave         => dmaIbSlave,
+         userInterrupt      => (others => '0')
+      );
 
 
    -------------------------------------------------------------------------------------------------
@@ -341,6 +367,26 @@ begin
             pgpRxCtrl        => pgpRxCtrl(i));
    end generate PGP_GTX_GEN;
 
+   -------------------------------------------------------------------------------------------------
+   -- User ethernet loopback
+   -------------------------------------------------------------------------------------------------
+   U_UserEthFifo : entity work.AxiStreamFifo
+      generic map (
+         TPD_G               => TPD_G,
+         FIFO_ADDR_WIDTH_G   => 9,
+         FIFO_PAUSE_THRESH_G => 128,
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C
+      ) port map (
+         sAxisClk    => userEthClk,
+         sAxisRst    => userEthClkRst,
+         sAxisMaster => userEThIbMaster,
+         sAxisCtrl   => userEThIbCtrl,
+         mAxisClk    => userEthClk,
+         mAxisRst    => userEthClkRst,
+         mAxisMaster => userEthObMaster,
+         mAxisSlave  => userEthObSlave
+      );
 
 end architecture STRUCTURE;
 
