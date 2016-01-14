@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000054"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000055"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.3 (x86_64) Built Mon Jan  4 17:03:27 PST 2016 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.3 (x86_64) Built Thu Jan 14 10:52:11 PST 2016 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 01/14/2016 (0xDB000055): SOF in MAC, variable header size.
 -- 01/04/2016 (0xDB000054): User ethernet
 -- 12/08/2015 (0xDB000053): Inbound header engine.
 -- 12/08/2015 (0xDB000052): Debug on mux/dma header in 3
