@@ -21,16 +21,17 @@ set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
 #set_property C_EN_STRG_QUAL true [get_debug_cores ${ilaName}]
 
 ## Setup Clock, Variable set in xdc file
-SetDebugCoreClk ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_AxiReadPathMux/axiClk}
+SetDebugCoreClk ${ilaName} {PpiPgpArray_1/U_PpiMonitor/ppiClk}
 
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[3].U_PpiSocket/U_IbHeader/U_IbDma/r_reg[ackCount]__0*}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[3].U_PpiSocket/U_IbHeader/U_IbDma/r_reg[reqCount]__0*}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[3].U_PpiSocket/U_IbHeader/U_IbDma/r_reg[stCount]__0*}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[3].U_PpiSocket/U_IbHeader/U_IbDma/ibFreeValid}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[3].U_PpiSocket/U_IbHeader/U_IbDma/ibPend}
-
-
-
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[inFrame]}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[chanInFrame]*}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[currDest]*}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[currSub]*}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[currFirst]*}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[currValid]}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[currEOF]}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[errorDet]}
+ConfigProbe ${ilaName} {PpiPgpArray_1/U_PpiMonitor/r[errorDetCnt]*}
 
 ## Delete the last unused port
 delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
