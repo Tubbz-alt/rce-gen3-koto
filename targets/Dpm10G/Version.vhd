@@ -22,14 +22,16 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00005F"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000061"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.3 (x86_64) Built Fri Mar 11 15:43:40 PST 2016 by rherbst";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2015.3 (x86_64) Built Sat Mar 12 14:09:47 PST 2016 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 03/08/2016 (0xDB000061): Pause detect.
+-- 03/08/2016 (0xDB000060): Threshold change.
 -- 03/08/2016 (0xDB00005F): Change PPI frame size.
 -- 03/08/2016 (0xDB00005E): Stable Fix.
 -- 03/08/2016 (0xDB00005B): PGP - PPI Bridge Fix.
