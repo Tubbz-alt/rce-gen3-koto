@@ -8,7 +8,7 @@
 -- the terms contained in the LICENSE.txt file.
 ------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
--- DpmDevelTest.vhd
+-- Dpm10GTest.vhd
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -20,7 +20,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
-entity DpmDevelTest is
+entity Dpm10GTest is
    port (
 
       -- Debug
@@ -38,10 +38,10 @@ entity DpmDevelTest is
       ethRefClkP   : in    sl;
       ethRefClkM   : in    sl;
 
-      pgpRxP       : in    sl;
-      pgpRxM       : in    sl;
-      pgpTxP       : out   sl;
-      pgpTxM       : out   sl;
+      extRxP       : in    sl;
+      extRxM       : in    sl;
+      extTxP       : out   sl;
+      extTxM       : out   sl;
 
       -- RTM High Speed
       --dpmToRtmHsP  : out   slv(0 downto 0);
@@ -69,11 +69,13 @@ entity DpmDevelTest is
       clkSelA      : out   slv(1 downto 0);
       clkSelB      : out   slv(1 downto 0)
    );
-end DpmDevelTest;
+end Dpm10GTest;
 
-architecture STRUCTURE of DpmDevelTest is
+architecture STRUCTURE of Dpm10GTest is
 
    constant TPD_C : time := 1 ns;
+
+   constant MAC_ADDR_C : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    -- Local Signals
    signal axiClk             : sl;
@@ -97,15 +99,39 @@ architecture STRUCTURE of DpmDevelTest is
    signal iethRxM            : slv(3 downto 0);
    signal iethTxP            : slv(3 downto 0);
    signal iethTxM            : slv(3 downto 0);
-   signal locRefClk          : sl;
-   signal locRefClkG         : sl;
-   signal pgpClk             : sl;
-   signal pgpClkRst          : sl;
+   signal phyClk             : sl;
+   signal phyRst             : sl;
 
    --signal dpmToRtmHsP  : slv(0 downto 0);
    --signal dpmToRtmHsM  : slv(0 downto 0);
    --signal rtmToDpmHsP  : slv(0 downto 0);
    --signal rtmToDpmHsM  : slv(0 downto 0);
+
+   constant AXIS_CONFIG_C  : AxiStreamConfigArray(3 downto 0) := (others => RCEG3_AXIS_DMA_CONFIG_C);
+
+   attribute dont_touch : string;
+
+   attribute dont_touch of axiClk             : signal is "true"; 
+   attribute dont_touch of axiClkRst          : signal is "true"; 
+   attribute dont_touch of sysClk125          : signal is "true"; 
+   attribute dont_touch of sysClk125Rst       : signal is "true"; 
+   attribute dont_touch of sysClk200          : signal is "true"; 
+   attribute dont_touch of sysClk200Rst       : signal is "true"; 
+   attribute dont_touch of extAxilReadMaster  : signal is "true"; 
+   attribute dont_touch of extAxilReadSlave   : signal is "true"; 
+   attribute dont_touch of extAxilWriteMaster : signal is "true"; 
+   attribute dont_touch of extAxilWriteSlave  : signal is "true"; 
+   attribute dont_touch of dmaClk             : signal is "true"; 
+   attribute dont_touch of dmaClkRst          : signal is "true"; 
+   attribute dont_touch of dmaState           : signal is "true"; 
+   attribute dont_touch of dmaObMaster        : signal is "true"; 
+   attribute dont_touch of dmaObSlave         : signal is "true"; 
+   attribute dont_touch of dmaIbMaster        : signal is "true"; 
+   attribute dont_touch of dmaIbSlave         : signal is "true"; 
+   attribute dont_touch of iethRxP            : signal is "true"; 
+   attribute dont_touch of iethRxM            : signal is "true"; 
+   attribute dont_touch of iethTxP            : signal is "true"; 
+   attribute dont_touch of iethTxM            : signal is "true"; 
 
 begin
 
@@ -116,7 +142,6 @@ begin
       generic map (
          TPD_G          => TPD_C,
          RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
-         OLD_BSI_MODE_G => false,
          ETH_10G_EN_G   => false
       ) port map (
          i2cSda                   => i2cSda,
@@ -158,61 +183,82 @@ begin
 
    -- Empty AXI Slave
    -- 0xA0000000 - 0xAFFFFFFF
-   --U_AxiLiteEmpty: entity work.AxiLiteEmpty 
-   --   port map (
-   --      axiClk          => axiClk,
-   --      axiClkRst       => axiClkRst,
-   --      axiReadMaster   => extAxilReadMaster,
-   --      axiReadSlave    => extAxilReadSlave,
-   --      axiWriteMaster  => extAxilWriteMaster,
-   --      axiWriteSlave   => extAxilWriteSlave
-   --   );
+--   U_AxiLiteEmpty: entity work.AxiLiteEmpty 
+--      port map (
+--         axiClk          => axiClk,
+--         axiClkRst       => axiClkRst,
+--         axiReadMaster   => extAxilReadMaster,
+--         axiReadSlave    => extAxilReadSlave,
+--         axiWriteMaster  => extAxilWriteMaster,
+--         axiWriteSlave   => extAxilWriteSlave
+--      );
 
 
    --------------------------------------------------
    -- PPI Loopback
    --------------------------------------------------
-   dmaClk(0)      <= sysClk200;
-   dmaClkRst(0)   <= sysClk200Rst;
-   dmaIbMaster(0) <= dmaObMaster(0);
-   dmaObSlave(0)  <= dmaIbSlave(0);
+   dmaClk(0)      <= sysClk125;
+   dmaClkRst(0)   <= sysClk125Rst;
+   --dmaIbMaster(0) <= dmaObMaster(0);
+   --dmaObSlave(0)  <= dmaIbSlave(0);
+   dmaIbMaster(0) <= AXI_STREAM_MASTER_INIT_C;
+   dmaObSlave(0)  <= AXI_STREAM_SLAVE_INIT_C;
 
-   dmaClk(1)      <= sysClk200;
-   dmaClkRst(1)   <= sysClk200Rst;
+   dmaClk(1)      <= phyClk;
+   dmaClkRst(1)   <= phyRst;
 
-   dmaClk(2)      <= sysClk200;
-   dmaClkRst(2)   <= sysClk200Rst;
-   dmaIbMaster(2) <= dmaObMaster(2);
-   dmaObSlave(2)  <= dmaIbSlave(2);
+   dmaClk(2)      <= sysClk125;
+   dmaClkRst(2)   <= sysClk125Rst;
+   dmaIbMaster(2) <= AXI_STREAM_MASTER_INIT_C;
+   dmaObSlave(2)  <= AXI_STREAM_SLAVE_INIT_C;
+   --dmaIbMaster(2) <= dmaObMaster(2);
+   --dmaObSlave(2)  <= dmaIbSlave(2);
 
    --------------------------------------------------
-   -- PGP Block
+   -- ETH Test Block
    --------------------------------------------------
-   U_DevelPgpLane : entity work.DevelPgpLane
+   U_10GigE : entity work.TenGigEthGtx7Wrapper
       generic map (
-         TPD_G  => TPD_C
+         TPD_G             => 1 ns,
+         -- DMA/MAC Configurations
+         NUM_LANE_G        => 1,
+         -- QUAD PLL Configurations
+         REFCLK_DIV2_G     => false,   -- TRUE: gtClkP/N = 312.5 MHz
+         --QPLL_REFCLK_SEL_G => "011", -- North
+         QPLL_REFCLK_SEL_G => "101", -- South
+         -- AXI Streaming Configurations
+         AXIS_CONFIG_G     => AXIS_CONFIG_C
       ) port map (
-         sysClk200       => sysClk200,
-         axiClk          => axiClk,
-         axiClkRst       => axiClkRst,
-         axiReadMaster   => extAxilReadMaster,
-         axiReadSlave    => extAxilReadSlave,
-         axiWriteMaster  => extAxilWriteMaster,
-         axiWriteSlave   => extAxilWriteSlave,
-         pgpAxisClk      => dmaClk(1),
-         pgpAxisRst      => dmaClkRst(1),
-         pgpDataRxMaster => dmaIbMaster(1),
-         pgpDataRxSlave  => dmaIbSlave(1),
-         pgpDataTxMaster => dmaObMaster(1),
-         pgpDataTxSlave  => dmaObSlave(1),
-         pgpDmaState     => dmaState(1),
-         locRefClkP      => locRefClkP,
-         locRefClkM      => locRefClkM,
-         pgpTxP          => pgpTxP,
-         pgpTxM          => pgpTxM,
-         pgpRxP          => pgpRxP,
-         pgpRxM          => pgpRxM
-      );
+         -- Local Configurations
+         localMac(0)  => MAC_ADDR_C,
+         -- Streaming DMA Interface 
+         dmaClk(0)       => phyClk,
+         dmaRst(0)       => phyRst,
+         dmaIbMasters(0) => dmaIbMaster(1),
+         dmaIbSlaves(0)  => dmaIbSlave(1),
+         dmaObMasters(0) => dmaObMaster(1),
+         dmaObSlaves(0)  => dmaObSlave(1),
+         -- Slave AXI-Lite Interface 
+         axiLiteClk(0)          => axiClk,
+         axiLiteRst(0)          => axiClkRst,
+         axiLiteReadMasters(0)  => extAxilReadMaster,
+         axiLiteReadSlaves(0)   => extAxilReadSlave,
+         axiLiteWriteMasters(0) => extAxilWriteMaster,
+         axiLiteWriteSlaves(0)  => extAxilWriteSlave,
+         -- Misc. Signals
+         extRst       => sysClk200Rst,
+         phyClk       => phyClk,
+         phyRst       => phyRst,
+         phyReady(0)  => open,
+         -- MGT Clock Port (156.25 MHz or 312.5 MHz)
+         gtClkP       => ethRefClkP,
+         gtClkN       => ethRefClkM,
+         -- MGT Ports
+         gtTxP(0)     => extTxP,
+         gtTxN(0)     => extTxM,
+         gtRxP(0)     => extRxP,
+         gtRxN(0)     => extRxM);  
+
 
    --------------------------------------------------
    -- Top Level Signals

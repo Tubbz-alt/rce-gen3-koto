@@ -8,5 +8,5 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-#source $::env(PROJ_DIR)/vivado/debug.tcl
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
 

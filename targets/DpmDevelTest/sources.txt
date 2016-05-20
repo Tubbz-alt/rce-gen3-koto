@@ -1,2 +1,5 @@
 vhdl work Version.vhd
 vhdl work hdl/DpmDevelTest.vhd
+vhdl work hdl/DevelPgpLane.vhd
+vhdl work hdl/multiplextest.vhd
+vhdl work hdl/arraytype.vhd

@@ -23,7 +23,6 @@ SetDebugCoreClk ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3
 
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[0].U_AxiStreamDma/U_ObDma/r[state]*}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[0].U_AxiStreamDma/U_ObDma/r[rMaster][araddr]*}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[0].U_AxiStreamDma/U_ObDma/r[rMaster][arsize]*}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[0].U_AxiStreamDma/U_ObDma/r[rMaster][arlen]*}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[0].U_AxiStreamDma/U_ObDma/r[rMaster][arvalid]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[0].U_AxiStreamDma/U_ObDma/r[reqBytes]*}

@@ -22,9 +22,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000303"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA000404"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmDevelTest: Vivado v2015.3 (x86_64) Built Thu Dec 10 17:14:42 PST 2015 by rherbst";
+constant BUILD_STAMP_C : string := "DpmDevelTest: Vivado v2015.4 (x86_64) Built Wed Apr 20 17:13:34 PDT 2016 by rherbst";
 
 end Version;
 
@@ -34,5 +34,6 @@ end Version;
 -- 06/26/2014 (0xDA000301): PPI
 -- 07/01/2014 (0xDA000302): Interrupt controller fix
 -- 09/23/2014 (0xDA000303): New RCE and timing.
+-- 09/23/2014 (0xDA000400): regression test.
 -------------------------------------------------------------------------------
 

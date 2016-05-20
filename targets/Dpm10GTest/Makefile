@@ -7,6 +7,7 @@ export PRJ_PART = XC7Z045FFG900-2
 
 # List of build core directories.
 export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
+                     $(PROJ_DIR)/../../modules/EthernetLib/EthMacCore \
                      $(PROJ_DIR)/../../modules/StdLib  \
                      $(PROJ_DIR)/../../modules/i2c_core  \
                      $(PROJ_DIR)/../../modules/PpiCommon \
@@ -15,6 +16,8 @@ export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
                      $(PROJ_DIR)/../../modules/pgp2b/gtx7 \
                      $(PROJ_DIR)/../../modules/RceG3 \
                      $(PROJ_DIR)/../../modules/DpmCore \
+                     $(PROJ_DIR)/../../modules/EthernetLib/TenGigEthCore/core \
+                     $(PROJ_DIR)/../../modules/EthernetLib/TenGigEthCore/gtx7 \
                      $(PROJ_DIR)
 
 # Use top level makefile
