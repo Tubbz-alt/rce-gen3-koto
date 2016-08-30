@@ -38,20 +38,11 @@ entity Dpm10GTest is
       ethRefClkP   : in    sl;
       ethRefClkM   : in    sl;
 
-      extRxP       : in    sl;
-      extRxM       : in    sl;
-      extTxP       : out   sl;
-      extTxM       : out   sl;
-
       -- RTM High Speed
-      --dpmToRtmHsP  : out   slv(0 downto 0);
-      --dpmToRtmHsM  : out   slv(0 downto 0);
-      --rtmToDpmHsP  : in    slv(0 downto 0);
-      --rtmToDpmHsM  : in    slv(0 downto 0);
-      --dpmToRtmHsP  : out   slv(11 downto 0);
-      --dpmToRtmHsM  : out   slv(11 downto 0);
-      --rtmToDpmHsP  : in    slv(11 downto 0);
-      --rtmToDpmHsM  : in    slv(11 downto 0);
+      dpmToRtmHsP  : out   slv(0 downto 0);
+      dpmToRtmHsM  : out   slv(0 downto 0);
+      rtmToDpmHsP  : in    slv(0 downto 0);
+      rtmToDpmHsM  : in    slv(0 downto 0);
 
       -- Reference Clocks
       locRefClkP   : in    sl;
@@ -78,34 +69,38 @@ architecture STRUCTURE of Dpm10GTest is
    constant MAC_ADDR_C : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    -- Local Signals
-   signal axiClk             : sl;
-   signal axiClkRst          : sl;
-   signal sysClk125          : sl;
-   signal sysClk125Rst       : sl;
-   signal sysClk200          : sl;
-   signal sysClk200Rst       : sl;
-   signal extAxilReadMaster  : AxiLiteReadMasterType;
-   signal extAxilReadSlave   : AxiLiteReadSlaveType;
-   signal extAxilWriteMaster : AxiLiteWriteMasterType;
-   signal extAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal dmaClk             : slv(2 downto 0);
-   signal dmaClkRst          : slv(2 downto 0);
-   signal dmaState           : RceDmaStateArray(2 downto 0);
-   signal dmaObMaster        : AxiStreamMasterArray(2 downto 0);
-   signal dmaObSlave         : AxiStreamSlaveArray(2 downto 0);
-   signal dmaIbMaster        : AxiStreamMasterArray(2 downto 0);
-   signal dmaIbSlave         : AxiStreamSlaveArray(2 downto 0);
-   signal iethRxP            : slv(3 downto 0);
-   signal iethRxM            : slv(3 downto 0);
-   signal iethTxP            : slv(3 downto 0);
-   signal iethTxM            : slv(3 downto 0);
-   signal phyClk             : sl;
-   signal phyRst             : sl;
-
-   --signal dpmToRtmHsP  : slv(0 downto 0);
-   --signal dpmToRtmHsM  : slv(0 downto 0);
-   --signal rtmToDpmHsP  : slv(0 downto 0);
-   --signal rtmToDpmHsM  : slv(0 downto 0);
+   signal axiClk              : sl;
+   signal axiClkRst           : sl;
+   signal sysClk125           : sl;
+   signal sysClk125Rst        : sl;
+   signal sysClk200           : sl;
+   signal sysClk200Rst        : sl;
+   signal extAxilReadMaster   : AxiLiteReadMasterType;
+   signal extAxilReadSlave    : AxiLiteReadSlaveType;
+   signal extAxilWriteMaster  : AxiLiteWriteMasterType;
+   signal extAxilWriteSlave   : AxiLiteWriteSlaveType;
+   signal dmaClk              : slv(2 downto 0);
+   signal dmaClkRst           : slv(2 downto 0);
+   signal dmaState            : RceDmaStateArray(2 downto 0);
+   signal dmaObMaster         : AxiStreamMasterArray(2 downto 0);
+   signal dmaObSlave          : AxiStreamSlaveArray(2 downto 0);
+   signal dmaIbMaster         : AxiStreamMasterArray(2 downto 0);
+   signal dmaIbSlave          : AxiStreamSlaveArray(2 downto 0);
+   signal iethRxP             : slv(3 downto 0);
+   signal iethRxM             : slv(3 downto 0);
+   signal iethTxP             : slv(3 downto 0);
+   signal iethTxM             : slv(3 downto 0);
+   signal phyClk              : sl;
+   signal phyRst              : sl;
+   signal muxAxilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal muxAxilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal muxAxilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal muxAxilWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
+   signal readRegisters       : Slv32Array(1 downto 0);
+   signal clkFreq             : slv(31 downto 0);
+   signal clkLocked           : sl;
+   signal clkFast             : sl;
+   signal clkSlow             : sl;
 
    constant AXIS_CONFIG_C  : AxiStreamConfigArray(3 downto 0) := (others => RCEG3_AXIS_DMA_CONFIG_C);
 
@@ -133,6 +128,8 @@ architecture STRUCTURE of Dpm10GTest is
    attribute dont_touch of iethTxP            : signal is "true"; 
    attribute dont_touch of iethTxM            : signal is "true"; 
 
+   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray := genAxiLiteConfig(2, x"A0000000", 16, 12);
+
 begin
 
    --------------------------------------------------
@@ -150,8 +147,10 @@ begin
          ethRxM                   => iethRxM,
          ethTxP                   => iethTxP,
          ethTxM                   => iethTxM,
-         ethRefClkP               => ethRefClkP,
-         ethRefClkM               => ethRefClkM,
+         --ethRefClkP               => ethRefClkP,
+         --ethRefClkM               => ethRefClkM,
+         ethRefClkP               => '0',
+         ethRefClkM               => '1',
          clkSelA                  => clkSelA,
          clkSelB                  => clkSelB,
          sysClk125                => sysClk125,
@@ -181,18 +180,64 @@ begin
    iethRxP(3 downto 1) <= (others=>'0');
    iethRxM(3 downto 1) <= (others=>'0');
 
-   -- Empty AXI Slave
-   -- 0xA0000000 - 0xAFFFFFFF
---   U_AxiLiteEmpty: entity work.AxiLiteEmpty 
---      port map (
---         axiClk          => axiClk,
---         axiClkRst       => axiClkRst,
---         axiReadMaster   => extAxilReadMaster,
---         axiReadSlave    => extAxilReadSlave,
---         axiWriteMaster  => extAxilWriteMaster,
---         axiWriteSlave   => extAxilWriteSlave
---      );
+   U_Cb : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_C,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 2,
+         DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
+         MASTERS_CONFIG_G   => AXIL_CONFIG_C)
+      port map (
+         axiClk              => axiClk,
+         axiClkRst           => axiClkRst,
+         sAxiWriteMasters(0) => extAxilWriteMaster,
+         sAxiWriteSlaves(0)  => extAxilWriteSlave,
+         sAxiReadMasters(0)  => extAxilReadMaster,
+         sAxiReadSlaves(0)   => extAxilReadSlave,
+         mAxiWriteMasters    => muxAxilWriteMasters,
+         mAxiWriteSlaves     => muxAxilWriteSlaves,
+         mAxiReadMasters     => muxAxilReadMasters,
+         mAxiReadSlaves      => muxAxilReadSlaves);
 
+   -- Empty AXI Slave
+   U_AxiLiteEmpty: entity work.AxiLiteEmpty 
+      generic map (
+         NUM_READ_REG_G  => 2
+      ) port map (
+         axiClk          => axiClk,
+         axiClkRst       => axiClkRst,
+         axiReadMaster   => muxAxilReadMasters(1),
+         axiReadSlave    => muxAxilReadSlaves(1),
+         axiWriteMaster  => muxAxilWriteMasters(1),
+         axiWriteSlave   => muxAxilWriteSlaves(1),
+         readRegister    => readRegisters
+      );
+
+   U_Freq: entity work.SyncClockFreq 
+      generic map (
+         TPD_G             => TPD_C,
+         REF_CLK_FREQ_G    => 200.0E+6,
+         CLK_LOWER_LIMIT_G => 150.0E+6,
+         CLK_UPPER_LIMIT_G => 161.0E+6
+      ) port map (
+         freqOut     => clkFreq,
+         freqUpdated => open,
+         locked      => clkLocked,
+         tooFast     => clkFast,
+         tooSlow     => clkSlow,
+         clkIn       => phyClk,
+         locClk      => axiClk,
+         refClk      => sysClk200
+      );
+
+   readRegisters(0)    <= clkFreq;
+   readRegisters(1)(0) <= clkLocked;
+   readRegisters(1)(1) <= clkFast;
+   readRegisters(1)(2) <= clkSlow;
+   readRegisters(1)(3) <= phyRst;
+   readRegisters(1)(4) <= sysClk200Rst;
+   readRegisters(1)(27 downto  5) <= (others=>'0');
+   readRegisters(1)(31 downto 28) <= x"A";
 
    --------------------------------------------------
    -- PPI Loopback
@@ -225,7 +270,7 @@ begin
          -- QUAD PLL Configurations
          REFCLK_DIV2_G     => false,   -- TRUE: gtClkP/N = 312.5 MHz
          --QPLL_REFCLK_SEL_G => "011", -- North
-         QPLL_REFCLK_SEL_G => "101", -- South
+         --QPLL_REFCLK_SEL_G => "101", -- South
          -- AXI Streaming Configurations
          AXIS_CONFIG_G     => AXIS_CONFIG_C
       ) port map (
@@ -241,10 +286,10 @@ begin
          -- Slave AXI-Lite Interface 
          axiLiteClk(0)          => axiClk,
          axiLiteRst(0)          => axiClkRst,
-         axiLiteReadMasters(0)  => extAxilReadMaster,
-         axiLiteReadSlaves(0)   => extAxilReadSlave,
-         axiLiteWriteMasters(0) => extAxilWriteMaster,
-         axiLiteWriteSlaves(0)  => extAxilWriteSlave,
+         axiLiteReadMasters(0)  => muxAxilReadMasters(0),
+         axiLiteReadSlaves(0)   => muxAxilReadSlaves(0),
+         axiLiteWriteMasters(0) => muxAxilWriteMasters(0),
+         axiLiteWriteSlaves(0)  => muxAxilWriteSlaves(0),
          -- Misc. Signals
          extRst       => sysClk200Rst,
          phyClk       => phyClk,
@@ -254,11 +299,10 @@ begin
          gtClkP       => ethRefClkP,
          gtClkN       => ethRefClkM,
          -- MGT Ports
-         gtTxP(0)     => extTxP,
-         gtTxN(0)     => extTxM,
-         gtRxP(0)     => extRxP,
-         gtRxN(0)     => extRxM);  
-
+         gtTxP(0)     => dpmToRtmHsP(0),
+         gtTxN(0)     => dpmToRtmHsM(0),
+         gtRxP(0)     => rtmToDpmHsP(0),
+         gtRxN(0)     => rtmToDpmHsM(0));
 
    --------------------------------------------------
    -- Top Level Signals

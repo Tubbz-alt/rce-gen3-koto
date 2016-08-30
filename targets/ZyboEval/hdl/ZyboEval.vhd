@@ -8,7 +8,7 @@
 -- the terms contained in the LICENSE.txt file.
 ------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
--- ZynqEval.vhd
+-- ZyboEval.vhd
 -------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -22,14 +22,14 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
-entity ZynqEval is
+entity ZyboEval is
    port (
       i2cSda     : inout sl;
       i2cScl     : inout sl
    );
-end ZynqEval;
+end ZyboEval;
 
-architecture STRUCTURE of ZynqEval is
+architecture STRUCTURE of ZyboEval is
    signal sysClk125               : sl;
    signal sysClk125Rst            : sl;
    signal sysClk200               : sl;

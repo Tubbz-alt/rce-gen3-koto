@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- Title         : Version Constant File
--- Project       : COB Zynq DTM
+-- Project       : COB DPM
 -------------------------------------------------------------------------------
 -- File          : Version.vhd
 -- Author        : Ryan Herbst, rherbst@slac.stanford.edu
--- Created       : 05/07/2013
+-- Created       : 04/03/2013
 -------------------------------------------------------------------------------
 -- Description:
 -- Version Constant Module
@@ -22,18 +22,14 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA00000C"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"F2000001"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10GTest: Vivado v2015.4 (x86_64) Built Wed Jun  1 13:28:15 PDT 2016 by rherbst";
+constant BUILD_STAMP_C : string := "ZyboEval: Vivado v2015.4 (x86_64) Built Tue May 31 14:35:45 PDT 2016 by rherbst";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
--- 06/26/2014 (0xDA000300): Initial Version
--- 06/26/2014 (0xDA000301): PPI
--- 07/01/2014 (0xDA000302): Interrupt controller fix
--- 09/23/2014 (0xDA000303): New RCE and timing.
--- 09/23/2014 (0xDA000400): regression test.
+-- 04/03/2013 (0xF2000001): Initial Version
 -------------------------------------------------------------------------------
 

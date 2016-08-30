@@ -28,8 +28,3 @@ set_clock_groups -asynchronous \
       -group [get_clocks -include_generated_clocks ethRxClk] \
       -group [get_clocks -include_generated_clocks ethTxClk] 
 
-set_property PACKAGE_PIN AE8  [get_ports extRxP]
-set_property PACKAGE_PIN AE7  [get_ports extRxM]
-set_property PACKAGE_PIN AK2  [get_ports extTxP]
-set_property PACKAGE_PIN AK1  [get_ports extTxM]
-

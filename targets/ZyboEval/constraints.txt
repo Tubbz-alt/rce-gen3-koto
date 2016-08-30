@@ -1,0 +1,2 @@
+../../modules/EvalCore/hdl/EvalCore.xdc
+hdl/ZyboEval.xdc
