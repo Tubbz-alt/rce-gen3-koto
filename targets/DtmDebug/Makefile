@@ -9,7 +9,6 @@ export PRJ_PART = XC7Z030FBG484-2
 export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
                      $(PROJ_DIR)/../../modules/StdLib  \
                      $(PROJ_DIR)/../../modules/ZynqPcieMaster \
-                     $(PROJ_DIR)/../../modules/i2c_core  \
                      $(PROJ_DIR)/../../modules/PpiCommon \
                      $(PROJ_DIR)/../../modules/RceG3 \
                      $(PROJ_DIR)/../../modules/DtmCore \
