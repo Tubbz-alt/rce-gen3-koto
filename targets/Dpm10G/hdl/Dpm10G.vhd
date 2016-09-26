@@ -116,12 +116,10 @@ architecture STRUCTURE of Dpm10G is
    signal pgpRxCtrl        : AxiStreamQuadCtrlArray(PGP_LANES_G-1 downto 0);
 
    -- User loopback
-   signal userEthClk       : sl;
-   signal userEthClkRst    : sl;
    signal userEthObMaster  : AxiStreamMasterType;
    signal userEthObSlave   : AxiStreamSlaveType;
    signal userEthIbMaster  : AxiStreamMasterType;
-   signal userEthIbCtrl    : AxiStreamCtrlType;
+   signal userEthIbSlave   : AxiStreamSlaveType;
 
 begin
 
@@ -157,12 +155,12 @@ begin
          extAxilReadSlave   => extAxilReadSlave,
          extAxilWriteMaster => extAxilWriteMaster,
          extAxilWriteSlave  => extAxilWriteSlave,
-         userEthClk         => userEthClk,
-         userEthClkRst      => userEthClkRst,
+         userEthClk         => sysClk200,
+         userEthClkRst      => sysClk200Rst,
          userEthObMaster    => userEthObMaster,
          userEthObSlave     => userEthObSlave,
          userEthIbMaster    => userEthIbMaster,
-         userEthIbCtrl      => userEthIbCtrl,
+         userEthIbSlave     => userEthIbSlave,
          dmaClk             => dmaClk,
          dmaClkRst          => dmaClkRst,
          dmaState           => dmaState,
@@ -368,25 +366,9 @@ begin
    end generate PGP_GTX_GEN;
 
    -------------------------------------------------------------------------------------------------
-   -- User ethernet loopback
+   -- User Ethernet loopback
    -------------------------------------------------------------------------------------------------
-   U_UserEthFifo : entity work.AxiStreamFifo
-      generic map (
-         TPD_G               => TPD_G,
-         FIFO_ADDR_WIDTH_G   => 9,
-         FIFO_PAUSE_THRESH_G => 128,
-         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C
-      ) port map (
-         sAxisClk    => userEthClk,
-         sAxisRst    => userEthClkRst,
-         sAxisMaster => userEThIbMaster,
-         sAxisCtrl   => userEThIbCtrl,
-         mAxisClk    => userEthClk,
-         mAxisRst    => userEthClkRst,
-         mAxisMaster => userEthObMaster,
-         mAxisSlave  => userEthObSlave
-      );
+   userEthIbMaster <= userEthObMaster;
+   userEthObSlave  <= userEthIbSlave;
 
 end architecture STRUCTURE;
-
