@@ -47,6 +47,33 @@ ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_RxFifo/U_Fifo/U_Fifo/U_Fifo/TWO_STAGE.MULTI_STAGE.GEN_MULTI_STAGE[1].Fifo_Middle_Stage/almost_full}
 ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_RxFifo/U_Fifo/U_Fifo/U_Fifo/TWO_STAGE.MULTI_STAGE.GEN_MULTI_STAGE[2].Fifo_Middle_Stage/almost_full}
 
+
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_TxFifo/mBypMaster[tLast]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_TxFifo/mBypMaster[tValid]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_TxFifo/mBypSlave[tReady]}
+
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_TxFifo/mPrimMaster[tLast]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_TxFifo/mPrimMaster[tValid]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_TxFifo/mPrimSlave[tReady]}
+
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/sAxisMaster[tLast]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/sAxisMaster[tValid]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/sAxisSlave[tReady]}
+
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/U_TxPauseGen.r_reg[state][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/U_TxPauseGen.r_reg[locPauseCnt][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/pauseTime[*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/rxPauseValue[*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Pause/macAddress[*]}
+
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Csum/sAxisMaster[tLast]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Csum/sAxisMaster[tValid]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Csum/sAxisSlave[tReady]}
+
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Export/macObMaster[tLast]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Export/macObMaster[tValid]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Tx/U_Export/macObSlave[tReady]}
+
 ## Delete the last unused port
 delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
 

@@ -22,14 +22,16 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000007"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000009"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Thu Sep 22 17:07:52 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Wed Sep 28 21:35:27 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 09/28/2016 (0xDC000009): Fix a bug where the TX CSUM wasn't caching non-IPv4/UDP/TCP frames
+-- 09/28/2016 (0xDC000008): Pause bug fix for latest EthMac
 -- 09/22/2016 (0xDC000007): Added Hardware Checksum checking/generating in the EthMac
 -- 04/22/2016 (0xDC000006): Latest modules.
 -- 02/18/2016 (0xDC000005): New read dma

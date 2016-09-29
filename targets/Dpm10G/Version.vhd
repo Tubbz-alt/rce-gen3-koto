@@ -22,14 +22,16 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000062"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000064"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Fri Sep 23 13:44:19 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Sep 28 21:35:53 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 09/28/2016 (0xDB000064): Fix a bug where the TX CSUM wasn't caching non-IPv4/UDP/TCP frames
+-- 09/28/2016 (0xDB000063): Pause bug fix for latest EthMac
 -- 09/23/2016 (0xDB000062): Added Hardware Checksum checking/generating in the EthMac
 -- 03/08/2016 (0xDB000061): Pause detect.
 -- 03/08/2016 (0xDB000060): Threshold change.
