@@ -502,7 +502,7 @@ begin
 
       U_SsiPrbsTx : entity work.SsiPrbsTx
          generic map (
-            TPD_G                      => TPD_G,
+            TPD_G                      => TPD_G,      
             ALTERA_SYN_G               => false,
             ALTERA_RAM_G               => "M9K",
             XIL_DEVICE_G               => "7SERIES",
@@ -515,7 +515,7 @@ begin
             FIFO_ADDR_WIDTH_G          => 9,
             FIFO_PAUSE_THRESH_G        => 256,
             MASTER_AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C,
-            MASTER_AXI_PIPE_STAGES_G   => 0
+            MASTER_AXI_PIPE_STAGES_G   => 1
          ) port map (
 
             mAxisClk     => pgpClk,
@@ -536,7 +536,7 @@ begin
 
       U_SsiPrbsRx: entity work.SsiPrbsRx 
          generic map (
-            TPD_G                      => 1 ns,
+            TPD_G                      => TPD_G,
             STATUS_CNT_WIDTH_G         => 32,
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
             ALTERA_SYN_G               => false,
@@ -551,9 +551,9 @@ begin
             FIFO_ADDR_WIDTH_G          => 9,
             FIFO_PAUSE_THRESH_G        => 256,
             SLAVE_AXI_STREAM_CONFIG_G  => SSI_PGP2B_CONFIG_C,
-            SLAVE_AXI_PIPE_STAGES_G    => 0,
+            SLAVE_AXI_PIPE_STAGES_G    => 1,
             MASTER_AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C,
-            MASTER_AXI_PIPE_STAGES_G   => 0
+            MASTER_AXI_PIPE_STAGES_G   => 1
          ) port map (
             sAxisClk        => pgpClk,
             sAxisRst        => pgpClkRst,
