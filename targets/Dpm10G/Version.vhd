@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000065"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000066"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Thu Sep 29 22:56:41 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Oct  5 08:34:32 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/05/2016 (0xDB000066): Overhauled the AxiStreamDmaRead and added pending AXI read support
 -- 09/29/2016 (0xDB000065): Fix a bug for PPI support in ZynqEthernet10G.vhd
 -- 09/28/2016 (0xDB000064): Fix a bug where the TX CSUM wasn't caching non-IPv4/UDP/TCP frames
 -- 09/28/2016 (0xDB000063): Pause bug fix for latest EthMac

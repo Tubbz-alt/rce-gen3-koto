@@ -8,6 +8,10 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
+## Get variables and Custom Procedures
+set VIVADO_BUILD_DIR $::env(VIVADO_BUILD_DIR)
+source -quiet ${VIVADO_BUILD_DIR}/vivado_env_var_v1.tcl
+source -quiet ${VIVADO_BUILD_DIR}/vivado_proc_v1.tcl
 
-set_property top {dma_read_tb} [get_filesets sim_1]
+## Place and Route strategies 
+set_property strategy Performance_Explore [get_runs impl_1]
