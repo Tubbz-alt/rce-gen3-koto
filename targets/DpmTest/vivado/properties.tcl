@@ -8,5 +8,10 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-# source $::env(PROJ_DIR)/vivado/debug.tcl
+## Get variables and Custom Procedures
+set VIVADO_BUILD_DIR $::env(VIVADO_BUILD_DIR)
+source -quiet ${VIVADO_BUILD_DIR}/vivado_env_var_v1.tcl
+source -quiet ${VIVADO_BUILD_DIR}/vivado_proc_v1.tcl
 
+## Place and Route strategies 
+set_property strategy Performance_Explore [get_runs impl_1]
