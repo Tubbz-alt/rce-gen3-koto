@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000066"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000067"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Oct  5 08:34:32 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Thu Oct  6 11:33:16 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/06/2016 (0xDB000067): Moved the TX/RX AxisStreamShift modules outside of the EthMac
 -- 10/05/2016 (0xDB000066): Overhauled the AxiStreamDmaRead and added pending AXI read support
 -- 09/29/2016 (0xDB000065): Fix a bug for PPI support in ZynqEthernet10G.vhd
 -- 09/28/2016 (0xDB000064): Fix a bug where the TX CSUM wasn't caching non-IPv4/UDP/TCP frames
@@ -44,11 +45,11 @@ end Version;
 -- 03/03/2016 (0xDB000057): Frame error detect.
 -- 01/29/2016 (0xDB000056): Added debug.
 -- 01/14/2016 (0xDB000055): SOF in MAC, variable header size.
--- 01/04/2016 (0xDB000054): User ethernet
+-- 01/04/2016 (0xDB000054): User Ethernet
 -- 12/08/2015 (0xDB000053): Inbound header engine.
--- 12/08/2015 (0xDB000052): Debug on mux/dma header in 3
--- 12/08/2015 (0xDB000051): New arb, debug on pause tx
--- 12/08/2015 (0xDB000050): ar/aw size fix
+-- 12/08/2015 (0xDB000052): Debug on MUX/DMA header in 3
+-- 12/08/2015 (0xDB000051): New ARB, debug on pause TX
+-- 12/08/2015 (0xDB000050): AR/AW size fix
 -- 12/08/2015 (0xDB00004D): Test drop fix.
 -- 12/07/2015 (0xDB00004C): Vivado 2015.3
 -- 11/30/2015 (0xDB00004B): restored cache settings.
@@ -87,7 +88,7 @@ end Version;
 -- 08/31/2014 (0xDB000010): PPI Bug Fix.
 -- 08/19/2014 (0xDB00000f): state count fix.
 -- 08/19/2014 (0xDB00000e): Export fixes. Proper simulation.
--- 08/19/2014 (0xDB00000d): Fifo and threshold fix.
+-- 08/19/2014 (0xDB00000d): FIFO and threshold fix.
 -- 08/19/2014 (0xDB00000C): Valid threshold change.
 -- 08/19/2014 (0xDB00000B): Valid threshold change.
 -- 08/19/2014 (0xDB00000A): Added clock constraints
