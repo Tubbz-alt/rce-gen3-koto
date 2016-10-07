@@ -1,4 +1,16 @@
-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Title      : 
+-------------------------------------------------------------------------------
+-- File       : Dpm10GAxi.vhd
+-- Author     : Ryan Herbst <rherbst@slac.stanford.edu>
+-- Company    : SLAC National Accelerator Laboratory
+-- Created    : 2015-09-03
+-- Last update: 2016-10-07
+-- Platform   : 
+-- Standard   : VHDL'93/02
+-------------------------------------------------------------------------------
+-- Description: AXIS 10GbE + PGP 
+-------------------------------------------------------------------------------
 -- This file is part of 'RCE Development Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
@@ -7,9 +19,7 @@
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 ------------------------------------------------------------------------------
--------------------------------------------------------------------------------
--- Dpm10GAxi.vhd
--------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
@@ -30,44 +40,36 @@ entity Dpm10GAxi is
       PGP_LANES_G     : integer range 1 to 12 := 12;
       PGP_LINE_RATE_G : real                  := 3.125E9);
    port (
-
       -- Debug
-      led : out slv(1 downto 0);
-
+      led         : out   slv(1 downto 0);
       -- I2C
-      i2cSda : inout sl;
-      i2cScl : inout sl;
-
+      i2cSda      : inout sl;
+      i2cScl      : inout sl;
       -- Ethernet
-      ethRxP     : in  slv(3 downto 0);
-      ethRxM     : in  slv(3 downto 0);
-      ethTxP     : out slv(3 downto 0);
-      ethTxM     : out slv(3 downto 0);
-      ethRefClkP : in  sl;
-      ethRefClkM : in  sl;
-
+      ethRxP      : in    slv(3 downto 0);
+      ethRxM      : in    slv(3 downto 0);
+      ethTxP      : out   slv(3 downto 0);
+      ethTxM      : out   slv(3 downto 0);
+      ethRefClkP  : in    sl;
+      ethRefClkM  : in    sl;
       -- RTM High Speed
-      dpmToRtmHsP : out slv(PGP_LANES_G-1 downto 0);
-      dpmToRtmHsM : out slv(PGP_LANES_G-1 downto 0);
-      rtmToDpmHsP : in  slv(PGP_LANES_G-1 downto 0);
-      rtmToDpmHsM : in  slv(PGP_LANES_G-1 downto 0);
-
+      dpmToRtmHsP : out   slv(PGP_LANES_G-1 downto 0);
+      dpmToRtmHsM : out   slv(PGP_LANES_G-1 downto 0);
+      rtmToDpmHsP : in    slv(PGP_LANES_G-1 downto 0);
+      rtmToDpmHsM : in    slv(PGP_LANES_G-1 downto 0);
       -- Reference Clocks
-      locRefClkP : in sl;
-      locRefClkM : in sl;
-      dtmRefClkP : in sl;
-      dtmRefClkM : in sl;
-
+      locRefClkP  : in    sl;
+      locRefClkM  : in    sl;
+      dtmRefClkP  : in    sl;
+      dtmRefClkM  : in    sl;
       -- DTM Signals
-      dtmClkP : in  slv(1 downto 0);
-      dtmClkM : in  slv(1 downto 0);
-      dtmFbP  : out sl;
-      dtmFbM  : out sl;
-
+      dtmClkP     : in    slv(1 downto 0);
+      dtmClkM     : in    slv(1 downto 0);
+      dtmFbP      : out   sl;
+      dtmFbM      : out   sl;
       -- Clock Select
-      clkSelA : out slv(1 downto 0);
-      clkSelB : out slv(1 downto 0)
-      );
+      clkSelA     : out   slv(1 downto 0);
+      clkSelB     : out   slv(1 downto 0));
 end Dpm10GAxi;
 
 architecture STRUCTURE of Dpm10GAxi is
@@ -116,103 +118,74 @@ architecture STRUCTURE of Dpm10GAxi is
    signal pgpRxCtrl        : AxiStreamQuadCtrlArray(PGP_LANES_G-1 downto 0);
 
    -- User loopback
-   signal userEthObMaster  : AxiStreamMasterType;
-   signal userEthObSlave   : AxiStreamSlaveType;
-   signal userEthIbMaster  : AxiStreamMasterType;
-   signal userEthIbSlave   : AxiStreamSlaveType;
+   signal userEthObMaster : AxiStreamMasterType;
+   signal userEthObSlave  : AxiStreamSlaveType;
+   signal userEthIbMaster : AxiStreamMasterType;
+   signal userEthIbSlave  : AxiStreamSlaveType;
 
 begin
 
-   --------------------------------------------------
-   -- Core
-   --------------------------------------------------
+   -----------
+   -- DPM Core
+   -----------
    U_DpmCore : entity work.DpmCore
       generic map (
-         TPD_G          => TPD_G,
-         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
-         OLD_BSI_MODE_G => false,
-         ETH_10G_EN_G   => true,
-         USER_ETH_EN_G   => true,
-         USER_ETH_TYPE_G => x"AAAA"
-         ) port map (
-            i2cSda             => i2cSda,
-            i2cScl             => i2cScl,
-            ethRxP             => ethRxP,
-            ethRxM             => ethRxM,
-            ethTxP             => ethTxP,
-            ethTxM             => ethTxM,
-            ethRefClkP         => ethRefClkP,
-            ethRefClkM         => ethRefClkM,
-            clkSelA            => clkSelA,
-            clkSelB            => clkSelB,
-            sysClk125          => sysClk125,
-            sysClk125Rst       => sysClk125Rst,
-            sysClk200          => sysClk200,
-            sysClk200Rst       => sysClk200Rst,
-            axiClk             => axilClk,
-            axiClkRst          => axilClkRst,
-            extAxilReadMaster  => extAxilReadMaster,
-            extAxilReadSlave   => extAxilReadSlave,
-            extAxilWriteMaster => extAxilWriteMaster,
-            extAxilWriteSlave  => extAxilWriteSlave,
-            userEthClk         => sysClk200,
-            userEthClkRst      => sysClk200Rst,
-            userEthObMaster    => userEthObMaster,
-            userEthObSlave     => userEthObSlave,
-            userEthIbMaster    => userEthIbMaster,
-            userEthIbSlave     => userEthIbSlave,
-            dmaClk             => dmaClk,
-            dmaClkRst          => dmaClkRst,
-            dmaState           => dmaState,
-            dmaObMaster        => dmaObMaster,
-            dmaObSlave         => dmaObSlave,
-            dmaIbMaster        => dmaIbMaster,
-            dmaIbSlave         => dmaIbSlave,
-            userInterrupt      => (others => '0')
-            );
+         TPD_G           => TPD_G,
+         RCE_DMA_MODE_G  => RCE_DMA_AXIS_C,
+         OLD_BSI_MODE_G  => false,
+         ETH_10G_EN_G    => true,
+         USER_ETH_EN_G   => false,
+         USER_ETH_TYPE_G => x"AAAA") 
+      port map (
+         i2cSda             => i2cSda,
+         i2cScl             => i2cScl,
+         ethRxP             => ethRxP,
+         ethRxM             => ethRxM,
+         ethTxP             => ethTxP,
+         ethTxM             => ethTxM,
+         ethRefClkP         => ethRefClkP,
+         ethRefClkM         => ethRefClkM,
+         clkSelA            => clkSelA,
+         clkSelB            => clkSelB,
+         sysClk125          => sysClk125,
+         sysClk125Rst       => sysClk125Rst,
+         sysClk200          => sysClk200,
+         sysClk200Rst       => sysClk200Rst,
+         axiClk             => axilClk,
+         axiClkRst          => axilClkRst,
+         extAxilReadMaster  => extAxilReadMaster,
+         extAxilReadSlave   => extAxilReadSlave,
+         extAxilWriteMaster => extAxilWriteMaster,
+         extAxilWriteSlave  => extAxilWriteSlave,
+         userEthClk         => sysClk200,
+         userEthClkRst      => sysClk200Rst,
+         userEthObMaster    => userEthObMaster,
+         userEthObSlave     => userEthObSlave,
+         userEthIbMaster    => userEthIbMaster,
+         userEthIbSlave     => userEthIbSlave,
+         dmaClk             => dmaClk,
+         dmaClkRst          => dmaClkRst,
+         dmaState           => dmaState,
+         dmaObMaster        => dmaObMaster,
+         dmaObSlave         => dmaObSlave,
+         dmaIbMaster        => dmaIbMaster,
+         dmaIbSlave         => dmaIbSlave,
+         userInterrupt      => (others => '0'));
 
-
-   -------------------------------------------------------------------------------------------------
-   -- AXI-Lite Crossbar
-   -------------------------------------------------------------------------------------------------
-   -- 0xA0000000 - 0xAFFFFFFF
---   AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
---      generic map (
---         TPD_G              => TPD_G,
---         NUM_SLAVE_SLOTS_G  => NUM_SLAVE_SLOTS_G,
---         NUM_MASTER_SLOTS_G => NUM_MASTER_SLOTS_G,
---         DEC_ERROR_RESP_G   => DEC_ERROR_RESP_G,
---         MASTERS_CONFIG_G   => MASTERS_CONFIG_G)
---      port map (
---         axiClk           => axilClk,
---         axiClkRst        => axilClkRst,
---         sAxiWriteMasters => sAxiWriteMasters,
---         sAxiWriteSlaves  => sAxiWriteSlaves,
---         sAxiReadMasters  => sAxiReadMasters,
---         sAxiReadSlaves   => sAxiReadSlaves,
---         mAxiWriteMasters => mAxiWriteMasters,
---         mAxiWriteSlaves  => mAxiWriteSlaves,
---         mAxiReadMasters  => mAxiReadMasters,
---         mAxiReadSlaves   => mAxiReadSlaves);
-
-
-   --------------------------------------------------
-   -- Top Level Signals
-   --------------------------------------------------
    led <= (others => '0');
 
-   -------------------------------------------------------------------------------------------------
+   -----------
    -- Clocking
-   -------------------------------------------------------------------------------------------------
+   -----------
    -- DTM Clock Signals
    U_DtmClkgen : for i in 0 to 1 generate
       U_DtmClkIn : IBUFDS
-         generic map (DIFF_TERM => true)
+         generic map (
+            DIFF_TERM => true)
          port map(
             I  => dtmClkP(i),
             IB => dtmClkM(i),
-            O  => open
-            );
+            O  => open);
    end generate;
 
    -- DTM Feedback
@@ -220,8 +193,7 @@ begin
       port map(
          O  => dtmFbP,
          OB => dtmFbM,
-         I  => '0'
-         );
+         I  => '0');
 
    -- locRefClk drives PGP
    U_LocRefClkIbufds : IBUFDS_GTE2
@@ -260,9 +232,9 @@ begin
    dmaClk    <= (others => sysClk200);
    dmaClkRst <= (others => sysClk200Rst);
 
-   -------------------------------------------------------------------------------------------------
+   -------------------
    -- PPI to PGP Array
-   -------------------------------------------------------------------------------------------------
+   -------------------
    PpiPgpArray_1 : entity work.PpiPgpArray
       generic map (
          TPD_G                   => TPD_G,
@@ -305,9 +277,9 @@ begin
          axilReadMaster   => extAxilReadMaster,
          axilReadSlave    => extAxilReadSlave);
 
-   -------------------------------------------------------------------------------------------------
+   ----------------
    -- PGP GTX Array
-   -------------------------------------------------------------------------------------------------
+   ----------------
    PGP_GTX_GEN : for i in PGP_LANES_G-1 downto 0 generate
       Pgp2bGtx7VarLat_1 : entity work.Pgp2bGtx7VarLat
          generic map (
@@ -365,9 +337,9 @@ begin
             pgpRxCtrl        => pgpRxCtrl(i));
    end generate PGP_GTX_GEN;
 
-   -------------------------------------------------------------------------------------------------
+   -------------------------
    -- User Ethernet loopback
-   -------------------------------------------------------------------------------------------------
+   -------------------------
    userEthIbMaster <= userEthObMaster;
    userEthObSlave  <= userEthIbSlave;
 

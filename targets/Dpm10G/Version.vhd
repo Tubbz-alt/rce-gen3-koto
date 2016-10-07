@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000067"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000068"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Thu Oct  6 11:33:16 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Fri Oct  7 15:16:04 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/07/2016 (0xDB000068): Setting (USER_ETH_EN_G to false) & tUser bug fix for PPI
 -- 10/06/2016 (0xDB000067): Moved the TX/RX AxisStreamShift modules outside of the EthMac
 -- 10/05/2016 (0xDB000066): Overhauled the AxiStreamDmaRead and added pending AXI read support
 -- 09/29/2016 (0xDB000065): Fix a bug for PPI support in ZynqEthernet10G.vhd

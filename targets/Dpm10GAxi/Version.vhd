@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00000B"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00000C"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Thu Oct  6 11:30:36 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Fri Oct  7 15:48:41 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/07/2016 (0xDC00000C): Setting (USER_ETH_EN_G to false) & tUser bug fix for PPI
 -- 10/06/2016 (0xDC00000B): Moved the TX/RX AxisStreamShift modules outside of the EthMac
 -- 10/05/2016 (0xDC00000A): Overhauled the AxiStreamDmaRead and added pending AXI read support
 -- 09/28/2016 (0xDC000009): Fix a bug where the TX CSUM wasn't caching non-IPv4/UDP/TCP frames
