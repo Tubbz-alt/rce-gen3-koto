@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00000C"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00000D"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Fri Oct  7 15:48:41 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Sun Oct  9 11:23:22 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/09/2016 (0xDC00000D): Fixed bug in "U_Reg : entity work.ZynqEthernet10GReg" port mapping
 -- 10/07/2016 (0xDC00000C): Setting (USER_ETH_EN_G to false) & tUser bug fix for PPI
 -- 10/06/2016 (0xDC00000B): Moved the TX/RX AxisStreamShift modules outside of the EthMac
 -- 10/05/2016 (0xDC00000A): Overhauled the AxiStreamDmaRead and added pending AXI read support
