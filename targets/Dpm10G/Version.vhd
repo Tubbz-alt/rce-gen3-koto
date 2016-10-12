@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000069"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00006A"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Sun Oct  9 13:38:16 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Oct 12 14:05:50 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/12/2016 (0xDB00006A): Fixed bug in the SSI FIFO filtering and adjusted the RX FIFO pause threshold 
 -- 10/09/2016 (0xDB000069): Fixed bug in "U_Reg : entity work.ZynqEthernet10GReg" port mapping
 -- 10/07/2016 (0xDB000068): Setting (USER_ETH_EN_G to false) & tUser bug fix for PPI
 -- 10/06/2016 (0xDB000067): Moved the TX/RX AxisStreamShift modules outside of the EthMac
