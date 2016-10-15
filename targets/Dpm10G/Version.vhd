@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00006A"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00006B"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Oct 12 14:05:50 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Sat Oct 15 09:07:00 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/14/2016 (0xDB00006B): Overhauled the AxiStreamDmaWrite
 -- 10/12/2016 (0xDB00006A): Fixed bug in the SSI FIFO filtering and adjusted the RX FIFO pause threshold 
 -- 10/09/2016 (0xDB000069): Fixed bug in "U_Reg : entity work.ZynqEthernet10GReg" port mapping
 -- 10/07/2016 (0xDB000068): Setting (USER_ETH_EN_G to false) & tUser bug fix for PPI

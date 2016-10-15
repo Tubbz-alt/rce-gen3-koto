@@ -22,14 +22,17 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC00000E"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000010"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Wed Oct 12 14:05:39 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Sat Oct 15 09:06:58 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/14/2016 (0xDC000010): Overhauled the AxiStreamDmaWrite
+-- 10/14/2016 (0xDC00000F): Tuning the RX FIFO thresholds 
+--                          and brought our the RX FIFO configuration to the top level of EthMacTop.vhd
 -- 10/12/2016 (0xDC00000E): Fixed bug in the SSI FIFO filtering and adjusted the RX FIFO pause threshold 
 -- 10/09/2016 (0xDC00000D): Fixed bug in "U_Reg : entity work.ZynqEthernet10GReg" port mapping
 -- 10/07/2016 (0xDC00000C): Setting (USER_ETH_EN_G to false) & tUser bug fix for PPI

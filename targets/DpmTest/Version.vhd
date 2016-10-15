@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA10030B"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA10030C"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmTest: Vivado v2016.2 (x86_64) Built Fri Oct  7 15:15:52 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "DpmTest: Vivado v2016.2 (x86_64) Built Sat Oct 15 09:06:49 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/14/2016 (0xDA10030C): Overhauled the AxiStreamDmaWrite
 -- 10/07/2016 (0xDA10030B): tUser bug fix for PPI
 -- 10/05/2016 (0xDA10030A): Overhauled the AxiStreamDmaRead and added pending AXI read support
 -- 12/06/2015 (0xDA100309): Compile test.
