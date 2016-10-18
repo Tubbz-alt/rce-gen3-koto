@@ -22,14 +22,18 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00006B"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00006C"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Sat Oct 15 09:07:00 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Mon Oct 17 21:33:40 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/17/2016 (0xDB00006C): Adding EthRxFifoDrop to EthMacCore (not implemented in ZynqEthernet10GReg yet)
+--                          and EthMacRxPause bug fix
+--                          and Increased ETH MAC RX FIFO size from 32kB to 64kB (maybe we should make this smaller in the future)
+--                          and fixed a bug in SsiFifo for terminating AXIS when overflow detected (refer to SVN# 12764)
 -- 10/14/2016 (0xDB00006B): Overhauled the AxiStreamDmaWrite
 -- 10/12/2016 (0xDB00006A): Fixed bug in the SSI FIFO filtering and adjusted the RX FIFO pause threshold 
 -- 10/09/2016 (0xDB000069): Fixed bug in "U_Reg : entity work.ZynqEthernet10GReg" port mapping

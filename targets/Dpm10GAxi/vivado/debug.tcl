@@ -27,39 +27,16 @@ CreateDebugCore ${ilaName}
 set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 
 ## Setup Clock, Variable set in xdc file
-SetDebugCoreClk ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/axiClk}
+SetDebugCoreClk ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/ethClk}
 
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[awlen][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][errorValue][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][firstUser][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][lastUser][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaReq][maxSize][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[shift][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[state][*]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/intAxisMaster[tLast]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/intAxisMaster[tValid]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/dmaReq[request]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/axiWriteSlave[bvalid]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/axiWriteCtrl[pause]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/axisSlave[tReady]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/axisMaster[tValid]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/axisMaster[tLast]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][done]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][idle]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][overflow]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaAck][writeError]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaReq][drop]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[dmaReq][request]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[last]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[shiftEn]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[slave][tReady]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[wMaster][awvalid]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[wMaster][bready]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[wMaster][wlast]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisDmaGen.U_RceG3DmaAxis/U_DmaChanGen[3].U_AxiStreamDma/U_IbDma/r[wMaster][wvalid]}
-
-
-
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/sAxisMaster[tData][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/sAxisMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/sAxisMaster[tUser][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/r[pauseValue][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/r[state][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/r[pauseEn]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/sAxisMaster[tLast]}
+ConfigProbe ${ilaName} {U_DpmCore/U_Eth10gGen.U_ZynqEthernet10G/U_EthMacTop/U_Rx/U_Pause/sAxisMaster[tValid]}
 
 ## Delete the last unused port
 delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
