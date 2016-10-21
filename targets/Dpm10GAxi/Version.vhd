@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000012"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DC000013"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Thu Oct 20 22:51:17 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10GAxi: Vivado v2016.2 (x86_64) Built Fri Oct 21 12:10:01 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/21/2016 (0xDC000013): Converted ZynqEthernet10GReg.vhd to new AXI-Lite coding style
 -- 10/19/2016 (0xDC000012): Added ZynqUserEthRouter.vhd to separate CPU/USER UDP (non-VLAN) traffic
 --                          Changed all 8-bit status registers to 32-bit in ZynqEthernet10GReg.vhd
 --                          Added IP address register to ZynqEthernet10GReg.vhd (need to user ETH interface)
