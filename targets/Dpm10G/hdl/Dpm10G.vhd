@@ -133,9 +133,7 @@ begin
          TPD_G           => TPD_G,
          RCE_DMA_MODE_G  => RCE_DMA_PPI_C,
          OLD_BSI_MODE_G  => false,
-         ETH_10G_EN_G    => true,
-         USER_ETH_EN_G   => false,
-         USER_ETH_TYPE_G => x"AAAA") 
+         ETH_10G_EN_G    => true) 
       port map (
          i2cSda             => i2cSda,
          i2cScl             => i2cScl,
@@ -157,12 +155,6 @@ begin
          extAxilReadSlave   => extAxilReadSlave,
          extAxilWriteMaster => extAxilWriteMaster,
          extAxilWriteSlave  => extAxilWriteSlave,
-         userEthClk         => sysClk200,
-         userEthClkRst      => sysClk200Rst,
-         userEthObMaster    => userEthObMaster,
-         userEthObSlave     => userEthObSlave,
-         userEthIbMaster    => userEthIbMaster,
-         userEthIbSlave     => userEthIbSlave,
          dmaClk             => dmaClk,
          dmaClkRst          => dmaClkRst,
          dmaState           => dmaState,

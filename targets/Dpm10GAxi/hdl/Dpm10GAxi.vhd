@@ -5,7 +5,7 @@
 -- Author     : Ryan Herbst <rherbst@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-03
--- Last update: 2016-10-07
+-- Last update: 2016-10-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -130,12 +130,17 @@ begin
    -----------
    U_DpmCore : entity work.DpmCore
       generic map (
-         TPD_G           => TPD_G,
-         RCE_DMA_MODE_G  => RCE_DMA_AXIS_C,
-         OLD_BSI_MODE_G  => false,
-         ETH_10G_EN_G    => true,
-         USER_ETH_EN_G   => false,
-         USER_ETH_TYPE_G => x"AAAA") 
+         TPD_G              => TPD_G,
+         RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
+         OLD_BSI_MODE_G     => false,
+         ETH_10G_EN_G       => true,
+         UDP_SERVER_EN_G    => true,
+         UDP_SERVER_SIZE_G  => 1,
+         UDP_SERVER_PORTS_G => (0 => 8192),
+         BYP_EN_G           => false,
+         BYP_ETH_TYPE_G     => x"AAAA",
+         VLAN_EN_G          => false,
+         VLAN_SIZE_G        => 1)         
       port map (
          i2cSda             => i2cSda,
          i2cScl             => i2cScl,
@@ -157,12 +162,6 @@ begin
          extAxilReadSlave   => extAxilReadSlave,
          extAxilWriteMaster => extAxilWriteMaster,
          extAxilWriteSlave  => extAxilWriteSlave,
-         userEthClk         => sysClk200,
-         userEthClkRst      => sysClk200Rst,
-         userEthObMaster    => userEthObMaster,
-         userEthObSlave     => userEthObSlave,
-         userEthIbMaster    => userEthIbMaster,
-         userEthIbSlave     => userEthIbSlave,
          dmaClk             => dmaClk,
          dmaClkRst          => dmaClkRst,
          dmaState           => dmaState,
