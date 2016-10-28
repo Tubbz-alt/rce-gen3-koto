@@ -22,14 +22,19 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB00006F"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000070"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Fri Oct 21 15:43:38 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Oct 26 15:25:17 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/26/2016 (0xDB000070): Reorganized the firmware to assign 4 lanes each to 3 PPI interfaces:
+--                            PPI0 - PGP lanes 0-3  (AXI-Lite Base address = 0xA0000000)
+--                            PPI1 - PGP lanes 4-7  (AXI-Lite Base address = 0xA0010000)
+--                            PPI2 - PGP lanes 8-11 (AXI-Lite Base address = 0xA0020000)
+--                            PPI3 - 10G XAUI       (AXI-Lite Base address = 0xB0000000)
 -- 10/21/2016 (0xDB00006F): Enabling BURST_MODE in inbound AXI stream FIFOs
 -- 10/21/2016 (0xDB00006E): Converted ZynqEthernet10GReg.vhd to new AXI-Lite coding style
 -- 10/19/2016 (0xDB00006D): Added ZynqUserEthRouter.vhd to separate CPU/USER UDP (non-VLAN) traffic

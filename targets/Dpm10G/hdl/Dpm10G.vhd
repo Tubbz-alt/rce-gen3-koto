@@ -5,7 +5,7 @@
 -- Author     : Ryan Herbst <rherbst@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-03
--- Last update: 2016-10-07
+-- Last update: 2016-10-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -75,9 +75,10 @@ end Dpm10G;
 architecture STRUCTURE of Dpm10G is
 
    -- Constants
-   constant AXIL_CLK_FREQ_C    : real            := 125.0E6;
-   constant GTX_REFCLK_FREQ_C  : real            := 250.0E6;
-   constant PGP_GTX_CPLL_CFG_C : Gtx7CPllCfgType := getGtx7CPllCfg(GTX_REFCLK_FREQ_C, PGP_LINE_RATE_G);
+   constant AXIL_CLK_FREQ_C    : real                                         := 125.0E6;
+   constant GTX_REFCLK_FREQ_C  : real                                         := 250.0E6;
+   constant PGP_GTX_CPLL_CFG_C : Gtx7CPllCfgType                              := getGtx7CPllCfg(GTX_REFCLK_FREQ_C, PGP_LINE_RATE_G);
+   constant XBAR_CONFIG_C      : AxiLiteCrossbarMasterConfigArray(2 downto 0) := genAxiLiteConfig(3, X"A0000000", 28, 16);
 
    signal locRefClk  : sl;
    signal locRefClkG : sl;
@@ -89,12 +90,16 @@ architecture STRUCTURE of Dpm10G is
    signal sysClk200Rst : sl;
 
    -- AXI-Lite
-   signal axilClk            : sl;
-   signal axilClkRst         : sl;
-   signal extAxilReadMaster  : AxiLiteReadMasterType;
-   signal extAxilReadSlave   : AxiLiteReadSlaveType;
-   signal extAxilWriteMaster : AxiLiteWriteMasterType;
-   signal extAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal axilClk             : sl;
+   signal axilClkRst          : sl;
+   signal extAxilReadMaster   : AxiLiteReadMasterType;
+   signal extAxilReadSlave    : AxiLiteReadSlaveType;
+   signal extAxilWriteMaster  : AxiLiteWriteMasterType;
+   signal extAxilWriteSlave   : AxiLiteWriteSlaveType;
+   signal extAxilReadMasters  : AxiLiteReadMasterArray(2 downto 0);
+   signal extAxilReadSlaves   : AxiLiteReadSlaveArray(2 downto 0);
+   signal extAxilWriteMasters : AxiLiteWriteMasterArray(2 downto 0);
+   signal extAxilWriteSlaves  : AxiLiteWriteSlaveArray(2 downto 0);
 
    -- DMA
    signal dmaClk      : slv(2 downto 0);
@@ -117,12 +122,6 @@ architecture STRUCTURE of Dpm10G is
    signal pgpRxMasterMuxed : AxiStreamMasterArray(PGP_LANES_G-1 downto 0);
    signal pgpRxCtrl        : AxiStreamQuadCtrlArray(PGP_LANES_G-1 downto 0);
 
-   -- User loopback
-   signal userEthObMaster : AxiStreamMasterType;
-   signal userEthObSlave  : AxiStreamSlaveType;
-   signal userEthIbMaster : AxiStreamMasterType;
-   signal userEthIbSlave  : AxiStreamSlaveType;
-
 begin
 
    -----------
@@ -130,10 +129,10 @@ begin
    -----------
    U_DpmCore : entity work.DpmCore
       generic map (
-         TPD_G           => TPD_G,
-         RCE_DMA_MODE_G  => RCE_DMA_PPI_C,
-         OLD_BSI_MODE_G  => false,
-         ETH_10G_EN_G    => true) 
+         TPD_G          => TPD_G,
+         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
+         OLD_BSI_MODE_G => false,
+         ETH_10G_EN_G   => true) 
       port map (
          i2cSda             => i2cSda,
          i2cScl             => i2cScl,
@@ -161,8 +160,7 @@ begin
          dmaObMaster        => dmaObMaster,
          dmaObSlave         => dmaObSlave,
          dmaIbMaster        => dmaIbMaster,
-         dmaIbSlave         => dmaIbSlave,
-         userInterrupt      => (others => '0'));
+         dmaIbSlave         => dmaIbSlave);
 
    led <= (others => '0');
 
@@ -224,50 +222,71 @@ begin
    dmaClk    <= (others => sysClk200);
    dmaClkRst <= (others => sysClk200Rst);
 
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 3,
+         MASTERS_CONFIG_G   => XBAR_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilClkRst,
+         sAxiWriteMasters(0) => extAxilWriteMaster,
+         sAxiWriteSlaves(0)  => extAxilWriteSlave,
+         sAxiReadMasters(0)  => extAxilReadMaster,
+         sAxiReadSlaves(0)   => extAxilReadSlave,
+         mAxiWriteMasters    => extAxilWriteMasters,
+         mAxiWriteSlaves     => extAxilWriteSlaves,
+         mAxiReadMasters     => extAxilReadMasters,
+         mAxiReadSlaves      => extAxilReadSlaves);     
+
    -------------------
    -- PPI to PGP Array
    -------------------
-   PpiPgpArray_1 : entity work.PpiPgpArray
-      generic map (
-         TPD_G                   => TPD_G,
-         NUM_LANES_G             => PGP_LANES_G,
-         AXIL_BASE_ADDRESS_G     => X"A0000000",
-         AXIL_CLK_FREQ_G         => AXIL_CLK_FREQ_C,
-         RX_AXIS_ADDR_WIDTH_G    => 10,
-         RX_AXIS_PAUSE_THRESH_G  => 500,
-         RX_AXIS_CASCADE_SIZE_G  => 1,
-         RX_DATA_ADDR_WIDTH_G    => 12,
-         RX_HEADER_ADDR_WIDTH_G  => 9,
-         RX_PPI_MAX_FRAME_SIZE_G => 2048,
-         TX_PPI_ADDR_WIDTH_G     => 9,
-         TX_AXIS_ADDR_WIDTH_G    => 9,
-         TX_AXIS_CASCADE_SIZE_G  => 1)
-      port map (
-         ppiClk           => dmaClk(0),
-         ppiClkRst        => dmaClkRst(0),
-         ppiState         => dmaState(0),
-         ppiIbMaster      => dmaIbMaster(0),
-         ppiIbSlave       => dmaIbSlave(0),
-         ppiObMaster      => dmaObMaster(0),
-         ppiObSlave       => dmaObSlave(0),
-         pgpTxClk         => (others => pgpClk),
-         pgpTxClkRst      => (others => pgpClkRst),
-         pgpTxIn          => pgpTxIn,
-         pgpTxOut         => pgpTxOut,
-         pgpTxMasters     => pgpTxMasters,
-         pgpTxSlaves      => pgpTxSlaves,
-         pgpRxClk         => (others => pgpClk),
-         pgpRxClkRst      => (others => pgpClkRst),
-         pgpRxIn          => pgpRxIn,
-         pgpRxOut         => pgpRxOut,
-         pgpRxMasterMuxed => pgpRxMasterMuxed,
-         pgpRxCtrl        => pgpRxCtrl,
-         axilClk          => axilClk,
-         axilClkRst       => axilClkRst,
-         axilWriteMaster  => extAxilWriteMaster,
-         axilWriteSlave   => extAxilWriteSlave,
-         axilReadMaster   => extAxilReadMaster,
-         axilReadSlave    => extAxilReadSlave);
+   PPI_PGP_GEN : for i in 2 downto 0 generate
+      U_PpiPgpArray : entity work.PpiPgpArray
+         generic map (
+            TPD_G                   => TPD_G,
+            NUM_LANES_G             => 4,
+            AXIL_BASE_ADDRESS_G     => XBAR_CONFIG_C(i).baseAddr,
+            AXIL_CLK_FREQ_G         => AXIL_CLK_FREQ_C,
+            RX_AXIS_ADDR_WIDTH_G    => 10,
+            RX_AXIS_PAUSE_THRESH_G  => 500,
+            RX_AXIS_CASCADE_SIZE_G  => 1,
+            RX_DATA_ADDR_WIDTH_G    => 12,
+            RX_HEADER_ADDR_WIDTH_G  => 9,
+            RX_PPI_MAX_FRAME_SIZE_G => 2048,
+            TX_PPI_ADDR_WIDTH_G     => 9,
+            TX_AXIS_ADDR_WIDTH_G    => 9,
+            TX_AXIS_CASCADE_SIZE_G  => 1)
+         port map (
+            ppiClk           => dmaClk(i),
+            ppiClkRst        => dmaClkRst(i),
+            ppiState         => dmaState(i),
+            ppiIbMaster      => dmaIbMaster(i),
+            ppiIbSlave       => dmaIbSlave(i),
+            ppiObMaster      => dmaObMaster(i),
+            ppiObSlave       => dmaObSlave(i),
+            pgpTxClk         => (others => pgpClk),
+            pgpTxClkRst      => (others => pgpClkRst),
+            pgpTxIn          => pgpTxIn(3+(4*i) downto (4*i)),
+            pgpTxOut         => pgpTxOut(3+(4*i) downto (4*i)),
+            pgpTxMasters     => pgpTxMasters(3+(4*i) downto (4*i)),
+            pgpTxSlaves      => pgpTxSlaves(3+(4*i) downto (4*i)),
+            pgpRxClk         => (others => pgpClk),
+            pgpRxClkRst      => (others => pgpClkRst),
+            pgpRxIn          => pgpRxIn(3+(4*i) downto (4*i)),
+            pgpRxOut         => pgpRxOut(3+(4*i) downto (4*i)),
+            pgpRxMasterMuxed => pgpRxMasterMuxed(3+(4*i) downto (4*i)),
+            pgpRxCtrl        => pgpRxCtrl(3+(4*i) downto (4*i)),
+            axilClk          => axilClk,
+            axilClkRst       => axilClkRst,
+            axilWriteMaster  => extAxilWriteMasters(i),
+            axilWriteSlave   => extAxilWriteSlaves(i),
+            axilReadMaster   => extAxilReadMasters(i),
+            axilReadSlave    => extAxilReadSlaves(i));
+   end generate PPI_PGP_GEN;
 
    ----------------
    -- PGP GTX Array
@@ -328,11 +347,5 @@ begin
             pgpRxMasterMuxed => pgpRxMasterMuxed(i),
             pgpRxCtrl        => pgpRxCtrl(i));
    end generate PGP_GTX_GEN;
-
-   -------------------------
-   -- User Ethernet loopback
-   -------------------------
-   userEthIbMaster <= userEthObMaster;
-   userEthObSlave  <= userEthIbSlave;
 
 end architecture STRUCTURE;
