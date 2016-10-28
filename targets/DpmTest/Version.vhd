@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA10030D"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA10030E"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmTest: Vivado v2016.2 (x86_64) Built Fri Oct 21 15:43:42 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "DpmTest: Vivado v2016.2 (x86_64) Built Fri Oct 28 09:16:33 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/28/2016 (0xDA10030E): Rebuilding with new AxiStreamDmaWrite AXIS cache support (SVN Revision# 12930)
 -- 10/21/2016 (0xDA10030D): Enabling BURST_MODE in inbound AXI stream FIFOs
 -- 10/14/2016 (0xDA10030C): Overhauled the AxiStreamDmaWrite
 -- 10/07/2016 (0xDA10030B): tUser bug fix for PPI

@@ -22,14 +22,15 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000070"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000071"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Wed Oct 26 15:25:17 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Fri Oct 28 09:23:29 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 10/28/2016 (0xDB000071): Rebuilding with new AxiStreamDmaWrite AXIS cache support (SVN Revision# 12930)
 -- 10/26/2016 (0xDB000070): Reorganized the firmware to assign 4 lanes each to 3 PPI interfaces:
 --                            PPI0 - PGP lanes 0-3  (AXI-Lite Base address = 0xA0000000)
 --                            PPI1 - PGP lanes 4-7  (AXI-Lite Base address = 0xA0010000)
