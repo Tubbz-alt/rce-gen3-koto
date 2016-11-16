@@ -5,7 +5,7 @@
 -- Author     : Ryan Herbst <rherbst@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-03
--- Last update: 2016-10-26
+-- Last update: 2016-11-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -111,8 +111,9 @@ architecture STRUCTURE of Dpm10G is
    signal dmaIbSlave  : AxiStreamSlaveArray(2 downto 0);
 
    -- PGP
-   signal pgpClk           : sl;
-   signal pgpClkRst        : sl;
+   signal pgpClk    : sl;
+   signal pgpClkRst : sl;
+
    signal pgpTxIn          : Pgp2bTxInArray(PGP_LANES_G-1 downto 0);
    signal pgpTxOut         : Pgp2bTxOutArray(PGP_LANES_G-1 downto 0);
    signal pgpTxMasters     : AxiStreamQuadMasterArray(PGP_LANES_G-1 downto 0);
@@ -121,6 +122,15 @@ architecture STRUCTURE of Dpm10G is
    signal pgpRxOut         : Pgp2bRxOutArray(PGP_LANES_G-1 downto 0);
    signal pgpRxMasterMuxed : AxiStreamMasterArray(PGP_LANES_G-1 downto 0);
    signal pgpRxCtrl        : AxiStreamQuadCtrlArray(PGP_LANES_G-1 downto 0);
+
+   signal intPgpTxIn          : Pgp2bTxInArray(PGP_LANES_G-1 downto 0);
+   signal intPgpTxOut         : Pgp2bTxOutArray(PGP_LANES_G-1 downto 0);
+   signal intPgpTxMasters     : AxiStreamQuadMasterArray(PGP_LANES_G-1 downto 0);
+   signal intPgpTxSlaves      : AxiStreamQuadSlaveArray(PGP_LANES_G-1 downto 0);
+   signal intPgpRxIn          : Pgp2bRxInArray(PGP_LANES_G-1 downto 0);
+   signal intPgpRxOut         : Pgp2bRxOutArray(PGP_LANES_G-1 downto 0);
+   signal intPgpRxMasterMuxed : AxiStreamMasterArray(PGP_LANES_G-1 downto 0);
+   signal intPgpRxCtrl        : AxiStreamQuadCtrlArray(PGP_LANES_G-1 downto 0);
 
 begin
 
@@ -288,10 +298,45 @@ begin
             axilReadSlave    => extAxilReadSlaves(i));
    end generate PPI_PGP_GEN;
 
+   -- NATURAL_ORDER : for i in PGP_LANES_G-1 downto 0 generate
+   -- ---------------------------------
+   -- -- Natural PGP Lane Mapping Order
+   -- ---------------------------------
+   -- intPgpTxIn(i)       <= pgpTxIn(i);
+   -- pgpTxOut(i)         <= intPgpTxOut(i);
+   -- intPgpTxMasters(i)  <= pgpTxMasters(i);
+   -- pgpTxSlaves(i)      <= intPgpTxSlaves(i);
+   -- intPgpRxIn(i)       <= pgpRxIn(i);
+   -- pgpRxOut(i)         <= intPgpRxOut(i);
+   -- pgpRxMasterMuxed(i) <= intPgpRxMasterMuxed(i);
+   -- intPgpRxCtrl(i)     <= pgpRxCtrl(i);
+   -- end generate NATURAL_ORDER;
+
+   REORG_0 : for i in 3 downto 0 generate
+      REORG_1 : for j in 2 downto 0 generate
+         -------------------------------
+         -- Reorganized PGP Lane Mapping
+         -------------------------------
+         -- PPI[0] - PGP lanes [0,3,6,9] 
+         -- PPI[1] - PGP lanes [1,4,7,10]
+         -- PPI[2] - PGP lanes [2,5,8,11]
+         -------------------------------
+         intPgpTxIn((3*i)+j)       <= pgpTxIn((4*j)+i);
+         pgpTxOut((4*j)+i)         <= intPgpTxOut((3*i)+j);
+         intPgpTxMasters((3*i)+j)  <= pgpTxMasters((4*j)+i);
+         pgpTxSlaves((4*j)+i)      <= intPgpTxSlaves((3*i)+j);
+         intPgpRxIn((3*i)+j)       <= pgpRxIn((4*j)+i);
+         pgpRxOut((4*j)+i)         <= intPgpRxOut((3*i)+j);
+         pgpRxMasterMuxed((4*j)+i) <= intPgpRxMasterMuxed((3*i)+j);
+         intPgpRxCtrl((3*i)+j)     <= pgpRxCtrl((4*j)+i);
+      end generate REORG_1;
+   end generate REORG_0;
+
    ----------------
    -- PGP GTX Array
    ----------------
    PGP_GTX_GEN : for i in PGP_LANES_G-1 downto 0 generate
+      
       Pgp2bGtx7VarLat_1 : entity work.Pgp2bGtx7VarLat
          generic map (
             TPD_G                 => TPD_G,
@@ -337,15 +382,14 @@ begin
             pgpRxClk         => pgpClk,
             pgpRxMmcmReset   => open,
             pgpRxMmcmLocked  => '1',
-            pgpRxIn          => pgpRxIn(i),
-            pgpRxOut         => pgpRxOut(i),
-            pgpTxIn          => pgpTxIn(i),
-            pgpTxOut         => pgpTxOut(i),
-            pgpTxMasters     => pgpTxMasters(i),
-            pgpTxSlaves      => pgpTxSlaves(i),
-            pgpRxMasters     => open,
-            pgpRxMasterMuxed => pgpRxMasterMuxed(i),
-            pgpRxCtrl        => pgpRxCtrl(i));
+            pgpRxIn          => intPgpRxIn(i),
+            pgpRxOut         => intPgpRxOut(i),
+            pgpTxIn          => intPgpTxIn(i),
+            pgpTxOut         => intPgpTxOut(i),
+            pgpTxMasters     => intPgpTxMasters(i),
+            pgpTxSlaves      => intPgpTxSlaves(i),
+            pgpRxMasterMuxed => intPgpRxMasterMuxed(i),
+            pgpRxCtrl        => intPgpRxCtrl(i));
    end generate PGP_GTX_GEN;
 
 end architecture STRUCTURE;

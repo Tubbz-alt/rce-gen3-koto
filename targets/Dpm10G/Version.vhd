@@ -22,20 +22,25 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000071"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DB000072"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Fri Oct 28 09:23:29 PDT 2016 by ruckman";
+constant BUILD_STAMP_C : string := "Dpm10G: Vivado v2016.2 (x86_64) Built Thu Nov  3 11:52:47 PDT 2016 by ruckman";
 
 end Version;
 
 -------------------------------------------------------------------------------
 -- Revision History:
+-- 11/03/2016 (0xDB000072): Reorganized the PGP lanes w.r.t. PPI plugin channels:
+--                            PPI[0] - PGP lanes [0,3,6,9] (AXI-Lite Base address = 0xA0000000)
+--                            PPI[1] - PGP lanes [1,4,7,10](AXI-Lite Base address = 0xA0010000)
+--                            PPI[2] - PGP lanes [2,5,8,11](AXI-Lite Base address = 0xA0020000)
+--                            PPI[3] - 10G XAUI            (AXI-Lite Base address = 0xB0000000)
 -- 10/28/2016 (0xDB000071): Rebuilding with new AxiStreamDmaWrite AXIS cache support (SVN Revision# 12930)
 -- 10/26/2016 (0xDB000070): Reorganized the firmware to assign 4 lanes each to 3 PPI interfaces:
---                            PPI0 - PGP lanes 0-3  (AXI-Lite Base address = 0xA0000000)
---                            PPI1 - PGP lanes 4-7  (AXI-Lite Base address = 0xA0010000)
---                            PPI2 - PGP lanes 8-11 (AXI-Lite Base address = 0xA0020000)
---                            PPI3 - 10G XAUI       (AXI-Lite Base address = 0xB0000000)
+--                            PPI[0] - PGP lanes [0-3]  (AXI-Lite Base address = 0xA0000000)
+--                            PPI[1] - PGP lanes [4-7]  (AXI-Lite Base address = 0xA0010000)
+--                            PPI[2] - PGP lanes [8-11] (AXI-Lite Base address = 0xA0020000)
+--                            PPI[3] - 10G XAUI       (AXI-Lite Base address = 0xB0000000)
 -- 10/21/2016 (0xDB00006F): Enabling BURST_MODE in inbound AXI stream FIFOs
 -- 10/21/2016 (0xDB00006E): Converted ZynqEthernet10GReg.vhd to new AXI-Lite coding style
 -- 10/19/2016 (0xDB00006D): Added ZynqUserEthRouter.vhd to separate CPU/USER UDP (non-VLAN) traffic
