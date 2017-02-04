@@ -106,7 +106,7 @@ begin
    U_DpmCore: entity work.DpmCore 
       generic map (
          TPD_G          => TPD_C,
-         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
+         RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
          OLD_BSI_MODE_G => false,
          ETH_10G_EN_G   => false
       ) port map (

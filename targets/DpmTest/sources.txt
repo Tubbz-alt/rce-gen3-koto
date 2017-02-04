@@ -1,3 +1,0 @@
-vhdl work Version.vhd
-vhdl work hdl/DpmRtmTest.vhd
-vhdl work hdl/DpmTest.vhd
