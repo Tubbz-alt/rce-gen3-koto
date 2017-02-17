@@ -1,3 +1,5 @@
+# Define Firmware Version Number
+export PRJ_VERSION = 0xDC000000
 
 # Define target output
 target: bit
@@ -5,14 +7,5 @@ target: bit
 # Define target part
 export PRJ_PART = XC7Z030FBG484-2
 
-# List of build core directories.
-export MODULE_DIRS = $(PROJ_DIR)/../../modules/ZynqEthernet  \
-                     $(PROJ_DIR)/../../modules/StdLib  \
-                     $(PROJ_DIR)/../../modules/ZynqPcieMaster \
-                     $(PROJ_DIR)/../../modules/PpiCommon \
-                     $(PROJ_DIR)/../../modules/RceG3 \
-                     $(PROJ_DIR)/../../modules/DtmCore \
-                     $(PROJ_DIR)
-
 # Use top level makefile
-include ../../modules/StdLib/build/system_vivado_v1.mk
+include ../../submodules/ruckus/system_vivado.mk

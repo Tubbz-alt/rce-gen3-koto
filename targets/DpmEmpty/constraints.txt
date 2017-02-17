@@ -1,2 +1,0 @@
-../../modules/DpmCore/hdl/DpmCore.xdc
-hdl/DpmEmpty.xdc

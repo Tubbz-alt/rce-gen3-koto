@@ -1,2 +1,0 @@
-../../modules/DtmCore/hdl/DtmCore.xdc
-hdl/DtmEmpty.xdc

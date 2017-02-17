@@ -1,2 +1,0 @@
-../../modules/DpmCore/hdl/DpmCore.xdc
-hdl/Dpm10G.xdc
