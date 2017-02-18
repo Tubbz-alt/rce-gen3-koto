@@ -9,8 +9,8 @@
 ##############################################################################
 
 set RUCKUS_DIR $::env(RUCKUS_DIR)
-source -quiet ${RUCKUS_DIR}/vivado_env_var_v1.tcl
-source -quiet ${RUCKUS_DIR}/vivado_proc_v1.tcl
+source -quiet ${RUCKUS_DIR}/vivado_env_var.tcl
+source -quiet ${RUCKUS_DIR}/vivado_proc.tcl
 
 ## Open the run
 open_run synth_1
