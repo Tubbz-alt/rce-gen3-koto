@@ -8,8 +8,8 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 set RUCKUS_DIR $::env(RUCKUS_DIR)
-source -quiet ${RUCKUS_DIR}/vivado_env_var_v1.tcl
-source -quiet ${RUCKUS_DIR}/vivado_proc_v1.tcl
+source -quiet ${RUCKUS_DIR}/vivado_env_var.tcl
+source -quiet ${RUCKUS_DIR}/vivado_proc.tcl
 
 ## Set the top level file
 set_property top zynq_gige_block [current_fileset]
