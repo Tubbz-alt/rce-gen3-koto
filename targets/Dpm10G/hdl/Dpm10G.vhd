@@ -37,7 +37,7 @@ use work.EthMacPkg.all;
 entity Dpm10G is
    generic (
       TPD_G           : time                  := 1 ns;
-      BUILD_INFO_G    : BuildInfoType
+      BUILD_INFO_G    : BuildInfoType;
       PGP_LANES_G     : integer range 1 to 12 := 12;
       PGP_LINE_RATE_G : real                  := 3.125E9);
    port (
