@@ -7,6 +7,7 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+set PROJ_DIR $::env(PROJ_DIR)
 
-# source $::env(PROJ_DIR)/vivado/debug.tcl
+source ${PROJ_DIR}/vivado/debug.tcl
 

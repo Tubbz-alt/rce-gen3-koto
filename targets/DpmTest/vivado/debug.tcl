@@ -175,5 +175,5 @@ ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3Dm
 delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
 
 ## Write the port map file
-write_debug_probes -force ${PROJ_DIR}/images/debug_probes_${PRJ_VERSION}.ltx
+write_debug_probes -force ${PROJ_DIR}/images/debug_probes_${IMAGENAME}.ltx
 
