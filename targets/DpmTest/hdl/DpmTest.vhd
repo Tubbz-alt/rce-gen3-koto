@@ -21,7 +21,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
 entity DpmTest is
-   generic )
+   generic (
       BUILD_INFO_G   : BuildInfoType
    );
    port (
