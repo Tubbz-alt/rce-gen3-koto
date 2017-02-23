@@ -2,7 +2,7 @@
 # Define target output
 target: vcs
 
-export PRJ_VERSION = "DA100416"
+export PRJ_VERSION = 0xDA100416
 
 # Define target part
 export PRJ_PART = XC7Z045FFG900-2
