@@ -22,9 +22,9 @@ USE ieee.std_logic_1164.ALL;
 
 package Version is
 
-constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100402"; -- MAKE_VERSION
+constant FPGA_VERSION_C : std_logic_vector(31 downto 0) := x"DA100416"; -- MAKE_VERSION
 
-constant BUILD_STAMP_C : string := "DpmTest: Vivado v2016.3 (x86_64) Built Tue Feb  7 14:34:13 PST 2017 by rherbst";
+constant BUILD_STAMP_C : string := "DpmTest: Vivado v2016.3 (x86_64) Built Tue Feb 21 08:52:48 PST 2017 by rherbst";
 
 end Version;
 

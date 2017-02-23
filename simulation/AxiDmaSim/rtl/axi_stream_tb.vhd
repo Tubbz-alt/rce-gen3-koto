@@ -25,6 +25,8 @@ entity axi_stream_tb is end axi_stream_tb;
 -- Define architecture
 architecture axi_stream_tb of axi_stream_tb is
 
+   constant CHAN_COUNT_C : integer := 3;
+
    signal axiClk          : sl;
    signal axiRst          : sl;
    signal axilReadMaster  : AxiLiteReadMasterType;
@@ -32,18 +34,18 @@ architecture axi_stream_tb of axi_stream_tb is
    signal axilWriteMaster : AxiLiteWriteMasterType;
    signal axilWriteSlave  : AxiLiteWriteSlaveType;
    signal interrupt       : sl;
-   signal online          : sl;
-   signal acknowledge     : sl;
-   signal sAxisMaster     : AxiStreamMasterType;
-   signal sAxisSlave      : AxiStreamSlaveType;
-   signal mAxisMaster     : AxiStreamMasterType;
-   signal mAxisSlave      : AxiStreamSlaveType;
-   signal mAxisCtrl       : AxiStreamCtrlType;
-   signal axiReadMaster   : AxiReadMasterArray(1 downto 0);
-   signal axiReadSlave    : AxiReadSlaveArray(1 downto 0);
-   signal axiWriteMaster  : AxiWriteMasterArray(1 downto 0);
-   signal axiWriteSlave   : AxiWriteSlaveArray(1 downto 0);
-   signal axiWriteCtrl    : AxiCtrlArray(1 downto 0);
+   signal online          : slv(CHAN_COUNT_C-1 downto 0);
+   signal acknowledge     : slv(CHAN_COUNT_C-1 downto 0);
+   signal sAxisMaster     : AxiStreamMasterArray(CHAN_COUNT_C-1 downto 0);
+   signal sAxisSlave      : AxiStreamSlaveArray(CHAN_COUNT_C-1 downto 0);
+   signal mAxisMaster     : AxiStreamMasterArray(CHAN_COUNT_C-1 downto 0);
+   signal mAxisSlave      : AxiStreamSlaveArray(CHAN_COUNT_C-1 downto 0);
+   signal mAxisCtrl       : AxiStreamCtrlArray(CHAN_COUNT_C-1 downto 0);
+   signal axiReadMaster   : AxiReadMasterArray(CHAN_COUNT_C downto 0);
+   signal axiReadSlave    : AxiReadSlaveArray(CHAN_COUNT_C downto 0);
+   signal axiWriteMaster  : AxiWriteMasterArray(CHAN_COUNT_C downto 0);
+   signal axiWriteSlave   : AxiWriteSlaveArray(CHAN_COUNT_C downto 0);
+   signal axiWriteCtrl    : AxiCtrlArray(CHAN_COUNT_C downto 0);
 
 --   type RegType is record
 --      axilReadMaster  : AxiLiteReadMasterType;
@@ -86,11 +88,8 @@ begin
          AXIS_READY_EN_G    => true,
          AXIS_CONFIG_G      => RCEG3_AXIS_DMA_CONFIG_C,
          AXI_DESC_CONFIG_G  => AXI_ACP_INIT_C,
-         AXI_DESC_BURST_G   => "01",
-         AXI_DESC_CACHE_G   => "1111",
          AXI_DMA_CONFIG_G   => AXI_HP_INIT_C,
-         AXI_DMA_BURST_G    => "01",
-         AXI_DMA_CACHE_G    => "1111",
+         CHAN_COUNT_G       => CHAN_COUNT_C,
          RD_PIPE_STAGES_G   => 1,
          RD_PEND_THRESH_G   => 1000)
       port map (
@@ -114,29 +113,31 @@ begin
          axiWriteSlave    => axiWriteSlave,
          axiWriteCtrl     => axiWriteCtrl);
 
-   U_ReadTest: entity work.AxiReadEmulate
-      generic map (
-         TPD_G        => 1 ns,
-         LATENCY_G    => 31,
-         AXI_CONFIG_G => AXI_HP_INIT_C,
-         SIM_DEBUG_G  => true)
-      port map (
-         axiClk        => axiClk,
-         axiRst        => axiRst,
-         axiReadMaster => axiReadMaster(1),
-         axiReadSlave  => axiReadSlave(1));
+   U_AxiGen: for i in 0 to CHAN_COUNT_C generate
+      U_ReadTest: entity work.AxiReadEmulate
+         generic map (
+            TPD_G        => 1 ns,
+            LATENCY_G    => 31,
+            AXI_CONFIG_G => AXI_HP_INIT_C,
+            SIM_DEBUG_G  => true)
+         port map (
+            axiClk        => axiClk,
+            axiRst        => axiRst,
+            axiReadMaster => axiReadMaster(i),
+            axiReadSlave  => axiReadSlave(i));
 
-   U_WriteTest: entity work.AxiWriteEmulate
-      generic map (
-         TPD_G        => 1 ns,
-         LATENCY_G    => 31,
-         AXI_CONFIG_G => AXI_HP_INIT_C,
-         SIM_DEBUG_G  => true)
-      port map (
-         axiClk         => axiClk,
-         axiRst         => axiRst,
-         axiWriteMaster => axiWriteMaster(1),
-         axiWriteSlave  => axiWriteSlave(1));
+      U_WriteTest: entity work.AxiWriteEmulate
+         generic map (
+            TPD_G        => 1 ns,
+            LATENCY_G    => 31,
+            AXI_CONFIG_G => AXI_HP_INIT_C,
+            SIM_DEBUG_G  => true)
+         port map (
+            axiClk         => axiClk,
+            axiRst         => axiRst,
+            axiWriteMaster => axiWriteMaster(i),
+            axiWriteSlave  => axiWriteSlave(i));
+   end generate;
 
    process begin
 
@@ -151,20 +152,20 @@ begin
 
       for i in 0 to 8 loop
          axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060048", toSlv(i,32), true); -- write FIFO
-         axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00064000" + (toSlv(i,8) & "00"), toSlv(i*8,32), true); -- addr table
+         axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00064000" + (toSlv(i,8) & "00"), toSlv(1024+i*8,32), true); -- addr table
       end loop;
 
       for i in 9 to 16 loop
-         axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00064000" + (toSlv(i,8) & "00"), toSlv(i*8,32), true); -- addr table
+         axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00064000" + (toSlv(i,8) & "00"), toSlv(1024+i*8,32), true); -- addr table
       end loop;
 
       axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060004", x"00000001", true); -- Int Enable
 
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00008038", true); -- Read Low
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"00800080", true); -- Read High
+      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"40000080", true); -- Read High
+      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00000030", true); -- Read Low
 
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00008040", true); -- Read Low
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"00800080", true); -- Read High
+      --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"00800080", true); -- Read High
+      --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00008040", true); -- Read Low
 
       wait for 1 US;
 
@@ -176,8 +177,7 @@ begin
    axilReadMaster   <= AXI_LITE_READ_MASTER_INIT_C;
    sAxisMaster      <= mAxisMaster;
    mAxisSlave       <= sAxisSlave;
-   mAxisCtrl        <= AXI_STREAM_CTRL_INIT_C;
-   axiWriteSlave(0) <= AXI_WRITE_SLAVE_FORCE_C;
+   mAxisCtrl        <= (others=>AXI_STREAM_CTRL_INIT_C);
    axiWriteCtrl     <= (others=>AXI_CTRL_INIT_C);
 
 end axi_stream_tb;
