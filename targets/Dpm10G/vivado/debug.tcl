@@ -8,6 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 set RUCKUS_DIR $::env(RUCKUS_DIR)
+set IMAGENAME  $::env(IMAGENAME)
 source -quiet ${RUCKUS_DIR}/vivado_env_var.tcl
 source -quiet ${RUCKUS_DIR}/vivado_proc.tcl
 
