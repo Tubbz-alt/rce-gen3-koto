@@ -17,7 +17,7 @@ open_run synth_1
 # Get a list of nets
 set netFile ${PROJ_DIR}/net_log.txt
 set fd [open ${netFile} "w"]
-puts $fd [get_nets {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/*}
+puts $fd [get_nets {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/*}]
 close $fd
 
 ## Setup configurations
