@@ -19,6 +19,7 @@ open_run synth_1
 set netFile ${PROJ_DIR}/net_log.txt
 set fd [open ${netFile} "w"]
 puts $fd [get_nets {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/*}]
+puts $fd [get_nets {PPI_PGP_GEN[0].U_PpiPgpArray/U_LaneGen[0].U_PpiPgpLane/U_PpiToPgp/*}]
 close $fd
 
 ## Setup configurations
@@ -32,7 +33,6 @@ set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
 
 ## Set the clock for the Core
 SetDebugCoreClk ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxClk}
-
 
 ## Set the Probes
 ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[0][tValid]}
