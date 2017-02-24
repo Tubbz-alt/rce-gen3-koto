@@ -21,23 +21,41 @@ puts $fd [get_nets {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U
 close $fd
 
 ## Setup configurations
-#set ilaName u_ila_0
+set ilaName u_ila_0
 
 ## Create the core
-#CreateDebugCore ${ilaName}
+CreateDebugCore ${ilaName}
 
 ## Set the record depth
-#set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
+set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
 
 ## Set the clock for the Core
-#SetDebugCoreClk ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/axiClk}
+SetDebugCoreClk ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxClk}
+
 
 ## Set the Probes
-#ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[0][tValid]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[0][tLast]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[0][tUser][*]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[1][tValid]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[1][tLast]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[1][tUser][*]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[2][tValid]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[2][tLast]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[2][tUser][*]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[3][tValid]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[3][tLast]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/pgpTxMasters[3][tUser][*]}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/cellTxEOC}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/cellTxEOF}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/cellTxEOFE}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/cellTxSOC}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/cellTxSOF}
+ConfigProbe ${ilaName} {PGP_GTX_GEN[0].Pgp2bGtx7VarLat_1/MuliLane_Inst/U_Pgp2bLane/U_TxEnGen.U_Pgp2bTx/schTxTimeout}
 
-## Delete the last unused port
-#delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
+## Delete the last unused port}
+delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
 
 ## Write the port map file
-#write_debug_probes -force ${PROJ_DIR}/images/debug_probes_${IMAGENAME}.ltx
+write_debug_probes -force ${PROJ_DIR}/images/debug_probes_${IMAGENAME}.ltx
 
