@@ -1,6 +1,8 @@
 # Define Firmware Version Number
 export PRJ_VERSION = 0xDB000073
 
+#GIT_BYPASS=1
+
 # Define target output
 target: bit
 
