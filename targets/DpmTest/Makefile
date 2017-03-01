@@ -1,5 +1,8 @@
 # Define Firmware Version Number
-export PRJ_VERSION = 0xDA100412
+export PRJ_VERSION = 0xDA100413
+
+# 412 = stable axis v2
+# 413 = axis v1 cache setting test
 
 # Define target output
 target: bit
