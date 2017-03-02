@@ -215,7 +215,7 @@ begin
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
             GEN_SYNC_FIFO_G            => true,
             VALID_THOLD_G              => 16,
-            MASTER_AXI_STREAM_CONFIG_G RCEG3_AXIS_DMA_CONFIG_C)
+            MASTER_AXI_STREAM_CONFIG_G => RCEG3_AXIS_DMA_CONFIG_C)
          port (
             -- Master Port (mAxisClk)
             mAxisClk        => sysClk125,
