@@ -175,12 +175,12 @@ begin
             -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
             1 => ( baseAddr     => x"A0010000",
                    addrBits     => 16,
-                   connectivity => x"FFFF")
+                   connectivity => x"FFFF"),
 
             -- Channel 2 = 0xA0002000 - 0xA002FFFF : PRBS0
             2 => ( baseAddr     => x"A0020000",
                    addrBits     => 16,
-                   connectivity => x"FFFF")
+                   connectivity => x"FFFF"),
 
             -- Channel 3 = 0xA0003000 - 0xA003FFFF : PRBS1
             3 => ( baseAddr     => x"A0030000",
@@ -216,7 +216,7 @@ begin
             GEN_SYNC_FIFO_G            => true,
             VALID_THOLD_G              => 16,
             MASTER_AXI_STREAM_CONFIG_G => RCEG3_AXIS_DMA_CONFIG_C)
-         port (
+         port map (
             -- Master Port (mAxisClk)
             mAxisClk        => sysClk125,
             mAxisRst        => sysClk125Rst,
@@ -227,6 +227,7 @@ begin
             axilReadSlave   => locAxilReadSlave(2+i),
             axilWriteMaster => locAxilWriteMaster(2+i),
             axilWriteSlave  => locAxilWriteSlave(2+i));
+   end generate;
 
    U_PrbsMux: entity work.AxiStreamMux
       generic map (
