@@ -7,4 +7,3 @@ loadRuckusTcl $::env(PROJ_DIR)/../../submodules/rce-gen3-fw-lib/DpmCore
 
 # Load local Source Code and constraints
 loadSource -sim_only -dir "$::DIR_PATH/rtl/"
-loadSource -path           "$::DIR_PATH/Version.vhd"

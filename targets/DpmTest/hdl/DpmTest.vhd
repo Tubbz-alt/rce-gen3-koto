@@ -80,10 +80,10 @@ architecture STRUCTURE of DpmTest is
    signal extAxilReadSlave   : AxiLiteReadSlaveType;
    signal extAxilWriteMaster : AxiLiteWriteMasterType;
    signal extAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal locAxilReadMaster  : AxiLiteReadMasterArray(3 downto 0);
-   signal locAxilReadSlave   : AxiLiteReadSlaveArray(3 downto 0);
-   signal locAxilWriteMaster : AxiLiteWriteMasterArray(3 downto 0);
-   signal locAxilWriteSlave  : AxiLiteWriteSlaveArray(3 downto 0);
+   signal locAxilReadMaster  : AxiLiteReadMasterArray(9 downto 0);
+   signal locAxilReadSlave   : AxiLiteReadSlaveArray(9 downto 0);
+   signal locAxilWriteMaster : AxiLiteWriteMasterArray(9 downto 0);
+   signal locAxilWriteSlave  : AxiLiteWriteSlaveArray(9 downto 0);
    signal dmaClk             : slv(2 downto 0);
    signal dmaClkRst          : slv(2 downto 0);
    signal dmaState           : RceDmaStateArray(2 downto 0);
@@ -91,8 +91,8 @@ architecture STRUCTURE of DpmTest is
    signal dmaObSlave         : AxiStreamSlaveArray(2 downto 0);
    signal dmaIbMaster        : AxiStreamMasterArray(2 downto 0);
    signal dmaIbSlave         : AxiStreamSlaveArray(2 downto 0);
-   signal prbsAxisMaster     : AxiStreamMasterArray(1 downto 0);
-   signal prbsAxisSlave      : AxiStreamSlaveArray(1 downto 0);
+   signal prbsAxisMaster     : AxiStreamMasterArray(7 downto 0);
+   signal prbsAxisSlave      : AxiStreamSlaveArray(7 downto 0);
    signal iethRxP            : slv(3 downto 0);
    signal iethRxM            : slv(3 downto 0);
    signal iethTxP            : slv(3 downto 0);
@@ -163,27 +163,47 @@ begin
       generic map (
          TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 4,
+         NUM_MASTER_SLOTS_G => 10,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => (
 
-            -- Channel 0 = 0xA0000000 - 0xA000FFFF : DPM Timing Source
             0 => ( baseAddr     => x"A0000000",
                    addrBits     => 16,
                    connectivity => x"FFFF"),
 
-            -- Channel 1 = 0xA0001000 - 0xA001FFFF : PGP Test
             1 => ( baseAddr     => x"A0010000",
                    addrBits     => 16,
                    connectivity => x"FFFF"),
 
-            -- Channel 2 = 0xA0002000 - 0xA002FFFF : PRBS0
             2 => ( baseAddr     => x"A0020000",
                    addrBits     => 16,
                    connectivity => x"FFFF"),
 
-            -- Channel 3 = 0xA0003000 - 0xA003FFFF : PRBS1
             3 => ( baseAddr     => x"A0030000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            4 => ( baseAddr     => x"A0040000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            5 => ( baseAddr     => x"A0050000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            6 => ( baseAddr     => x"A0060000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            7 => ( baseAddr     => x"A0070000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            8 => ( baseAddr     => x"A0080000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            9 => ( baseAddr     => x"A0090000",
                    addrBits     => 16,
                    connectivity => x"FFFF")
          )
@@ -208,13 +228,14 @@ begin
    dmaClkRst   <= (others=>sysClk125Rst);
    dmaIbMaster(2 downto 1) <= dmaObMaster(2 downto 1);
    dmaObSlave(2 downto 1)  <= dmaIbSlave(2 downto 1);
+   dmaObSlave(0)           <= AXI_STREAM_SLAVE_FORCE_C;
 
-   U_PrbsGen: for i in 0 to 1 generate
+   U_PrbsGen: for i in 0 to 7 generate
       U_Prbs: entity work.SsiPrbsTx
          generic map (
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
-            GEN_SYNC_FIFO_G            => true,
-            VALID_THOLD_G              => 16,
+            GEN_SYNC_FIFO_G            => false,
+            VALID_THOLD_G              => 128,
             MASTER_AXI_STREAM_CONFIG_G => RCEG3_AXIS_DMA_CONFIG_C)
          port map (
             -- Master Port (mAxisClk)
@@ -222,8 +243,8 @@ begin
             mAxisRst        => sysClk125Rst,
             mAxisMaster     => prbsAxisMaster(i),
             mAxisSlave      => prbsAxisSlave(i),
-            locClk          => sysClk125,
-            locRst          => sysClk125Rst,
+            locClk          => axiClk,
+            locRst          => axiClkRst,
             trig            => '0',
             packetLength    => X"00000100",
             axilReadMaster  => locAxilReadMaster(2+i),
@@ -234,18 +255,18 @@ begin
 
    U_PrbsMux: entity work.AxiStreamMux
       generic map (
-         NUM_SLAVES_G   => 2,
+         NUM_SLAVES_G   => 8,
          MODE_G         => "INDEXED",
          TDEST_LOW_G    => 0,
          ILEAVE_EN_G    => true,
-         ILEAVE_REARB_G => 16)
+         ILEAVE_REARB_G => 128)
       port map (
          axisClk      => sysClk125,
          axisRst      => sysClk125Rst,
          sAxisMasters => prbsAxisMaster,
          sAxisSlaves  => prbsAxisSlave,
-         mAxisMaster  => dmaObMaster(0),
-         mAxisSlave   => dmaObSlave(0));
+         mAxisMaster  => dmaIbMaster(0),
+         mAxisSlave   => dmaIbSlave(0));
 
    --------------------------------------------------
    -- Timing Signals

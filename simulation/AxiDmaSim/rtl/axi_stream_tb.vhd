@@ -29,6 +29,8 @@ architecture axi_stream_tb of axi_stream_tb is
 
    signal axiClk          : sl;
    signal axiRst          : sl;
+   signal locClk          : sl;
+   signal locRst          : sl;
    signal axilReadMaster  : AxiLiteReadMasterType;
    signal axilReadSlave   : AxiLiteReadSlaveType;
    signal axilWriteMaster : AxiLiteWriteMasterType;
@@ -40,27 +42,15 @@ architecture axi_stream_tb of axi_stream_tb is
    signal sAxisSlave      : AxiStreamSlaveArray(CHAN_COUNT_C-1 downto 0);
    signal mAxisMaster     : AxiStreamMasterArray(CHAN_COUNT_C-1 downto 0);
    signal mAxisSlave      : AxiStreamSlaveArray(CHAN_COUNT_C-1 downto 0);
+   signal prbsAxisMaster  : AxiStreamMasterArray(1 downto 0);
+   signal prbsAxisSlave   : AxiStreamSlaveArray(1 downto 0);
    signal mAxisCtrl       : AxiStreamCtrlArray(CHAN_COUNT_C-1 downto 0);
    signal axiReadMaster   : AxiReadMasterArray(CHAN_COUNT_C downto 0);
    signal axiReadSlave    : AxiReadSlaveArray(CHAN_COUNT_C downto 0);
    signal axiWriteMaster  : AxiWriteMasterArray(CHAN_COUNT_C downto 0);
    signal axiWriteSlave   : AxiWriteSlaveArray(CHAN_COUNT_C downto 0);
    signal axiWriteCtrl    : AxiCtrlArray(CHAN_COUNT_C downto 0);
-
---   type RegType is record
---      axilReadMaster  : AxiLiteReadMasterType;
---      axilWriteMaster : AxiLiteWriteMasterType;
---      count           : slv(15 downto 0);
---   end record RegType;
---
---   constant REG_INIT_C : RegType := (
---      axilReadMaster  <= AXI_LITE_READ_MASTER_INIT_C,
---      axilWriteMaster <= AXI_LITE_WRITE_MASTER_INIT_C,
---      count           <= (others=>'0')
---   );
---
---   signal r   : RegType := REG_INIT_C;
---   signal rin : RegType;
+   signal trig            : sl;
 
 begin
 
@@ -75,6 +65,20 @@ begin
       axiRst <= '1';
       wait for (100 ns);
       axiRst <= '0';
+      wait;
+   end process;
+
+   process begin
+      locClk <= '1';
+      wait for 10 ns;
+      locClk <= '0';
+      wait for 10 ns;
+   end process;
+
+   process begin
+      locRst <= '1';
+      wait for (100 ns);
+      locRst <= '0';
       wait;
    end process;
 
@@ -161,24 +165,66 @@ begin
 
       axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060004", x"00000001", true); -- Int Enable
 
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"40000080", true); -- Read High
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00000030", true); -- Read Low
+      --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"40000080", true); -- Read High
+      --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00000030", true); -- Read Low
 
       --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060044", x"00800080", true); -- Read High
       --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060040", x"00008040", true); -- Read Low
 
-      wait for 1 US;
+      --wait for 1 US;
 
-      axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"0006004C", x"00030002", true); -- In ack/enable
+      --axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"0006004C", x"00030002", true); -- In ack/enable
+      
+      wait for 1 US;
+      trig <= '1';
+      wait for 20 NS;
+      trig <= '0';
 
       wait;
    end process;
 
    axilReadMaster   <= AXI_LITE_READ_MASTER_INIT_C;
-   sAxisMaster      <= mAxisMaster;
-   mAxisSlave       <= sAxisSlave;
+
+   sAxisMaster(CHAN_COUNT_C-1 downto 1) <= (others=>AXI_STREAM_MASTER_INIT_C);
+
+   mAxisSlave       <= (others=>AXI_STREAM_SLAVE_INIT_C);
    mAxisCtrl        <= (others=>AXI_STREAM_CTRL_INIT_C);
    axiWriteCtrl     <= (others=>AXI_CTRL_INIT_C);
+
+
+   U_PrbsGen: for i in 0 to 1 generate
+      U_Prbs: entity work.SsiPrbsTx
+         generic map (
+            AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
+            GEN_SYNC_FIFO_G            => false,
+            VALID_THOLD_G              => 128,
+            MASTER_AXI_STREAM_CONFIG_G => RCEG3_AXIS_DMA_CONFIG_C)
+         port map (
+            -- Master Port (mAxisClk)
+            mAxisClk        => axiClk,
+            mAxisRst        => axiRst,
+            mAxisMaster     => prbsAxisMaster(i),
+            mAxisSlave      => prbsAxisSlave(i),
+            locClk          => locClk,
+            locRst          => locRst,
+            trig            => trig,
+            packetLength    => X"00010000");
+   end generate;
+
+   U_PrbsMux: entity work.AxiStreamMux
+      generic map (
+         NUM_SLAVES_G   => 2,
+         MODE_G         => "INDEXED",
+         TDEST_LOW_G    => 0,
+         ILEAVE_EN_G    => true,
+         ILEAVE_REARB_G => 128)
+      port map (
+         axisClk      => axiClk,
+         axisRst      => axiRst,
+         sAxisMasters => prbsAxisMaster,
+         sAxisSlaves  => prbsAxisSlave,
+         mAxisMaster  => sAxisMaster(0),
+         mAxisSlave   => sAxisSlave(0));
 
 end axi_stream_tb;
 
