@@ -49,7 +49,7 @@ ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3Dm
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[dmaWrTrack][dropEn]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[dmaWrTrack][inUse]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[dmaWrTrack][overflow]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[dmaWrTrack][dest]}
+ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[dmaWrTrack][dest][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[reqCount][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[result][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/r[slave][tReady]}
