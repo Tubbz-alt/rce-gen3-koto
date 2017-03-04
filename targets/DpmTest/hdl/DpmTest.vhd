@@ -224,8 +224,8 @@ begin
    --------------------------------------------------
    -- PPI Loopback
    --------------------------------------------------
-   dmaClk      <= (others=>sysClk125);
-   dmaClkRst   <= (others=>sysClk125Rst);
+   dmaClk      <= (others=>sysClk200);
+   dmaClkRst   <= (others=>sysClk200Rst);
    dmaIbMaster(2 downto 1) <= dmaObMaster(2 downto 1);
    dmaObSlave(2 downto 1)  <= dmaIbSlave(2 downto 1);
    dmaObSlave(0)           <= AXI_STREAM_SLAVE_FORCE_C;
@@ -239,8 +239,8 @@ begin
             MASTER_AXI_STREAM_CONFIG_G => RCEG3_AXIS_DMA_CONFIG_C)
          port map (
             -- Master Port (mAxisClk)
-            mAxisClk        => sysClk125,
-            mAxisRst        => sysClk125Rst,
+            mAxisClk        => sysClk200,
+            mAxisRst        => sysClk200Rst,
             mAxisMaster     => prbsAxisMaster(i),
             mAxisSlave      => prbsAxisSlave(i),
             locClk          => axiClk,
@@ -261,8 +261,8 @@ begin
          ILEAVE_EN_G    => true,
          ILEAVE_REARB_G => 128)
       port map (
-         axisClk      => sysClk125,
-         axisRst      => sysClk125Rst,
+         axisClk      => sysClk200,
+         axisRst      => sysClk200Rst,
          sAxisMasters => prbsAxisMaster,
          sAxisSlaves  => prbsAxisSlave,
          mAxisMaster  => dmaIbMaster(0),
