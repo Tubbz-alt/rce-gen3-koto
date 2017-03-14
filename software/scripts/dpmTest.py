@@ -10,10 +10,13 @@ import rceg3
 import atexit
 import time
 import logging
+import sys
+import rogue
 
-logging.getLogger("pyre").setLevel(logging.DEBUG)
+logging.getLogger("pyre").setLevel(logging.INFO)
 logging.getLogger("pyrogue").setLevel(logging.INFO)
-logging.getLogger("pyrogue.rce").setLevel(logging.DEBUG)
+#rogue.Logging.setLevel(logging.DEBUG)
+#logging.getLogger("pyrogue.rce").setLevel(logging.DEBUG)
 
 # Set base
 dpmTest = pyrogue.Root('dpmTest','DPM Test Image')
@@ -56,4 +59,19 @@ def stop():
 
 # Start with ipython -i scripts/evalBoard.py
 print("Started rogue mesh and epics V3 server. To exit type stop()")
+
+f = open('none_log.txt','w')
+cnt = 0
+
+while True:
+    time.sleep(1)
+#    cnt += 1
+#    tot = 0
+#    for i in range(0,8):
+#       tot += dpmTest.prbsRx[i].rxCount.get()
+#
+#    msg = "%i %i %i" % (cnt,tot,sys.getrefcount(None))
+#    print(msg)
+#    f.write(msg + "\n")
+#    f.flush()
 

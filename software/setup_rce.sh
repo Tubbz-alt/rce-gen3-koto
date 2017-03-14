@@ -1,7 +1,7 @@
 
 # Setup environment
 source /mnt/host/epics/base-3.15.1/settings.sh
-source /mnt/host/rogue/setup_rce.sh
+source /mnt/host/rogue/v1.2.0/setup_env.sh
 
 # Package directories
 export SURF_DIR=${PWD}/../submodules/surf/
