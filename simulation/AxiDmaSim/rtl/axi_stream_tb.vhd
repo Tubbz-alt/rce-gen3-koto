@@ -42,8 +42,8 @@ architecture axi_stream_tb of axi_stream_tb is
    signal sAxisSlave      : AxiStreamSlaveArray(CHAN_COUNT_C-1 downto 0);
    signal mAxisMaster     : AxiStreamMasterArray(CHAN_COUNT_C-1 downto 0);
    signal mAxisSlave      : AxiStreamSlaveArray(CHAN_COUNT_C-1 downto 0);
-   signal prbsAxisMaster  : AxiStreamMasterArray(1 downto 0);
-   signal prbsAxisSlave   : AxiStreamSlaveArray(1 downto 0);
+   signal prbsAxisMaster  : AxiStreamMasterArray(7 downto 0);
+   signal prbsAxisSlave   : AxiStreamSlaveArray(7 downto 0);
    signal mAxisCtrl       : AxiStreamCtrlArray(CHAN_COUNT_C-1 downto 0);
    signal axiReadMaster   : AxiReadMasterArray(CHAN_COUNT_C downto 0);
    signal axiReadSlave    : AxiReadSlaveArray(CHAN_COUNT_C downto 0);
@@ -68,19 +68,22 @@ begin
       wait;
    end process;
 
-   process begin
-      locClk <= '1';
-      wait for 10 ns;
-      locClk <= '0';
-      wait for 10 ns;
-   end process;
+   locClk <= axiClk;
+   locRst <= locRst;
 
-   process begin
-      locRst <= '1';
-      wait for (100 ns);
-      locRst <= '0';
-      wait;
-   end process;
+--   process begin
+--      locClk <= '1';
+--      wait for 10 ns;
+--      locClk <= '0';
+--      wait for 10 ns;
+--   end process;
+--
+--   process begin
+--      locRst <= '1';
+--      wait for (100 ns);
+--      locRst <= '0';
+--      wait;
+--   end process;
 
    U_AxiStreamDmaV2: entity work.AxiStreamDmaV2 
       generic map (
@@ -133,7 +136,8 @@ begin
       U_WriteTest: entity work.AxiWriteEmulate
          generic map (
             TPD_G        => 1 ns,
-            LATENCY_G    => 31,
+            --LATENCY_G    => 31,
+            LATENCY_G    => 0,
             AXI_CONFIG_G => AXI_HP_INIT_C,
             SIM_DEBUG_G  => true)
          port map (
@@ -154,7 +158,7 @@ begin
       axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060020", x"00000000", true); -- Fifo reset
       axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060000", x"00000001", true); -- Enable
 
-      for i in 0 to 8 loop
+      for i in 0 to 16 loop
          axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00060048", toSlv(i,32), true); -- write FIFO
          axiLiteBusSimWrite ( axiClk, axilWriteMaster, axilWriteSlave, x"00064000" + (toSlv(i,8) & "00"), toSlv(1024+i*8,32), true); -- addr table
       end loop;
@@ -192,7 +196,7 @@ begin
    axiWriteCtrl     <= (others=>AXI_CTRL_INIT_C);
 
 
-   U_PrbsGen: for i in 0 to 1 generate
+   U_PrbsGen: for i in 0 to 7 generate
       U_Prbs: entity work.SsiPrbsTx
          generic map (
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
@@ -213,7 +217,7 @@ begin
 
    U_PrbsMux: entity work.AxiStreamMux
       generic map (
-         NUM_SLAVES_G   => 2,
+         NUM_SLAVES_G   => 8,
          MODE_G         => "INDEXED",
          TDEST_LOW_G    => 0,
          ILEAVE_EN_G    => true,

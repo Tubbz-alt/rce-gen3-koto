@@ -1,5 +1,5 @@
 # Define Firmware Version Number
-export PRJ_VERSION = 0xDA100413
+export PRJ_VERSION = 0xDA100414
 
 # 412 = stable axis v2
 # 413 = axis v1 cache setting test
@@ -7,7 +7,7 @@ export PRJ_VERSION = 0xDA100413
 # Define target output
 target: bit
 
-#export GIT_BYPASS = 1
+export GIT_BYPASS = 1
 
 # Define target part
 export PRJ_PART = XC7Z045FFG900-2

@@ -226,16 +226,16 @@ begin
    --------------------------------------------------
    dmaClk      <= (others=>sysClk200);
    dmaClkRst   <= (others=>sysClk200Rst);
-   dmaIbMaster(2 downto 1) <= dmaObMaster(2 downto 1);
-   dmaObSlave(2 downto 1)  <= dmaIbSlave(2 downto 1);
-   dmaObSlave(0)           <= AXI_STREAM_SLAVE_FORCE_C;
+   dmaIbMaster(1 downto 0) <= dmaObMaster(1 downto 0);
+   dmaObSlave(1 downto 0)  <= dmaIbSlave(1 downto 0);
+   dmaObSlave(2)           <= AXI_STREAM_SLAVE_FORCE_C;
 
    U_PrbsGen: for i in 0 to 7 generate
       U_Prbs: entity work.SsiPrbsTx
          generic map (
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
             GEN_SYNC_FIFO_G            => false,
-            VALID_THOLD_G              => 128,
+            VALID_THOLD_G              => 384,
             MASTER_AXI_STREAM_CONFIG_G => RCEG3_AXIS_DMA_CONFIG_C)
          port map (
             -- Master Port (mAxisClk)
@@ -259,14 +259,14 @@ begin
          MODE_G         => "INDEXED",
          TDEST_LOW_G    => 0,
          ILEAVE_EN_G    => true,
-         ILEAVE_REARB_G => 128)
+         ILEAVE_REARB_G => 0)
       port map (
          axisClk      => sysClk200,
          axisRst      => sysClk200Rst,
          sAxisMasters => prbsAxisMaster,
          sAxisSlaves  => prbsAxisSlave,
-         mAxisMaster  => dmaIbMaster(0),
-         mAxisSlave   => dmaIbSlave(0));
+         mAxisMaster  => dmaIbMaster(2),
+         mAxisSlave   => dmaIbSlave(2));
 
    --------------------------------------------------
    -- Timing Signals
