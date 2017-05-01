@@ -19,16 +19,16 @@ open_run synth_1
 set netFile ${PROJ_DIR}/net_log.txt
 set fd [open ${netFile} "w"]
 set nl ""
-
-append nl [get_nets {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaWrite/*}]
-append nl [get_nets {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_ChanGen[0].U_DmaRead/*}]
-append nl [get_nets {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_V2Gen/U_DmaDesc/*}]
+append nl [get_nets {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_Gen2Dma[2].U_RceG3DmaAxisChan/U_AxiStreamDmaV2/U_DmaDesc}]
+append nl [get_nets {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_Gen2Dma[2].U_RceG3DmaAxisChan/U_AxiStreamDmaV2/U_ChanGen[0].U_DmaRead} ]
+append nl [get_nets {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_AxisV2DmaGen.U_RceG3DmaAxisV2/U_Gen2Dma[2].U_RceG3DmaAxisChan/U_AxiStreamDmaV2/U_ChanGen[0].U_DmaWrite} ]
 append nl [get_nets *]
 
 regsub -all -line { } $nl "\n" nl
 puts $fd $nl
 close $fd
 
+exit 
 ## Setup configurations
 set ilaName u_ila_0
 
