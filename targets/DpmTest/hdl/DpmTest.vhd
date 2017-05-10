@@ -80,14 +80,14 @@ architecture STRUCTURE of DpmTest is
    signal extAxilReadSlave   : AxiLiteReadSlaveType;
    signal extAxilWriteMaster : AxiLiteWriteMasterType;
    signal extAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal locAxilReadMaster  : AxiLiteReadMasterArray(3 downto 0);
-   signal locAxilReadSlave   : AxiLiteReadSlaveArray(3 downto 0);
-   signal locAxilWriteMaster : AxiLiteWriteMasterArray(3 downto 0);
-   signal locAxilWriteSlave  : AxiLiteWriteSlaveArray(3 downto 0);
-   signal prbAxilReadMaster  : AxiLiteReadMasterArray(1 downto 0);
-   signal prbAxilReadSlave   : AxiLiteReadSlaveArray(1 downto 0);
-   signal prbAxilWriteMaster : AxiLiteWriteMasterArray(1 downto 0);
-   signal prbAxilWriteSlave  : AxiLiteWriteSlaveArray(1 downto 0);
+   signal locAxilReadMaster  : AxiLiteReadMasterArray(5 downto 0);
+   signal locAxilReadSlave   : AxiLiteReadSlaveArray(5 downto 0);
+   signal locAxilWriteMaster : AxiLiteWriteMasterArray(5 downto 0);
+   signal locAxilWriteSlave  : AxiLiteWriteSlaveArray(5 downto 0);
+   signal prbAxilReadMaster  : AxiLiteReadMasterArray(3 downto 0);
+   signal prbAxilReadSlave   : AxiLiteReadSlaveArray(3 downto 0);
+   signal prbAxilWriteMaster : AxiLiteWriteMasterArray(3 downto 0);
+   signal prbAxilWriteSlave  : AxiLiteWriteSlaveArray(3 downto 0);
    signal dmaClk             : slv(2 downto 0);
    signal dmaClkRst          : slv(2 downto 0);
    signal dmaState           : RceDmaStateArray(2 downto 0);
@@ -95,8 +95,8 @@ architecture STRUCTURE of DpmTest is
    signal dmaObSlave         : AxiStreamSlaveArray(2 downto 0);
    signal dmaIbMaster        : AxiStreamMasterArray(2 downto 0);
    signal dmaIbSlave         : AxiStreamSlaveArray(2 downto 0);
-   signal prbsAxisMaster     : AxiStreamMasterArray(1 downto 0);
-   signal prbsAxisSlave      : AxiStreamSlaveArray(1 downto 0);
+   signal prbsAxisMaster     : AxiStreamMasterArray(3 downto 0);
+   signal prbsAxisSlave      : AxiStreamSlaveArray(3 downto 0);
    signal iethRxP            : slv(3 downto 0);
    signal iethRxM            : slv(3 downto 0);
    signal iethTxP            : slv(3 downto 0);
@@ -167,7 +167,7 @@ begin
       generic map (
          TPD_G              => TPD_C,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 4,
+         NUM_MASTER_SLOTS_G => 6,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,
          MASTERS_CONFIG_G   => (
 
@@ -184,6 +184,14 @@ begin
                    connectivity => x"FFFF"),
 
             3 => ( baseAddr     => x"A0030000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            4 => ( baseAddr     => x"A0040000",
+                   addrBits     => 16,
+                   connectivity => x"FFFF"),
+
+            5 => ( baseAddr     => x"A0050000",
                    addrBits     => 16,
                    connectivity => x"FFFF")
          )
@@ -206,16 +214,17 @@ begin
    --------------------------------------------------
    dmaClk      <= (others=>sysClk200);
    dmaClkRst   <= (others=>sysClk200Rst);
-   dmaIbMaster(1 downto 0) <= dmaObMaster(1 downto 0);
-   dmaObSlave(1 downto 0)  <= dmaIbSlave(1 downto 0);
-   dmaObSlave(2)           <= AXI_STREAM_SLAVE_FORCE_C;
+   dmaIbMaster(1) <= dmaObMaster(1);
+   dmaObSlave(1)  <= dmaIbSlave(1);
+   dmaObSlave(2)  <= AXI_STREAM_SLAVE_FORCE_C;
 
-   U_PrbsGen: for i in 0 to 1 generate
+   U_PrbsGen: for i in 0 to 3 generate
       U_SsiPrbsRateGen: entity work.SsiPrbsRateGen
          generic map (
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
-            VALID_THOLD_G              => 64,
-            FIFO_ADDR_WIDTH_G          => 9,
+            VALID_THOLD_G              => 128,
+            VALID_BURST_MODE_G         => true,
+            FIFO_ADDR_WIDTH_G          => 10,
             AXIS_CLK_FREQ_G            => 200.0E+6,
             AXIS_CONFIG_G              => RCEG3_AXIS_DMA_CONFIG_C)
          port map (
@@ -246,20 +255,37 @@ begin
 
    end generate;
 
-   U_PrbsMux: entity work.AxiStreamMux
+   U_PrbsMuxA: entity work.AxiStreamMux
       generic map (
          NUM_SLAVES_G   => 2,
          MODE_G         => "INDEXED",
          TDEST_LOW_G    => 0,
          ILEAVE_EN_G    => true,
-         ILEAVE_REARB_G => 32)
+         --ILEAVE_REARB_G => 64)
+         ILEAVE_REARB_G => 0)
       port map (
          axisClk      => sysClk200,
          axisRst      => sysClk200Rst,
-         sAxisMasters => prbsAxisMaster,
-         sAxisSlaves  => prbsAxisSlave,
+         sAxisMasters => prbsAxisMaster(1 downto 0),
+         sAxisSlaves  => prbsAxisSlave(1 downto 0),
          mAxisMaster  => dmaIbMaster(2),
          mAxisSlave   => dmaIbSlave(2));
+
+   U_PrbsMuxB: entity work.AxiStreamMux
+      generic map (
+         NUM_SLAVES_G   => 2,
+         MODE_G         => "INDEXED",
+         TDEST_LOW_G    => 0,
+         ILEAVE_EN_G    => true,
+         --ILEAVE_REARB_G => 64)
+         ILEAVE_REARB_G => 0)
+      port map (
+         axisClk      => sysClk200,
+         axisRst      => sysClk200Rst,
+         sAxisMasters => prbsAxisMaster(3 downto 2),
+         sAxisSlaves  => prbsAxisSlave(3 downto 2),
+         mAxisMaster  => dmaIbMaster(0),
+         mAxisSlave   => dmaIbSlave(0));
 
    --------------------------------------------------
    -- Timing Signals
