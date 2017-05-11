@@ -51,7 +51,7 @@ ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPp
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tData][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tDest][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tLast]}
-ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tStrb][*]}
+ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tkeep][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tUser][*]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisMaster[tValid]}
 ConfigProbe ${ilaName} {U_DpmCore/U_RceG3Top/U_RceG3Dma/U_PpiDmaGen.U_RceG3DmaPpi/U_PpiGen[0].U_PpiSocket/U_IbPayload/U_WrDma/axisSlave[tReady]}
