@@ -3,6 +3,7 @@ export PRJ_VERSION = 0xAA000001
 
 export GIT_BYPASS=1
 
+# For cygwin compiles
 export PROJ_DIR = /cygwin64/$(PWD)
 
 # Define target output
