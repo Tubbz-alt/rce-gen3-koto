@@ -1,7 +1,9 @@
 # Define Firmware Version Number
 export PRJ_VERSION = 0xAA000001
 
-GIT_BYPASS=1
+export GIT_BYPASS=1
+
+export PROJ_DIR = /cygwin64/$(PWD)
 
 # Define target output
 target: bit
