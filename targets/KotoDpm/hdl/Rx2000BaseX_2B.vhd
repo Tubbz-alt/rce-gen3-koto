@@ -82,10 +82,10 @@ architecture rtl of Rx2000BaseX is
 -- MT added
     signal ilaclk : sl;
     signal dbgtrg : sl;
-    attribute mark_debug of dbgtrg : signal is "true";
+    --attribute mark_debug of dbgtrg : signal is "true";
     
     signal stateProbe : slv(1 downto 0);
-    attribute mark_debug of stateProbe : signal is "true";
+    --attribute mark_debug of stateProbe : signal is "true";
     
     -- Integrated Logic Analyzer used for debugging on RX recovered clock
     COMPONENT ila_Rx2000
@@ -327,9 +327,10 @@ begin
                    txResetDoneOut=> txResetDone(i),
                    txDataIn      => txData(i),
                    txCharIsKIn   => txDataK(i),
-                   loopbackIn    => rAxi.loopback,
-                   debugOut      => gtxDebugT(i) );
+                   loopbackIn    => rAxi.loopback);
+                   --debugOut      => gtxDebugT(i) );
     
+        gtxDebugT(i) <= (others=>'0');
         txData(i) <= rTx.txLength when rTx.txEn='1' else
                 x"50BC";
         txDataK(i) <= "00" when rTx.txEn='1' else
@@ -433,7 +434,9 @@ begin
     -- Responsible for responding to registers 
     -------------------------------------------
     combAxi : process (axilReadMaster, axilWriteMaster, locRst, rAxi,
-                       eventCnt, dataCnt, dropCnt, txStatus, txStatusCnt, rxStatus, rxStatusCnt, gtxDebugO) is
+                       eventCnt, dataCnt, dropCnt, txStatus, txStatusCnt, rxStatus, rxStatusCnt, gtxDebugO,
+                       dbgRdEmpty, dbgRdData, txDbgRdEmpty, txDbgRdData, rxEnable, dbgRst, rxClkEn, txCtrl,
+                       rxDv, rxEnable, dstMac, ethType, rxData ) is
         variable v             : RegTypeAxi;
         variable axilStatus    : AxiLiteStatusType;
         variable axilWriteResp : slv(1 downto 0);
@@ -551,7 +554,7 @@ begin
 
 
 -- MT added, to hold rxEnable HIGH after write to 0x34 until write to 0x38 
-   fdrce : process(rxClr,locClk) is  --process with sensitivity list.
+   fdrce : process(rxClr,locClk,dbgRst,rxClkEn) is  --process with sensitivity list.
    begin  --"begin" statement for the process. 
      if (rxClr = '1' or dbgRst = '1') then  --Asynchronous clear input
            rxEnable <= '0';
@@ -563,7 +566,7 @@ begin
    end process fdrce;  --end of process statement.
 
 
-    combTx : process (rTx) is
+    combTx : process (rTx,txPacket) is
         variable v : RegTypeTx;
     begin
         -- Latch the current value
@@ -584,7 +587,7 @@ begin
         rTxIn <= v;
     end process combTx;
 
-    combRx : process (rRx) is
+    combRx : process (rRx,txCtrl,rxDv,rxEnable,dstMac,ethType,rxData) is
         variable v : RegTypeRx;
         --variable v : rRxArray;
         variable txAxisMaster : AxiStreamMasterType;
@@ -596,6 +599,8 @@ begin
         ssiResetFlags(txAxisMaster);
         txAxisMaster.tData := (others => '0');
         txAxisMaster.tValid := '0';
+        txAxisMaster.tDest := x"00";
+        txAxisMaster.tId   := x"00";
 
         -- Check for overflow condition or forced EOFE
         if (txCtrl.overflow = '1') then

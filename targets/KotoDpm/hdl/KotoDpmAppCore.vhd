@@ -46,8 +46,8 @@ entity KotoDpmAppCore is
       rtmToDpmHsP        : in  slv(NUM_RX_LANES-1 downto 0);
       rtmToDpmHsM        : in  slv(NUM_RX_LANES-1 downto 0);
       -- DTM Signals
-      dtmRefClkP         : in  sl;
-      dtmRefClkM         : in  sl;
+      --dtmRefClkP         : in  sl;
+      --dtmRefClkM         : in  sl;
       dtmClkP            : in  slv(1 downto 0);
       dtmClkM            : in  slv(1 downto 0);
       dtmFbP             : out sl;
@@ -90,8 +90,8 @@ architecture mapping of KotoDpmAppCore is
    
    signal extAxilReadSlaveProbe  : AxiLiteReadSlaveType;
    signal extAxilWriteSlaveProbe : AxiLiteWriteSlaveType;  
-   attribute mark_debug of extAxilReadSlaveProbe : signal is "true";
-   attribute mark_debug of extAxilWriteSlaveProbe : signal is "true";
+   --attribute mark_debug of extAxilReadSlaveProbe : signal is "true";
+   --attribute mark_debug of extAxilWriteSlaveProbe : signal is "true";
 
    signal userWriteMasterProbe : AxiWriteMasterType;
 
@@ -99,7 +99,7 @@ architecture mapping of KotoDpmAppCore is
    signal sysRst : sl;
 
    signal dbgout: sl;
-   attribute mark_debug of dbgout : signal is "true";
+   --attribute mark_debug of dbgout : signal is "true";
 
    signal resetfifos: sl;
    

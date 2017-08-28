@@ -29,19 +29,21 @@ use work.Config.all;
 use work.EthMacPkg.all;
 
 entity KotoDpm is
+   generic (
+      BUILD_INFO_G    : BuildInfoType);
    port (
       -- Debug
-      led        : out   slv(1 downto 0);
+      led         : out   slv(1 downto 0);
       -- I2C
-      i2cSda     : inout sl;
-      i2cScl     : inout sl;
+      i2cSda      : inout sl;
+      i2cScl      : inout sl;
       -- Ethernet: (3 downto 0) for 10Gb
-      ethRxP     : in    slv(3 downto 0);
-      ethRxM     : in    slv(3 downto 0);
-      ethTxP     : out   slv(3 downto 0);
-      ethTxM     : out   slv(3 downto 0);
-      ethRefClkP : in    sl;
-      ethRefClkM : in    sl;
+      ethRxP      : in    slv(3 downto 0);
+      ethRxM      : in    slv(3 downto 0);
+      ethTxP      : out   slv(3 downto 0);
+      ethTxM      : out   slv(3 downto 0);
+      ethRefClkP  : in    sl;
+      ethRefClkM  : in    sl;
       -- -- RTM High Speed
 --      dpmToRtmHsP : out   slv(0 downto 0);
 --      dpmToRtmHsM : out   slv(0 downto 0);
@@ -52,18 +54,18 @@ entity KotoDpm is
       rtmToDpmHsP : in    slv(NUM_RX_LANES-1 downto 0);
       rtmToDpmHsM : in    slv(NUM_RX_LANES-1 downto 0);
       -- Reference Clocks
-      locRefClkP : in    sl;
-      locRefClkM : in    sl;
+      locRefClkP  : in    sl;
+      locRefClkM  : in    sl;
       -- DTM Signals
-      dtmRefClkP : in    sl;
-      dtmRefClkM : in    sl;
-      dtmClkP    : in    slv(1 downto 0);
-      dtmClkM    : in    slv(1 downto 0);
-      dtmFbP     : out   sl;
-      dtmFbM     : out   sl;
+      dtmRefClkP  : in    sl;
+      dtmRefClkM  : in    sl;
+      dtmClkP     : in    slv(1 downto 0);
+      dtmClkM     : in    slv(1 downto 0);
+      dtmFbP      : out   sl;
+      dtmFbM      : out   sl;
       -- Clock Select
-      clkSelA    : out   slv(1 downto 0);
-      clkSelB    : out   slv(1 downto 0));
+      clkSelA     : out   slv(1 downto 0);
+      clkSelB     : out   slv(1 downto 0));
 end KotoDpm;
 
 architecture TOP_LEVEL of KotoDpm is
@@ -76,17 +78,17 @@ architecture TOP_LEVEL of KotoDpm is
    signal sysClk200    : sl;
    signal sysClk200Rst : sl;
 
-  -- AXI-Lite
+   -- AXI-Lite
    signal axiClk            : sl;
    signal axiClkRst         : sl;
-   signal extAxilReadMaster : AxiLiteReadMasterType;
-   signal extAxilReadSlave  : AxiLiteReadSlaveType;
-   signal extAxilWriteMaster: AxiLiteWriteMasterType;
-   signal extAxilWriteSlave : AxiLiteWriteSlaveType;
+   signal extAxilReadMaster   : AxiLiteReadMasterType;
+   signal extAxilReadSlave    : AxiLiteReadSlaveType;
+   signal extAxilWriteMaster  : AxiLiteWriteMasterType;
+   signal extAxilWriteSlave   : AxiLiteWriteSlaveType;
 
    -- DMA
-   signal dmaClk    : slv(2 downto 0);
-   signal dmaClkRst : slv(2 downto 0);
+   signal dmaClk      : slv(2 downto 0);
+   signal dmaClkRst   : slv(2 downto 0);
    signal dmaState    : RceDmaStateArray(2 downto 0);     -- added as in Dpm10GAxi
    signal dmaObMaster : AxiStreamMasterArray(2 downto 0);
    signal dmaObSlave  : AxiStreamSlaveArray(2 downto 0);
@@ -107,7 +109,7 @@ architecture TOP_LEVEL of KotoDpm is
    attribute KEEP_HIERARCHY              : string;
    attribute KEEP_HIERARCHY of U_DpmCore : label is "TRUE";
    attribute KEEP_HIERARCHY of U_AppCore : label is "TRUE";
-   
+
    -- User loopback
    signal userEthObMaster : AxiStreamMasterType;
    signal userEthObSlave  : AxiStreamSlaveType;
@@ -122,6 +124,7 @@ begin
    U_DpmCore : entity work.DpmCore
       generic map (
          TPD_G          => TPD_C,
+         BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
 --         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
          OLD_BSI_MODE_G => false,
@@ -179,7 +182,7 @@ begin
          -- User Interrupts
          userInterrupt      => (others => '0')
          );  
-         
+
 --   -- 1 GigE Mapping
 --   ethTxP(0)           <= iethTxP(0);
 --   ethTxM(0)           <= iethTxM(0);
@@ -193,7 +196,7 @@ begin
    ethTxM           <= iethTxM;
    iethRxP          <= ethRxP;
    iethRxM          <= ethRxM;
-   
+
    --------------------------------------------------
    -- Application Core Module
    --------------------------------------------------
@@ -212,8 +215,8 @@ begin
          rtmToDpmHsP        => rtmToDpmHsP,
          rtmToDpmHsM        => rtmToDpmHsM,
          -- DTM Signals
-         dtmRefClkP         => dtmRefClkP,
-         dtmRefClkM         => dtmRefClkM,
+         --dtmRefClkP         => dtmRefClkP,
+         --dtmRefClkM         => dtmRefClkM,
          dtmClkP            => dtmClkP,
          dtmClkM            => dtmClkM,
          dtmFbP             => dtmFbP,
@@ -243,11 +246,11 @@ begin
          userReadSlave      => userReadSlave,
          userReadMaster     => userReadMaster 
     );  
-         
+
     -------------------------
     -- User Ethernet loopback (as in Dpm10GAxi)
     -------------------------
     userEthIbMaster <= userEthObMaster;
     userEthObSlave  <= userEthIbSlave;
-           
+
 end architecture TOP_LEVEL;

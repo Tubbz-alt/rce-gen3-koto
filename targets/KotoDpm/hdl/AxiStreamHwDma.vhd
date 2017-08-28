@@ -83,9 +83,9 @@ architecture structure of AxiStreamHwDma is
       signal axilWriteSlaveProbe: AxiLiteWriteSlaveType;
    
       signal ibstateProbe  : slv(1 downto 0);
-      attribute mark_debug of ibstateProbe : signal is "true";
+      --attribute mark_debug of ibstateProbe : signal is "true";
       signal obstateProbe  : slv(1 downto 0);
-      attribute mark_debug of obstateProbe : signal is "true";
+      --attribute mark_debug of obstateProbe : signal is "true";
    
       signal sAxisSlaveProbe: AxiStreamSlaveType;
       signal axiWriteMasterProbe  : AxiWriteMasterType;
@@ -380,7 +380,7 @@ begin
    end process;
 
    -- Async
-   process (ib, r, axiRst, fifoReset, ibAck, freeListEmpty, freeListDout, pendListFull ) is
+   process (ib, r, axiRst, fifoReset, ibAck, freeListEmpty, freeListDout, pendListFull, maxSize, freeLoadEmpty, freeLoadDout ) is
       variable v : IbType;
    begin
       v := ib;
