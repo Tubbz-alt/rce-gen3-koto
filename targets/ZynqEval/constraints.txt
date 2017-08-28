@@ -1,2 +1,0 @@
-../../modules/EvalCore/hdl/EvalCore.xdc
-hdl/ZynqEval.xdc

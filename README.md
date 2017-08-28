@@ -1,6 +1,6 @@
-# rce-gen3-fw-examples
+# rce-gen3-koto
 
-Example Firmware Targets for the RCE Platform
+KOTO Firmware Targets for the RCE Platform
 
 # Before you clone the GIT repository
 
@@ -17,4 +17,4 @@ Example Firmware Targets for the RCE Platform
 > $ git lfs install
 
 # Clone the GIT repository
-> $ git clone --recursive git@github.com:slaclab/rce-gen3-fw-examples
+> $ git clone --recursive git@github.com:slaclab/rce-gen3-koto
