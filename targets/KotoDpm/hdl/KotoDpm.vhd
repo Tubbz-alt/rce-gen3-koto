@@ -1,15 +1,15 @@
 -------------------------------------------------------------------------------
--- Title      : 
+-- Title      :
 -------------------------------------------------------------------------------
 -- File       : KotoDpm.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-13
 -- Last update: 2017-07-05   M. Tecchio, following Dpm10GAxi.vhd from rherbst rcde/dpm_stable/Dpm10GAxi
--- Platform   : 
+-- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- Copyright (c) 2015 SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
@@ -110,13 +110,16 @@ architecture TOP_LEVEL of KotoDpm is
    attribute KEEP_HIERARCHY of U_DpmCore : label is "TRUE";
    attribute KEEP_HIERARCHY of U_AppCore : label is "TRUE";
 
-   -- User loopback
+   -- User 10Gb loopback: now used since KotoDpm_10G
    signal userEthObMaster : AxiStreamMasterType;
    signal userEthObSlave  : AxiStreamSlaveType;
    signal userEthIbMaster : AxiStreamMasterType;
    signal userEthIbSlave  : AxiStreamSlaveType;
 
 begin
+
+   userEthObSlave   <= AXI_STREAM_SLAVE_INIT_C;
+--   userEthIbSlave   <= AXI_STREAM_SLAVE_FORCE_C;
 
    --------------------------------------------------
    -- Core
@@ -130,7 +133,7 @@ begin
          OLD_BSI_MODE_G => false,
 --         ETH_10G_EN_G   => false,
          ETH_10G_EN_G   => true,
-         AXI_ST_COUNT_G => 3, 
+         AXI_ST_COUNT_G => 3,
  -- added as is in Dpm10GAxi.vdh
 		 UDP_SERVER_EN_G    => true,
          UDP_SERVER_SIZE_G  => 1,
@@ -138,7 +141,7 @@ begin
          BYP_EN_G           => false,
          BYP_ETH_TYPE_G     => x"AAAA",
          VLAN_EN_G          => false,
-         VLAN_SIZE_G        => 1)         
+         VLAN_SIZE_G        => 1)
       port map (
          -- I2C
          i2cSda             => i2cSda,
@@ -180,8 +183,8 @@ begin
          userReadSlave      => userReadSlave,
          userReadMaster     => userReadMaster,
          -- User Interrupts
-         userInterrupt      => (others => '0')
-         );  
+         userInterrupt      => (others => '0')  -- force inputs
+         );
 
 --   -- 1 GigE Mapping
 --   ethTxP(0)           <= iethTxP(0);
@@ -206,7 +209,7 @@ begin
       port map (
          -- Debug
          led                => led,
-         -- 250 MHz Reference Oscillator 
+         -- 250 MHz Reference Oscillator
          locRefClkP         => locRefClkP,
          locRefClkM         => locRefClkM,
          -- -- RTM High Speed
@@ -215,8 +218,8 @@ begin
          rtmToDpmHsP        => rtmToDpmHsP,
          rtmToDpmHsM        => rtmToDpmHsM,
          -- DTM Signals
-         --dtmRefClkP         => dtmRefClkP,
-         --dtmRefClkM         => dtmRefClkM,
+         dtmRefClkP         => dtmRefClkP,
+         dtmRefClkM         => dtmRefClkM,
          dtmClkP            => dtmClkP,
          dtmClkM            => dtmClkM,
          dtmFbP             => dtmFbP,
@@ -233,24 +236,30 @@ begin
          extAxilReadSlave   => extAxilReadSlave,
          extAxilWriteMaster => extAxilWriteMaster,
          extAxilWriteSlave  => extAxilWriteSlave,
-         -- DMA Interfaces
+         -- DMA Interfaces (built-in)
          dmaClk             => dmaClk,
          dmaRst             => dmaClkRst,
          dmaObMaster        => dmaObMaster,
          dmaObSlave         => dmaObSlave,
          dmaIbMaster        => dmaIbMaster,
          dmaIbSlave         => dmaIbSlave,
-         -- User memory access (for 10Gb Eth communication to CI)
+         -- User 10Gb Ethernet UDP access
+         userEthObMaster   => userEthObMaster,
+         userEthObSlave    => userEthObSlave,
+         userEthIbMaster   => userEthIbMaster,
+         userEthIbSlave    => userEthIbSlave,
+         -- Direct DMA access (for 10Gb Eth communication to CI)
          userWriteSlave     => userWriteSlave,
          userWriteMaster    => userWriteMaster,
          userReadSlave      => userReadSlave,
-         userReadMaster     => userReadMaster 
-    );  
+         userReadMaster     => userReadMaster
+    );
 
     -------------------------
     -- User Ethernet loopback (as in Dpm10GAxi)
+    -- from KotoDpm_10G, connected to DMA Read signals from KotoDpmAppCore
     -------------------------
-    userEthIbMaster <= userEthObMaster;
-    userEthObSlave  <= userEthIbSlave;
+--    userEthIbMaster <= userEthObMaster;
+--    userEthObSlave  <= userEthIbSlave;
 
 end architecture TOP_LEVEL;

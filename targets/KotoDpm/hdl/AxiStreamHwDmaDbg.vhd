@@ -6,7 +6,7 @@
 -- Author     : Ryan Herbst, rherbst@slac.stanford.edu
 -- Created    : 2014-04-25
 -- Last update: 2015-12-18
--- Platform   :
+-- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:
@@ -29,7 +29,7 @@ use work.AxiLitePkg.all;
 use work.AxiPkg.all;
 use work.AxiDmaPkg.all;
 
-entity AxiStreamHwDma is
+entity AxiStreamHwDmaDbg is
    generic (
       TPD_G             : time                 := 1 ns;
       FREE_ADDR_WIDTH_G : integer              := 9;
@@ -48,7 +48,7 @@ entity AxiStreamHwDma is
       axiRst          : in  sl;
 
       obReady         : in  sl;
-
+      
       -- Register Access & Interrupt
       axilClk         : in  sl;  -- connected sysClk125:  needed for axi Lite signals
       axilRst         : in  sl;
@@ -57,7 +57,7 @@ entity AxiStreamHwDma is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
 
-      -- SSI
+      -- SSI 
       sAxisMaster     : in  AxiStreamMasterType;
       sAxisSlave      : out AxiStreamSlaveType;
       mAxisMaster     : out AxiStreamMasterType;
@@ -69,14 +69,42 @@ entity AxiStreamHwDma is
       axiReadSlave    : in  AxiReadSlaveType;
       axiWriteMaster  : out AxiWriteMasterType;
       axiWriteSlave   : in  AxiWriteSlaveType;
-      axiWriteCtrl    : in  AxiCtrlType
+      axiWriteCtrl    : in  AxiCtrlType;
+      
+      dbgout          : in sl
    );
-end AxiStreamHwDma;
+end AxiStreamHwDmaDbg;
 
-architecture structure of AxiStreamHwDma is
+architecture structure of AxiStreamHwDmaDbg is
 
+   
+-- MT Added   
+      signal axilReadSlaveProbe:  AxiLiteReadSlaveType;
+      signal axilWriteSlaveProbe: AxiLiteWriteSlaveType;
+   
+      signal ibstateProbe  : slv(1 downto 0);
+      attribute mark_debug of ibstateProbe : signal is "true";
+      signal obstateProbe  : slv(1 downto 0);
+      attribute mark_debug of obstateProbe : signal is "true";
+   
+      signal sAxisSlaveProbe: AxiStreamSlaveType;
+      signal axiWriteMasterProbe  : AxiWriteMasterType;
+   
+      signal rdEnableProbe      : sl;   
+      signal wrEnableProbe      : sl;   
+
+      signal axiReadMasterProbe: AxiReadMasterType;
+      signal mAxisMasterProbe  : AxiStreamMasterType;
+      
+      component ila_AxiStreamDma
+       PORT ( clk         : IN STD_LOGIC;
+              trig_in     : IN STD_LOGIC;
+              probe0      : IN STD_LOGIC_VECTOR(699 DOWNTO 0) );
+      end component;
+-- end of MT added
+      
    constant countWidth : integer := 10;
-
+   
    type StateType is (S_IDLE_C, S_WAIT_C, S_FIFO_0_C, S_FIFO_1_C);
 
    type RegType is record
@@ -148,7 +176,7 @@ architecture structure of AxiStreamHwDma is
 
    signal fifoReset     : sl;
    signal maxSize       : slv(23 downto 0);
-
+   
    signal freeLoadEmpty : sl;
    signal freeLoadRd    : sl;
    signal freeLoadDout  : slv(31 downto 0);
@@ -162,7 +190,7 @@ architecture structure of AxiStreamHwDma is
    signal pendListDout  : slv(31 downto 0);
    signal pendListFull  : sl;
    signal pendListEmpty : sl;
-
+   
    signal obAck              : AxiReadDmaAckType;
    signal obReq              : AxiReadDmaReqType;
    signal ibAck              : AxiWriteDmaAckType;
@@ -184,7 +212,7 @@ begin
       rd_clk     => axiClk,
       rd_en      => freeLoadRd,
       dout       => freeLoadDout,
-      empty      => freeLoadEmpty );
+      empty      => freeLoadEmpty );  
 
   U_FreeList : entity work.FifoSync
     generic map (
@@ -204,7 +232,7 @@ begin
       din        => ob.freeListDin,
       dout       => freeListDout,
       prog_full  => freeListFull,  -- unused
---      prog_empty => freeListEmpty );
+--      prog_empty => freeListEmpty );  
       empty => freeListEmpty );  -- used in place of PushFifoValid[0]
 
   U_PendList : entity work.FifoSync
@@ -226,8 +254,8 @@ begin
       dout       => pendListDout,
       prog_full  => pendListFull,  -- used in place of popFifoPFull[0]
 --      prog_empty => pendListEmpty );
-      empty => pendListEmpty );   -- used in place of PushFifoValid[1]
-
+      empty => pendListEmpty );   -- used in place of PushFifoValid[1] 
+    
    -------------------------------------
    -- Local Register Space
    -------------------------------------
@@ -248,7 +276,7 @@ begin
       v := r;
       v.fifoClear := '0';
       v.fifoLoad  := '0';
-
+      
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axiWriteSlave, v.axiReadSlave, axiStatus);
 
       -- Write
@@ -263,11 +291,11 @@ begin
 --               v.buffAddr  := axilWriteMaster.wdata;
 --               v.fifoLoad  := '1';
 --  MT  after implementing RCE_HP driver
-            when "000" =>      -- driver write to 0x404
+            when "000" =>      -- driver write to 0x404 
                 v.rxEnable := axilWriteMaster.wdata(0);
-            when "001" =>      -- driver write to 0x404
+            when "001" =>      -- driver write to 0x404 
                 v.fifoClear := axilWriteMaster.wdata(0);
-            when "010" =>      -- driver write to 0x408
+            when "010" =>      -- driver write to 0x408 
                 v.maxRxSize := axilWriteMaster.wdata(23 downto 0);
             when "011" =>      -- driver write to 0x40C
                 v.buffAddr  := axilWriteMaster.wdata;
@@ -282,29 +310,29 @@ begin
       -- Read
       if (axiStatus.readEnable = '1') then  -- from AxiLitePkg/axiSlaveReadTxn
                                             --  readEnable = 1 if (RM)arvalid=1 && (RS)rvalid=0 (which requires (RM)rready=1!)
-
+                                                   
          v.axiReadSlave.rdata := (others=>'0');
 
-         case axilReadMaster.araddr(4 downto 2) is
+        case axilReadMaster.araddr(4 downto 2) is
 --            when "000" =>
 --               v.fifoClear := '1';
 --               v.maxRxSize := axilWriteMaster.wdata(23 downto 0);
 --            when "001" =>
 --               v.buffAddr  := axilWriteMaster.wdata;
 --               v.fifoLoad  := '1';
---  MT  after implementing RCE_HP driver
-            when "000" =>      -- driver write to 0x404
+--  MT  after implementing RCE_HP driver 
+            when "000" =>      -- driver write to 0x404 
                 v.axiReadSlave.rdata(0) := r.rxEnable;
                 v.axiReadSlave.rdata(4) := r.fifoLoad;
-            when "001" =>      -- driver write to 0x404
+            when "001" =>      -- driver write to 0x404 
                 v.axiReadSlave.rdata(0) := r.fifoClear;
-            when "010" =>      -- driver write to 0x408
+            when "010" =>      -- driver write to 0x408 
                 v.axiReadSlave.rdata(23 downto 0) := r.maxRxSize;
             when "011" =>      -- driver write to 0x40C
                 v.axiReadSlave.rdata := r.buffAddr;
             when others =>
-               null;
-         end case;
+                null;
+        end case;
 
          -- Send Axi Response
          axiSlaveReadResponse(v.axiReadSlave);
@@ -320,9 +348,14 @@ begin
       rin <= v;
 
       -- Outputs
-      axilReadSlave     <= r.axiReadSlave;
-      axilWriteSlave    <= r.axiWriteSlave;
+--      axilReadSlave     <= r.axiReadSlave;
+--      axilWriteSlave    <= r.axiWriteSlave;
+      axilReadSlaveProbe     <= r.axiReadSlave;
+      axilWriteSlaveProbe    <= r.axiWriteSlave;
 
+      rdEnableProbe         <= axiStatus.readEnable;
+      wrEnableProbe         <= axiStatus.writeEnable;
+     
    end process;
 
   U_SyncClear : entity work.SynchronizerOneShot
@@ -330,7 +363,7 @@ begin
      port map ( clk     => axiClk,
                 dataIn  => r.fifoClear,
                 dataOut => fifoReset );
-
+    
   U_SyncSize : entity work.SynchronizerVector
      generic map ( TPD_G     => TPD_G,
                    WIDTH_G   => 24 )
@@ -341,7 +374,7 @@ begin
    -------------------------------------
    -- Inbound Controller
    -------------------------------------
-   U_IbDma : entity work.AxiStreamDmaWrite
+   U_IbDma : entity work.AxiStreamDmaWriteKoto
       generic map (
          TPD_G            => TPD_G,
          AXI_READY_EN_G   => AXI_READY_EN_G,
@@ -355,8 +388,10 @@ begin
          dmaReq          => ibReq,
          dmaAck          => ibAck,
          axisMaster      => sAxisMaster,
-         axisSlave       => sAxisSlave,
-         axiWriteMaster  => axiWriteMaster,
+--         axisSlave       => sAxisSlave,
+         axisSlave       => sAxisSlaveProbe,
+--         axiWriteMaster  => axiWriteMaster,
+         axiWriteMaster  => axiWriteMasterProbe,
          axiWriteSlave   => axiWriteSlave,
          axiWriteCtrl    => axiWriteCtrl
       );
@@ -370,7 +405,7 @@ begin
    end process;
 
    -- Async
-   process (ib, r, axiRst, fifoReset, ibAck, freeListEmpty, freeListDout, pendListFull, maxSize, freeLoadEmpty, freeLoadDout) is
+   process (ib, r, axiRst, fifoReset, ibAck, freeListEmpty, freeListDout, pendListFull ) is
       variable v : IbType;
    begin
       v := ib;
@@ -425,7 +460,7 @@ begin
             v.state                     := S_IDLE_C;
 
          when others => null;
-
+                        
       end case;
 
       -- Reset
@@ -448,7 +483,7 @@ begin
    -------------------------------------
    -- Outbound Controller
    -------------------------------------
-   U_ObDma : entity work.AxiStreamDmaRead
+   U_ObDma : entity work.AxiStreamDmaReadKoto 
       generic map (
          TPD_G            => TPD_G,
          AXIS_READY_EN_G  => AXIS_READY_EN_G,
@@ -461,10 +496,12 @@ begin
          axiRst          => axiRst,
          dmaReq          => obReq,
          dmaAck          => obAck,
-         axisMaster      => mAxisMaster,
+--         axisMaster      => mAxisMaster,
+         axisMaster      => mAxisMasterProbe,
          axisSlave       => mAxisSlave,
          axisCtrl        => mAxisCtrl,
-         axiReadMaster   => axiReadMaster,
+--         axiReadMaster   => axiReadMaster,
+         axiReadMaster   => axiReadMasterProbe,
          axiReadSlave    => axiReadSlave
       );
 
@@ -538,7 +575,109 @@ begin
       -- Outputs
       obReq                 <= ob.obReq;
       pendListRd            <= v.pendListRead;
-
+      
    end process;
 
+
+-- MT added
+   ibstateProbe <=   b"00" when ibin.state = S_IDLE_C else
+                     b"01" when ibin.state = S_WAIT_C else
+                     b"10" when ibin.state = S_FIFO_0_C else
+                     b"11";
+   
+   obstateProbe <=   b"00" when obin.state = S_IDLE_C else
+                     b"01" when obin.state = S_FIFO_0_C else
+                     b"10" when obin.state = S_FIFO_1_C else
+                     b"11";
+   
+
+    u_ila : ila_AxiStreamDma
+      port map (clk         => axiClk,
+                trig_in     => dbgout,
+                probe0(0) => axiRst,
+                probe0(32  downto   1) => axilReadMaster.araddr(31 downto 0),
+                probe0(33) => axilReadMaster.arvalid,
+                probe0(34) => axilReadMaster.rready,
+                probe0(66  downto  35) => axilWriteMaster.awaddr(31 downto 0),
+                probe0(67) => axilWriteMaster.awvalid,      
+                probe0(99  downto  68) => axilWriteMaster.wdata(31 downto 0),  -- ==> buffAddr (U_FreeLOad:Din), initialized to 0x3f000000
+                probe0(100) => axilWriteMaster.wvalid,      
+                probe0(101) => axilWriteMaster.bready,         
+                probe0(133  downto 102) => axilReadSlaveProbe.rdata(31 downto 0),
+                probe0(134) => axilReadSlaveProbe.arready,
+                probe0(135) => axilWriteSlaveProbe.awready,      
+                probe0(136) => axilWriteSlaveProbe.bvalid, 
+                probe0(168  downto 137) => ibReq.address(31 downto 0),   -- if(pendListFull = '0') ==> freeLoadDout(31:0) elsif(freeListEmpty='0') ==> freeListDout(31:0)
+                probe0(200  downto 169) => ibReq.maxsize(31 downto 0),
+                probe0(201) => ibReq.request, 
+                probe0(217  downto 202) => sAxisMaster.tData(15 downto 0),
+                probe0(218) => sAxisMaster.tValid, 
+                probe0(219) => sAxisMaster.tLast, 
+                probe0(220) => axiWriteCtrl.pause,
+                probe0(221) => axiWriteSlave.awready,
+                probe0(222) => axiWriteSlave.bvalid,
+                probe0(254  downto 223) => ibAck.size(31 downto 0),
+                probe0(255) => ibAck.done, 
+                probe0(257  downto 256) => ibstateProbe,
+                probe0(258) => sAxisSlaveProbe.tReady, 
+                probe0(290  downto 259) => axiWriteMasterProbe.awaddr(31 downto 0),
+                probe0(298  downto 291) => axiWriteMasterProbe.awlen(7 downto 0),
+                probe0(301  downto 299) => axiWriteMasterProbe.awsize(2 downto 0),
+                probe0(303  downto 302) => axiWriteMasterProbe.awburst(1 downto 0),
+                probe0(367  downto 304) => axiWriteMasterProbe.wdata(63 downto 0),
+                probe0(387  downto 368) => (others=>'0'),
+                probe0(388) => axiWriteMasterProbe.awvalid, 
+                probe0(389) => axiWriteMasterProbe.wlast, 
+                probe0(390) => axiWriteMasterProbe.bready, 
+                probe0(391) => fifoReset, 
+                probe0(392) => r.fifoLoad, 
+                probe0(393) => ib.freeLoadRead, 
+                probe0(394) => freeLoadEmpty, 
+                probe0(395) => freeLoadRd, 
+                probe0(396) => ob.freeListWrite,
+                probe0(428  downto 397) => ob.freeListDin(31 downto 0),
+                probe0(429) => freeListRd,
+                probe0(430) => freeListEmpty,        
+                probe0(431) => ib.pendListWrite, 
+                probe0(463 downto 432) => ib.pendListDin(31 downto 0),
+                probe0(495 downto 464) => pendListDout(31 downto 0),
+                probe0(496)  => pendListEmpty,
+                probe0(497)  => pendListRd,
+                probe0(498)  => pendListFull,
+                probe0(499) => wrEnableProbe,
+                probe0(500) => rdEnableProbe, 
+                probe0(501) => obAck.done, 
+                probe0(503  downto 502) => obstateProbe,
+                probe0(535  downto 504) => obReq.address(31 downto 0),
+                probe0(551  downto 536) => obReq.size(15 downto 0),
+                probe0(552) => obReq.request, 
+                probe0(553) => r.rxEnable, 
+                probe0(554) => obReady,
+                probe0(562   downto 555) => axiReadMasterProbe.arlen(7 downto 0),
+                probe0(594   downto 563) => axiReadMasterProbe.araddr(31 downto 0),
+                probe0(595) => axiReadMasterProbe.arvalid,
+                probe0(596) => axiReadMasterProbe.rready,
+                probe0(597) => axiReadSlave.arready,
+                probe0(598) => axiReadSlave.rvalid,
+                probe0(599) => axiReadSlave.rlast,
+                probe0(663   downto 600) => axiReadSlave.rdata(63 downto 0),
+                probe0(664) => mAxisSlave.tReady,
+                probe0(665) => mAxisCtrl.pause,
+                probe0(666) => mAxisMasterProbe.tValid,
+                probe0(667) => mAxisMasterProbe.tLast,
+                probe0(699   downto 668) => mAxisMasterProbe.tData(31 downto 0)
+--                probe0(699  downto 689) => (others=>'0')
+       );
+    
+      axilReadSlave <= axilReadSlaveProbe;
+      axilWriteSlave <= axilWriteSlaveProbe;
+     
+      sAxisSlave <= sAxisSlaveProbe;
+      axiWriteMaster  <= axiWriteMasterProbe;
+      
+      axiReadMaster  <= axiReadMasterProbe;
+      mAxisMaster    <= mAxisMasterProbe;
+
+     
 end structure;
+
