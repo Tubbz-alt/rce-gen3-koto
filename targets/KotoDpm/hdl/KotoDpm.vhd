@@ -17,7 +17,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.RceG3Pkg.all;
+use work.RceG3Pkg.all; 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
@@ -182,10 +182,16 @@ begin
          userWriteMaster    => userWriteMaster,
          userReadSlave      => userReadSlave,
          userReadMaster     => userReadMaster,
+         -- User Eth Interface (for the 10 Gb Eth communication to CI)
+         userEthUdpIbMaster     => userEthIbMaster,
+         userEthUdpIbSlave      => userEthIbSlave,
+         userEthUdpObMaster     => userEthObMaster,  
+--         userEthUdpObMaster     => open,        -- disconnected output 
+         userEthUdpObSlave      => userEthObSlave,																	  
          -- User Interrupts
          userInterrupt      => (others => '0')  -- force inputs
          );
-
+		 
 --   -- 1 GigE Mapping
 --   ethTxP(0)           <= iethTxP(0);
 --   ethTxM(0)           <= iethTxM(0);
@@ -245,7 +251,7 @@ begin
          dmaIbSlave         => dmaIbSlave,
          -- User 10Gb Ethernet UDP access
          userEthObMaster   => userEthObMaster,
-         userEthObSlave    => userEthObSlave,
+--         userEthObSlave    => userEthObSlave,
          userEthIbMaster   => userEthIbMaster,
          userEthIbSlave    => userEthIbSlave,
          -- Direct DMA access (for 10Gb Eth communication to CI)

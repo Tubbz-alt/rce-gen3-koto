@@ -73,7 +73,7 @@ entity KotoDpmAppCore is
       dmaIbSlave         : in  AxiStreamSlaveArray(2 downto 0);
       -- User 10 Gb Ethernet UDP access
       userEthObMaster   : in   AxiStreamMasterType;
-      userEthObSlave    : out  AxiStreamSlaveType;
+--      userEthObSlave    : out  AxiStreamSlaveType;
       userEthIbMaster   : out  AxiStreamMasterType;
       userEthIbSlave    : in   AxiStreamSlaveType;
       -- User DMA memory access of incoming ADC data via HP[2]: runs at 200 MHz!!
@@ -260,7 +260,7 @@ begin
    dmaObSlave(0)  <= dmaIbSlave(0);
 
    -- User DMA Outbound only,
-   userDmaObSlave   <= AXI_STREAM_SLAVE_INIT_C;
+--   userDmaObSlave   <= AXI_STREAM_SLAVE_INIT_C;
 --   mAxisSlave       <= AXI_STREAM_SLAVE_INIT_C;
    userEthIbSlaveForce   <= AXI_STREAM_SLAVE_FORCE_C;
 
