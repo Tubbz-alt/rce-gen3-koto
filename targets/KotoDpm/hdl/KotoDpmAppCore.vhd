@@ -46,8 +46,8 @@ entity KotoDpmAppCore is
       rtmToDpmHsP        : in  slv(NUM_RX_LANES-1 downto 0);
       rtmToDpmHsM        : in  slv(NUM_RX_LANES-1 downto 0);
       -- DTM Signals
-      dtmRefClkP         : in  sl;
-      dtmRefClkM         : in  sl;
+      dtmRefClkP         : in  sl; -- unused
+      dtmRefClkM         : in  sl; -- unused
       dtmClkP            : in  slv(1 downto 0);
       dtmClkM            : in  slv(1 downto 0);
       dtmFbP             : out sl;
@@ -600,147 +600,13 @@ begin
 --         mAxiWriteMaster    => userWriteMasterProbe,
          mAxiWriteSlave     => userWriteSlave
       );
-
-
---   u_ila : ila_DpmApp
-----     port map ( clk         => sysClk200,   -- drives clk200 to Rx2000Base and axiDmaClk
---     port map ( clk         => axiDmaClk,
---                trig_in     => dbgout,
-----                trig_in_ack => open,
-
-----    0xA000_0000 AxiLight
---       probe0(31  downto   0) => extAxilWriteMaster.awaddr(31 downto 0),
---       probe0(63  downto  32) => extAxilWriteMaster.wdata(31 downto 0),
---       probe0(64)  => extAxilWriteMaster.awvalid,
---       probe0(65)  => extAxilWriteMaster.wvalid,
---       probe0(66)  => '0',
---       probe0(67)  => extAxilWriteMaster.bready,
---       probe0(68) => extAxilWriteSlaveProbe.awready,
---       probe0(69) => extAxilWriteSlaveProbe.wready,
---       probe0(70) => extAxilWriteSlaveProbe.bvalid,
-
---       probe0(102  downto 71) => extAxilReadMaster.araddr(31 downto 0),
---       probe0(103)  => extAxilReadMaster.arvalid,
---       probe0(104) => extAxilReadMaster.rready,
---       probe0(136  downto  105) => extAxilReadSlaveProbe.rdata(31 downto 0),
---       probe0(137) => extAxilReadSlaveProbe.arready,
---       probe0(138) => extAxilReadSlaveProbe.rvalid,
-
-----     AxiLite Crossbar outputs
---       probe0(154  downto  139) => axilWriteMasters(0).awaddr(15 downto 0),
---       probe0(162  downto  155) => axilWriteMasters(0).wdata(7 downto 0),
---       probe0(163) => axilWriteMasters(0).awvalid,
---       probe0(164) => axilWriteMasters(0).wvalid,
---       probe0(165) => axilWriteMasters(0).bready,
---       probe0(166) => axilWriteSlaves(0).awready,
---       probe0(167) => axilWriteSlaves(0).wready,
---       probe0(168) => axilWriteSlaves(0).bvalid,
---       probe0(184  downto  169) => axilReadMasters(0).araddr(15 downto 0),
---       probe0(185) => axilReadMasters(0).arvalid,
---       probe0(186) => axilReadMasters(0).rready,
---       probe0(206  downto  187) => axilReadSlaves(0).rdata(19 downto 0),
---       probe0(207) => axilReadSlaves(0).arready,
---       probe0(208) => axilReadSlaves(0).rvalid,
-
---       probe0(224  downto  209) => axilWriteMasters(1).awaddr(15 downto 0),
---       probe0(232  downto  225) => axilWriteMasters(1).wdata(7 downto 0),
---       probe0(233) => axilWriteMasters(1).awvalid,
---       probe0(234) => axilWriteMasters(1).wvalid,
---       probe0(235) => axilWriteMasters(1).bready,
---       probe0(236) => axilWriteSlaves(1).awready,
---       probe0(237) => axilWriteSlaves(1).wready,
---       probe0(238) => axilWriteSlaves(1).bvalid,
---       probe0(254  downto  239) => axilReadMasters(1).araddr(15 downto 0),
---       probe0(255) => axilReadMasters(1).arvalid,
---       probe0(256) => axilReadMasters(1).rready,
---       probe0(268  downto  257) => axilReadSlaves(1).rdata(11 downto 0),
---       probe0(269) => axilReadSlaves(1).arready,
---       probe0(270) => axilReadSlaves(1).rvalid,
-
-----     RX2000 output to IbFifo
---       probe0(334  downto  271) => RxAxisMaster.tdata(63 downto 0),
---       probe0(335) => RxAxisMaster.tValid,
---       probe0(336) => RxAxisMaster.tLast,
-
-----     IbFifo output to AxiStreamDma
---       probe0(400  downto  337) => userDmaIbMaster.tdata(63 downto 0),
---       probe0(401) => userDmaIbMaster.tValid,
---       probe0(402) => userDmaIbMaster.tLast,
---       probe0(403) => userDmaIbSlave.tReady,
-
-----     AxiStreamDma outputs to IbFifos
---       probe0(404) => sAxisSlave.tReady,
-
-----     AxiWritePath inputs
-----     from AxiStreamDma outputs
---       probe0(420  downto  405) => locWriteMaster.awaddr(15 downto 0),
---       probe0(428  downto  421) => locWriteMaster.wdata(7 downto 0),
---       probe0(429) => locWriteMaster.awvalid,
---       probe0(430) => locWriteMaster.wvalid,
---       probe0(431) => locWriteMaster.wlast,
---       probe0(432) => locWriteMaster.bready,
-----     from DpmCore
---       probe0(433) => userWriteSlave.awready,
---       probe0(434) => userWriteSlave.wready,
---       probe0(435) => userWriteSlave.bvalid,
-
-----     AxiWritePath outputs
-----     to AxiStreamDma
---       probe0(436) => locWriteSlave.awready,
---       probe0(437) => locWriteSlave.bvalid,
---       probe0(438) => locWriteCtrl.pause,
---       probe0(439) => locWriteCtrl.overflow,
-----     to DpmCore
---       probe0(455  downto  440) => userWriteMasterProbe.awaddr(15 downto 0),
---       probe0(519  downto  456) => userWriteMasterProbe.wdata(63 downto 0),
---       probe0(520) => userWriteMasterProbe.awvalid,
---       probe0(521) => userWriteMasterProbe.wvalid,
---       probe0(522) => userWriteMasterProbe.wlast,
---       probe0(523) => userWriteMasterProbe.bready,
-
-----     AxiReadPath inputs
-----     from AxiStreamDma outputs
---       probe0(539  downto  524) => locReadMaster.araddr(15 downto 0),
---       probe0(540) => locReadMaster.arvalid,
---       probe0(541) => locReadMaster.rready,
-----     from DpmCore
---       probe0(542) => userReadSlave.arready,
---       probe0(543) => userReadSlave.rlast,
---       probe0(544) => userReadSlave.rvalid,
---       probe0(560  downto  545) => userreadSlave.rdata(15 downto 0),
-
-----     AxiWritePath outputs
-----     to AxiStreamDma
---       probe0(561) => locReadSlave.arready,
---       probe0(562) => locReadSlave.rlast,
---       probe0(563) => locReadSlave.rvalid,
---       probe0(627  downto  564) => locReadSlave.rdata(63 downto 0),
-----     from DpmCore
---       probe0(643  downto  628) => userReadMasterProbe.araddr(15 downto 0),
---       probe0(644) => userReadMasterProbe.arvalid,
---       probe0(645) => userReadMasterProbe.rready,
-
---       probe0(646) => userDmaObSlave.tReady,
---       probe0(647) => userDmaObCtrl.idle,
---       probe0(648) => userDmaObCtrl.overflow,
---       probe0(649) => userDmaObCtrl.pause,
-
-----     ObFifo inpput/output to 10 Gb Ethener
---       probe0(713  downto  650) => userEthIbMasterProbe.tdata(63 downto 0),
---       probe0(714) => userEthIbMasterProbe.tValid,
---       probe0(715) => userEthIbMasterProbe.tLast,
---       probe0(716) => userEthIbSlave.tReady,
---       probe0(717) => userEthIbSlaveForce.tReady,
-
---       probe0(719  downto  718) => (others => '0')
---      );
-
---      extAxilWriteSlave <= extAxilWriteSlaveProbe;
---      extAxilReadSlave  <= extAxilReadSlaveProbe;
-
---      userWriteMaster <= userWriteMasterProbe;
---      userReadMaster  <= userReadMasterProbe;
-
---      userEthIbMaster <= userEthIbMasterProbe;
+      
+      -- dtmRefClk termination block
+      ibufds_dtmrefclk : IBUFDS_GTE2
+      port map ( O               =>   open,
+                 ODIV2           =>   open,
+                 CEB             =>   '0',
+                 I               =>   dtmRefClkP,
+                 IB              =>   dtmRefClkM );
 
 end mapping;

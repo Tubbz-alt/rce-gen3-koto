@@ -110,6 +110,7 @@ architecture rtl of Rx2000BaseX_2B_dbg is
         txPacket       : sl;
         loopback       : slv(2 downto 0);
         rxReset        : sl;
+        rxEnable       : sl;
         testVal        : slv(31 downto 0);
         srcMac         : slv(47 downto 0);  -- Ethernet header (source MAC address) 6 Bytes
         ramWr          : sl;
@@ -124,6 +125,7 @@ architecture rtl of Rx2000BaseX_2B_dbg is
         txPacket       => '0',
         loopback       => "000",
         rxReset        => '0',
+        rxEnable       => '0',
         testVal        => (others=>'0'),
         srcMac         => x"08005600445d",
         ramWr          => '0',
@@ -232,7 +234,6 @@ architecture rtl of Rx2000BaseX_2B_dbg is
     signal dbgWrEn : slv(NUM_RX_LANES-1 downto 0);
     signal dbgWrFull : slv(NUM_RX_LANES-1 downto 0);
 
-    signal rxEnWrite : sl := '0';
     signal rxEnable : sl := '0';
     signal fifoRst : sl := '0';
 
@@ -419,7 +420,7 @@ begin
     ------------------------------------------------
     combAxi : process (axilReadMaster, axilWriteMaster, locRst, rAxi,
                        eventCnt, dataCnt, dropCnt, txStatus, txStatusCnt, rxStatus, rxStatusCnt,
-                       rxEnable, dbgRdEmpty, dbgRdData) is
+                       dbgRdEmpty, dbgRdData) is
         variable v             : RegTypeAxi;
         variable axilStatus    : AxiLiteStatusType;
         variable axilWriteResp : slv(1 downto 0);
@@ -433,8 +434,6 @@ begin
 
         fifoRst   <= '0';  -- HIGH only for 1 clock!
         dbgRdEn   <= (others => '0'); -- Tell the FIFO providing debug data to stop outputting for now
-        rxEnWrite <= '0';
-
         ---------------------------------------------------------------------
         -- Axi-Lite interface: Adresses correspond to offset from 0xA0000000
         ---------------------------------------------------------------------
@@ -450,7 +449,7 @@ begin
                                 v.rxReset     := axilWriteMaster.wdata(3);
                 when X"30"  =>  fifoRst     <= '1';    -- write 8c X
                 -- MT added:  controls data into RX_FIFO (in case fiber is not connected)
-                when X"34"  =>  rxEnWrite   <= '1'; -- write 8d 1/0 to set HIGH/LOW
+                when X"34"  =>  v.rxEnable    := axilWriteMaster.wdata(0);   -- write 8d 1/0 ti set HIGH/LOW
                 -- MT added
                 when X"40"  =>  v.srcMac(31 downto 0)     := axilWriteMaster.wdata;
                 when X"44"  =>  v.srcMac(47 downto 32)    := axilWriteMaster.wdata(15 downto 0);
@@ -503,7 +502,7 @@ begin
                     v.axilReadSlave.rdata(23 downto 0) := dbgRdData(i);  -- rx data content (U_dbgFifo : entity work.FifoAsync)
                     dbgRdEn(i) <= '1';
                 when 15 =>   -- position X"3C"
-                        v.axilReadSlave.rdata(0) := rxEnable;
+                    v.axilReadSlave.rdata(0) := rAxi.rxEnable;
                 when others => -- invalid position
                     axilReadResp := AXI_ERROR_RESP_G;
             end case;
@@ -517,6 +516,7 @@ begin
         -- Outputs
         axilReadSlave  <= rAxi.axilReadSlave;
         axilWriteSlave <= rAxi.axilWriteSlave;
+        rxEnable       <= rAxi.rxEnable;
     end process combAxi;
 
 -- MT added: sync fifoRst with RX(0) recovered clock
@@ -526,15 +526,6 @@ begin
          dbgRst <= fifoRst after TPD_G;
       end if;
    end process rx0_Rst;
-
-
--- MT added, to hold rxEnable value
-   fdrce : process(rxEnWrite,locClk) is  --process with sensitivity list.
-   begin  --"begin" statement for the process.
-     if ( rxEnWrite = '1' and  rising_edge(locClk) ) then
-        rxEnable <= axilWriteMaster.wdata(0);
-     end if;
-   end process fdrce;  --end of process statement.
 
 
     combTx : process (rTx,txPacket) is
