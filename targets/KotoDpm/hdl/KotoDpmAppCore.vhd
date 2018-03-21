@@ -91,29 +91,6 @@ architecture mapping of KotoDpmAppCore is
 
    signal userEthIbSlaveForce   : AxiStreamSlaveType;
 
----- add for ILA
---   signal extAxilReadSlaveProbe  : AxiLiteReadSlaveType;
---   signal extAxilWriteSlaveProbe : AxiLiteWriteSlaveType;
---   attribute mark_debug of extAxilReadSlaveProbe : signal is "true";
---   attribute mark_debug of extAxilWriteSlaveProbe : signal is "true";
-
---   signal userWriteMasterProbe : AxiWriteMasterType;
---   signal userReadMasterProbe  : AxiReadMasterType;
---   attribute mark_debug of userWriteMasterProbe : signal is "true";
---   attribute mark_debug of userReadMasterProbe : signal is "true";
-
---   signal userEthIbMasterProbe   : AxiStreamMasterType;
---   attribute mark_debug of userEthIbMasterProbe : signal is "true";
-
-
---   component ila_DpmApp
---    PORT ( clk         : IN STD_LOGIC;
---           trig_in     : IN STD_LOGIC;
-----           trig_in_ack : OUT STD_LOGIC;
---           probe0      : IN STD_LOGIC_VECTOR(719 DOWNTO 0) );
---   end component;
----- end
-
    signal sysClk : sl;
    signal sysRst : sl;
 

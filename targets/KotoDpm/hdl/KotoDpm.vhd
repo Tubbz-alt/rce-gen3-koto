@@ -130,7 +130,7 @@ begin
          BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
 --         RCE_DMA_MODE_G => RCE_DMA_PPI_C,
-         OLD_BSI_MODE_G => false,
+--         OLD_BSI_MODE_G => false, -- not in latest DmpCore Mar 16, 2018
 --         ETH_10G_EN_G   => false,
          ETH_10G_EN_G   => true,
          AXI_ST_COUNT_G => 3,
